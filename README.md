@@ -1,4 +1,4 @@
-# pneumatic_door_controller
+# cnc_pneumatic
 A simple pneumatic door controller
 
 This simple project is for my CNC which now has a pneumatic door (operated by pneumatic cylinders) and a pneumatic valve.
