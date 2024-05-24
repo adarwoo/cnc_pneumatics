@@ -1,0 +1,77 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "hub", "hub\hub.cproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
+EndProject
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "controller", "controller\controller.cppproj", "{5764C427-76A3-4304-9E24-98CF13FBBA9D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "asx", "asx", "{E30A2C65-9EB8-4069-ACA6-2A17B7EB93DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7E2BE5AE-FEA4-4761-AE0D-FAC18227A591}"
+	ProjectSection(SolutionItems) = preProject
+		asx\src\_ccp.s = asx\src\_ccp.s
+		asx\src\alert.c = asx\src\alert.c
+		asx\src\builtin.cpp = asx\src\builtin.cpp
+		asx\src\ccp.c = asx\src\ccp.c
+		asx\src\digital_input.c = asx\src\digital_input.c
+		asx\src\digital_output.c = asx\src\digital_output.c
+		asx\src\mem.c = asx\src\mem.c
+		asx\src\piezzo.c = asx\src\piezzo.c
+		asx\src\queue.c = asx\src\queue.c
+		asx\src\reactor.c = asx\src\reactor.c
+		asx\src\sysclk.c = asx\src\sysclk.c
+		asx\src\timer.c = asx\src\timer.c
+		asx\src\twim.c = asx\src\twim.c
+		asx\src\twis.c = asx\src\twis.c
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{2B386131-0118-409E-9FA7-D4EBDDC3D66D}"
+	ProjectSection(SolutionItems) = preProject
+		asx\include\alert.h = asx\include\alert.h
+		asx\include\board.h = asx\include\board.h
+		asx\include\builtin.hpp = asx\include\builtin.hpp
+		asx\include\ccp.h = asx\include\ccp.h
+		asx\include\compiler.h = asx\include\compiler.h
+		asx\include\cpp.h = asx\include\cpp.h
+		asx\include\debug.h = asx\include\debug.h
+		asx\include\digital_input.h = asx\include\digital_input.h
+		asx\include\digital_output.h = asx\include\digital_output.h
+		asx\include\ioport.h = asx\include\ioport.h
+		asx\include\mem.h = asx\include\mem.h
+		asx\include\osc.h = asx\include\osc.h
+		asx\include\piezzo.h = asx\include\piezzo.h
+		asx\include\queue.h = asx\include\queue.h
+		asx\include\reactor.h = asx\include\reactor.h
+		asx\include\sound.h = asx\include\sound.h
+		asx\include\sysclk.h = asx\include\sysclk.h
+		asx\include\timer.h = asx\include\timer.h
+		asx\include\twi_common.h = asx\include\twi_common.h
+		asx\include\twim.h = asx\include\twim.h
+		asx\include\typestring.hpp = asx\include\typestring.hpp
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.ActiveCfg = Debug|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.Build.0 = Debug|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.ActiveCfg = Release|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.Build.0 = Release|AVR
+		{5764C427-76A3-4304-9E24-98CF13FBBA9D}.Debug|AVR.ActiveCfg = Debug|AVR
+		{5764C427-76A3-4304-9E24-98CF13FBBA9D}.Debug|AVR.Build.0 = Debug|AVR
+		{5764C427-76A3-4304-9E24-98CF13FBBA9D}.Release|AVR.ActiveCfg = Release|AVR
+		{5764C427-76A3-4304-9E24-98CF13FBBA9D}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7E2BE5AE-FEA4-4761-AE0D-FAC18227A591} = {E30A2C65-9EB8-4069-ACA6-2A17B7EB93DC}
+		{2B386131-0118-409E-9FA7-D4EBDDC3D66D} = {E30A2C65-9EB8-4069-ACA6-2A17B7EB93DC}
+	EndGlobalSection
+EndGlobal

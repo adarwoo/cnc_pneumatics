@@ -1,0 +1,1898 @@
+Archive member included to satisfy reference by file (symbol)
+
+/usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+                              avr_release/asx/src/queue.o (__divmodhi4)
+/usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+                              /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o (exit)
+/usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+                              avr_release/asx/src/digital_input.o (__do_copy_data)
+/usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+                              avr_release/asx/src/digital_input.o (__do_clear_bss)
+/usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+                              /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o) (__udivmodhi4)
+/usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(qsort.o)
+                              avr_release/asx/src/reactor.o (qsort)
+/usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(memset.o)
+                              avr_release/asx/src/mem.o (memset)
+/usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+                              /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(qsort.o) (__prologue_saves__)
+/usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+                              /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(qsort.o) (__epilogue_restores__)
+
+Allocating common symbols
+Common symbol       size              file
+
+reactor_notifications
+                    0x2               avr_release/asx/src/reactor.o
+react_on_sample     0x1               avr_release/pressure_mon.o
+react_accept_comms  0x1               avr_release/protocol.o
+_reactor            0x1               avr_release/asx/src/digital_output.o
+react_check_comms   0x1               avr_release/protocol.o
+slave               0x19              avr_release/i2c_slave.o
+
+Discarded input sections
+
+ .data          0x0000000000000000        0x0 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+ .bss           0x0000000000000000        0x0 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/alert.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/alert.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/alert.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/alert.o
+ .text.alert_init
+                0x0000000000000000        0x2 avr_release/asx/src/alert.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/builtin.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/builtin.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/builtin.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/builtin.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/builtin.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/builtin.o
+ .rodata.str1.1
+                0x0000000000000000       0x17 avr_release/asx/src/builtin.o
+ .text.__cxa_pure_virtual
+                0x0000000000000000        0xe avr_release/asx/src/builtin.o
+ .debug_info    0x0000000000000000       0x7d avr_release/asx/src/builtin.o
+ .debug_abbrev  0x0000000000000000       0x5d avr_release/asx/src/builtin.o
+ .debug_aranges
+                0x0000000000000000       0x20 avr_release/asx/src/builtin.o
+ .debug_ranges  0x0000000000000000       0x10 avr_release/asx/src/builtin.o
+ .debug_macro   0x0000000000000000       0x29 avr_release/asx/src/builtin.o
+ .debug_macro   0x0000000000000000      0xb14 avr_release/asx/src/builtin.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/builtin.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/builtin.o
+ .debug_line    0x0000000000000000       0x90 avr_release/asx/src/builtin.o
+ .debug_str     0x0000000000000000     0x3031 avr_release/asx/src/builtin.o
+ .comment       0x0000000000000000       0x12 avr_release/asx/src/builtin.o
+ .debug_frame   0x0000000000000000       0x24 avr_release/asx/src/builtin.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/ccp.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/ccp.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/ccp.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/ccp.o
+ .debug_info    0x0000000000000000       0x21 avr_release/asx/src/ccp.o
+ .debug_abbrev  0x0000000000000000       0x13 avr_release/asx/src/ccp.o
+ .debug_aranges
+                0x0000000000000000       0x18 avr_release/asx/src/ccp.o
+ .debug_macro   0x0000000000000000       0x11 avr_release/asx/src/ccp.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/ccp.o
+ .debug_line    0x0000000000000000       0x2e avr_release/asx/src/ccp.o
+ .debug_str     0x0000000000000000     0x2b34 avr_release/asx/src/ccp.o
+ .comment       0x0000000000000000       0x12 avr_release/asx/src/ccp.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/_ccp.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/_ccp.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/_ccp.o
+ .text.ccp_write_io
+                0x0000000000000000        0xa avr_release/asx/src/_ccp.o
+ .debug_line    0x0000000000000000       0x57 avr_release/asx/src/_ccp.o
+ .debug_info    0x0000000000000000       0x5a avr_release/asx/src/_ccp.o
+ .debug_abbrev  0x0000000000000000       0x14 avr_release/asx/src/_ccp.o
+ .debug_aranges
+                0x0000000000000000       0x20 avr_release/asx/src/_ccp.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_input.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/digital_input.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/digital_input.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/digital_input.o
+ .text._digital_input_sample
+                0x0000000000000000       0xc6 avr_release/asx/src/digital_input.o
+ .rodata.str1.1
+                0x0000000000000000       0x1b avr_release/asx/src/digital_input.o
+ .text.digital_input
+                0x0000000000000000       0x86 avr_release/asx/src/digital_input.o
+ .text.digital_input_init
+                0x0000000000000000       0xc0 avr_release/asx/src/digital_input.o
+ .bss._react_handle_change
+                0x0000000000000000        0x1 avr_release/asx/src/digital_input.o
+ .bss._digital_input_next_sampled_entry
+                0x0000000000000000        0x1 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000      0x2fc avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000000000       0x66 avr_release/asx/src/digital_input.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/digital_output.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/digital_output.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/digital_output.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/digital_output.o
+ .text._digital_output_reactor_handler
+                0x0000000000000000       0xfc avr_release/asx/src/digital_output.o
+ .text.digitial_output_set
+                0x0000000000000000       0x58 avr_release/asx/src/digital_output.o
+ .text.digitial_output_toggle
+                0x0000000000000000       0x4a avr_release/asx/src/digital_output.o
+ .text.digitial_output_start
+                0x0000000000000000       0x56 avr_release/asx/src/digital_output.o
+ .text.digital_output_init
+                0x0000000000000000       0x12 avr_release/asx/src/digital_output.o
+ .text.digital_output
+                0x0000000000000000       0x24 avr_release/asx/src/digital_output.o
+ .bss._number_of_outputs
+                0x0000000000000000        0x1 avr_release/asx/src/digital_output.o
+ .debug_info    0x0000000000000000      0xb6a avr_release/asx/src/digital_output.o
+ .debug_abbrev  0x0000000000000000      0x30d avr_release/asx/src/digital_output.o
+ .debug_loc     0x0000000000000000      0x792 avr_release/asx/src/digital_output.o
+ .debug_aranges
+                0x0000000000000000       0x48 avr_release/asx/src/digital_output.o
+ .debug_ranges  0x0000000000000000       0x98 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000      0x1d3 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000      0x302 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000      0x174 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x66 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/digital_output.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/digital_output.o
+ .debug_line    0x0000000000000000      0x4ed avr_release/asx/src/digital_output.o
+ .debug_str     0x0000000000000000    0x19125 avr_release/asx/src/digital_output.o
+ .comment       0x0000000000000000       0x12 avr_release/asx/src/digital_output.o
+ .debug_frame   0x0000000000000000       0xe8 avr_release/asx/src/digital_output.o
+ COMMON         0x0000000000000000        0x1 avr_release/asx/src/digital_output.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/mem.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/mem.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/mem.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000      0x302 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/mem.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/queue.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/queue.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/queue.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/queue.o
+ .text.queue_push
+                0x0000000000000000       0x42 avr_release/asx/src/queue.o
+ .text.queue_pop
+                0x0000000000000000       0x54 avr_release/asx/src/queue.o
+ .text.queue_leftpush
+                0x0000000000000000       0x44 avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000       0x97 avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000       0x97 avr_release/asx/src/queue.o
+ .debug_macro   0x0000000000000000       0x5a avr_release/asx/src/queue.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/reactor.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/reactor.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/reactor.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000      0x2fc avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x62 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000      0x10e avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x66 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/reactor.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/sysclk.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/sysclk.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/sysclk.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/sysclk.o
+ .text.sysclk_init
+                0x0000000000000000        0xa avr_release/asx/src/sysclk.o
+ .debug_info    0x0000000000000000      0x25a avr_release/asx/src/sysclk.o
+ .debug_abbrev  0x0000000000000000      0x116 avr_release/asx/src/sysclk.o
+ .debug_aranges
+                0x0000000000000000       0x20 avr_release/asx/src/sysclk.o
+ .debug_ranges  0x0000000000000000       0x10 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000      0x1a1 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000      0x2fc avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000      0x174 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x66 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x46 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x9b avr_release/asx/src/sysclk.o
+ .debug_macro   0x0000000000000000       0x5e avr_release/asx/src/sysclk.o
+ .debug_line    0x0000000000000000      0x2c0 avr_release/asx/src/sysclk.o
+ .debug_str     0x0000000000000000    0x19010 avr_release/asx/src/sysclk.o
+ .comment       0x0000000000000000       0x12 avr_release/asx/src/sysclk.o
+ .debug_frame   0x0000000000000000       0x24 avr_release/asx/src/sysclk.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/timer.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/timer.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/timer.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/timer.o
+ .text.timer_get_count
+                0x0000000000000000       0x12 avr_release/asx/src/timer.o
+ .text.timer_init
+                0x0000000000000000       0x4c avr_release/asx/src/timer.o
+ .text.timer_time_lapsed_since
+                0x0000000000000000       0x3a avr_release/asx/src/timer.o
+ .text.timer_dispatch
+                0x0000000000000000       0xe4 avr_release/asx/src/timer.o
+ .text.timer_cancel
+                0x0000000000000000       0xa8 avr_release/asx/src/timer.o
+ .data._timer_slot_reactor
+                0x0000000000000000        0x1 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x97 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000      0x302 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x42 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x5a avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000000000       0x46 avr_release/asx/src/timer.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .text          0x0000000000000000        0x0 avr_release/asx/src/twis.o
+ .data          0x0000000000000000        0x0 avr_release/asx/src/twis.o
+ .bss           0x0000000000000000        0x0 avr_release/asx/src/twis.o
+ .text.TWI_SlaveTransactionFinished
+                0x0000000000000000        0x8 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000      0x2fc avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000      0x174 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x66 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/asx/src/twis.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/board.o
+ .text          0x0000000000000000        0x0 avr_release/board.o
+ .data          0x0000000000000000        0x0 avr_release/board.o
+ .bss           0x0000000000000000        0x0 avr_release/board.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/board.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/board.o
+ .debug_macro   0x0000000000000000      0x2fc avr_release/board.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/board.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/board.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/board.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/board.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/board.o
+ .debug_macro   0x0000000000000000      0x174 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/board.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x66 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/board.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/board.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/board.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/board.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/board.o
+ .debug_macro   0x0000000000000000       0x46 avr_release/board.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/protocol.o
+ .text          0x0000000000000000        0x0 avr_release/protocol.o
+ .data          0x0000000000000000        0x0 avr_release/protocol.o
+ .bss           0x0000000000000000        0x0 avr_release/protocol.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/protocol.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/protocol.o
+ .debug_macro   0x0000000000000000      0x2fc avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/protocol.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x97 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0xfd avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x5a avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/protocol.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/protocol.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/protocol.o
+ .debug_macro   0x0000000000000000       0x46 avr_release/protocol.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/i2c_slave.o
+ .text          0x0000000000000000        0x0 avr_release/i2c_slave.o
+ .data          0x0000000000000000        0x0 avr_release/i2c_slave.o
+ .bss           0x0000000000000000        0x0 avr_release/i2c_slave.o
+ .data.allow_change
+                0x0000000000000000        0x1 avr_release/i2c_slave.o
+ .data.last_good_command
+                0x0000000000000000        0x1 avr_release/i2c_slave.o
+ .bss.data      0x0000000000000000        0x2 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x97 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000      0x302 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0xfd avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x5a avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/i2c_slave.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/pressure_mon.o
+ .text          0x0000000000000000        0x0 avr_release/pressure_mon.o
+ .data          0x0000000000000000        0x0 avr_release/pressure_mon.o
+ .bss           0x0000000000000000        0x0 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000      0x2fc avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000      0x174 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x66 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x46 avr_release/pressure_mon.o
+ .debug_macro   0x0000000000000000       0x2e avr_release/pressure_mon.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .group         0x0000000000000000        0x8 avr_release/main.o
+ .text          0x0000000000000000        0x0 avr_release/main.o
+ .data          0x0000000000000000        0x0 avr_release/main.o
+ .bss           0x0000000000000000        0x0 avr_release/main.o
+ .debug_macro   0x0000000000000000      0xa60 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/main.o
+ .debug_macro   0x0000000000000000      0x1c9 avr_release/main.o
+ .debug_macro   0x0000000000000000      0x2fc avr_release/main.o
+ .debug_macro   0x0000000000000000       0x9e avr_release/main.o
+ .debug_macro   0x0000000000000000       0x19 avr_release/main.o
+ .debug_macro   0x0000000000000000     0x3cdf avr_release/main.o
+ .debug_macro   0x0000000000000000       0x9a avr_release/main.o
+ .debug_macro   0x0000000000000000       0xa5 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x18 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x34 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x22 avr_release/main.o
+ .debug_macro   0x0000000000000000      0x174 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/main.o
+ .debug_macro   0x0000000000000000       0x35 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x66 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x96 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x17 avr_release/main.o
+ .debug_macro   0x0000000000000000      0x250 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x76 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/main.o
+ .debug_macro   0x0000000000000000      0x6d9 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x10 avr_release/main.o
+ .debug_macro   0x0000000000000000       0xe2 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x40 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x69 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x1c avr_release/main.o
+ .debug_macro   0x0000000000000000       0xe4 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x46 avr_release/main.o
+ .debug_macro   0x0000000000000000       0x16 avr_release/main.o
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .text.libgcc.mul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .text.libgcc   0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .text.libgcc.prologue
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .text.libgcc.builtins
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .text.libgcc.fmul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .text.libgcc.fixed
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .text.libgcc.mul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .text.libgcc.div
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .text.libgcc   0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .text.libgcc.prologue
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .text.libgcc.builtins
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .text.libgcc.fmul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .text.libgcc.fixed
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .text.libgcc.mul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .text.libgcc.div
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .text.libgcc   0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .text.libgcc.prologue
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .text.libgcc.builtins
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .text.libgcc.fmul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .text.libgcc.fixed
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .text.libgcc.mul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .text.libgcc.div
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .text.libgcc   0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .text.libgcc.prologue
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .text.libgcc.builtins
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .text.libgcc.fmul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .text.libgcc.fixed
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.mul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .text.libgcc   0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.prologue
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.builtins
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.fmul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.fixed
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(qsort.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(qsort.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(qsort.o)
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(memset.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(memset.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(memset.o)
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .text.libgcc.mul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .text.libgcc.div
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .text.libgcc   0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .text.libgcc.builtins
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .text.libgcc.fmul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .text.libgcc.fixed
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+ .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+ .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+ .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+ .text.libgcc.mul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+ .text.libgcc.div
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+ .text.libgcc   0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+ .text.libgcc.builtins
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+ .text.libgcc.fmul
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+ .text.libgcc.fixed
+                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x0000000000000000 0x0000000000004000 xr
+data             0x0000000000803800 0x0000000000000800 rw !x
+eeprom           0x0000000000810000 0x0000000000000100 rw !x
+fuse             0x0000000000820000 0x000000000000000a rw !x
+lock             0x0000000000830000 0x0000000000000400 rw !x
+signature        0x0000000000840000 0x0000000000000400 rw !x
+user_signatures  0x0000000000850000 0x0000000000000400 rw !x
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+Address of section .data set to 0x803800
+                0x0000000000008000                __RODATA_PM_OFFSET__ = 0x8000
+LOAD /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+START GROUP
+LOAD avr_release/asx/src/alert.o
+LOAD avr_release/asx/src/builtin.o
+LOAD avr_release/asx/src/ccp.o
+LOAD avr_release/asx/src/_ccp.o
+LOAD avr_release/asx/src/digital_input.o
+LOAD avr_release/asx/src/digital_output.o
+LOAD avr_release/asx/src/mem.o
+LOAD avr_release/asx/src/queue.o
+LOAD avr_release/asx/src/reactor.o
+LOAD avr_release/asx/src/sysclk.o
+LOAD avr_release/asx/src/timer.o
+LOAD avr_release/asx/src/twis.o
+LOAD avr_release/board.o
+LOAD avr_release/protocol.o
+LOAD avr_release/i2c_slave.o
+LOAD avr_release/pressure_mon.o
+LOAD avr_release/main.o
+END GROUP
+START GROUP
+LOAD /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libm.a
+END GROUP
+LOAD /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a
+LOAD /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libm.a
+START GROUP
+LOAD /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a
+LOAD /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libm.a
+LOAD /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a
+LOAD /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/libattiny1626.a
+END GROUP
+                [0x0000000000000000]                __TEXT_REGION_ORIGIN__ = DEFINED (__TEXT_REGION_ORIGIN__)?__TEXT_REGION_ORIGIN__:0x0
+                [0x0000000000803800]                __DATA_REGION_ORIGIN__ = DEFINED (__DATA_REGION_ORIGIN__)?__DATA_REGION_ORIGIN__:0x802000
+                [0x0000000000004000]                __TEXT_REGION_LENGTH__ = DEFINED (__TEXT_REGION_LENGTH__)?__TEXT_REGION_LENGTH__:0x100000
+                [0x0000000000000800]                __DATA_REGION_LENGTH__ = DEFINED (__DATA_REGION_LENGTH__)?__DATA_REGION_LENGTH__:0xffa0
+                [0x0000000000000100]                __EEPROM_REGION_LENGTH__ = DEFINED (__EEPROM_REGION_LENGTH__)?__EEPROM_REGION_LENGTH__:0x10000
+                [0x000000000000000a]                __FUSE_REGION_LENGTH__ = DEFINED (__FUSE_REGION_LENGTH__)?__FUSE_REGION_LENGTH__:0x400
+                0x0000000000000400                __LOCK_REGION_LENGTH__ = DEFINED (__LOCK_REGION_LENGTH__)?__LOCK_REGION_LENGTH__:0x400
+                0x0000000000000400                __SIGNATURE_REGION_LENGTH__ = DEFINED (__SIGNATURE_REGION_LENGTH__)?__SIGNATURE_REGION_LENGTH__:0x400
+                0x0000000000000400                __USER_SIGNATURE_REGION_LENGTH__ = DEFINED (__USER_SIGNATURE_REGION_LENGTH__)?__USER_SIGNATURE_REGION_LENGTH__:0x400
+                0x0000000000008000                __RODATA_PM_OFFSET__ = DEFINED (__RODATA_PM_OFFSET__)?__RODATA_PM_OFFSET__:0x8000
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x0000000000000000     0x12ce
+ *(.vectors)
+ .vectors       0x0000000000000000       0x78 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+                0x0000000000000000                __vectors
+                0x0000000000000000                __vector_default
+ *(.vectors)
+ *(.progmem.gcc*)
+                0x0000000000000078                . = ALIGN (0x2)
+                0x0000000000000078                __trampolines_start = .
+ *(.trampolines)
+ .trampolines   0x0000000000000078        0x0 linker stubs
+ *(.trampolines*)
+                0x0000000000000078                __trampolines_end = .
+ *libprintf_flt.a:*(.progmem.data)
+ *libc.a:*(.progmem.data)
+ *(.progmem*)
+                0x0000000000000078                . = ALIGN (0x2)
+ *(.jumptables)
+ *(.jumptables*)
+ *(.lowtext)
+ *(.lowtext*)
+                0x0000000000000078                __ctors_start = .
+ *(.ctors)
+                0x0000000000000078                __ctors_end = .
+                0x0000000000000078                __dtors_start = .
+ *(.dtors)
+                0x0000000000000078                __dtors_end = .
+ SORT(*)(.ctors)
+ SORT(*)(.dtors)
+ *(.init0)
+ .init0         0x0000000000000078        0x0 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+                0x0000000000000078                __init
+ *(.init0)
+ *(.init1)
+ *(.init1)
+ *(.init2)
+ .init2         0x0000000000000078        0xc /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+ *(.init2)
+ *(.init3)
+ *(.init3)
+ *(.init4)
+ .init4         0x0000000000000084       0x16 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_copy_data.o)
+                0x0000000000000084                __do_copy_data
+ .init4         0x000000000000009a       0x10 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_clear_bss.o)
+                0x000000000000009a                __do_clear_bss
+ *(.init4)
+ *(.init5)
+ *(.init5)
+ *(.init6)
+ *(.init6)
+ *(.init7)
+ *(.init7)
+ *(.init8)
+ *(.init8)
+ *(.init9)
+ .init9         0x00000000000000aa        0x8 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+ *(.init9)
+ *(.text)
+ .text          0x00000000000000b2        0x4 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+                0x00000000000000b2                __vector_22
+                0x00000000000000b2                __vector_28
+                0x00000000000000b2                __vector_1
+                0x00000000000000b2                __vector_24
+                0x00000000000000b2                __vector_12
+                0x00000000000000b2                __bad_interrupt
+                0x00000000000000b2                __vector_3
+                0x00000000000000b2                __vector_23
+                0x00000000000000b2                __vector_11
+                0x00000000000000b2                __vector_13
+                0x00000000000000b2                __vector_17
+                0x00000000000000b2                __vector_19
+                0x00000000000000b2                __vector_27
+                0x00000000000000b2                __vector_5
+                0x00000000000000b2                __vector_4
+                0x00000000000000b2                __vector_9
+                0x00000000000000b2                __vector_2
+                0x00000000000000b2                __vector_21
+                0x00000000000000b2                __vector_15
+                0x00000000000000b2                __vector_29
+                0x00000000000000b2                __vector_8
+                0x00000000000000b2                __vector_26
+                0x00000000000000b2                __vector_10
+                0x00000000000000b2                __vector_16
+                0x00000000000000b2                __vector_18
+                0x00000000000000b2                __vector_20
+                0x00000000000000b6                . = ALIGN (0x2)
+ *(.text.*)
+ .text.alert_record
+                0x00000000000000b6        0x6 avr_release/asx/src/alert.o
+                0x00000000000000b6                alert_record
+ .text._handle_pin_change_isr
+                0x00000000000000bc      0x130 avr_release/asx/src/digital_input.o
+ .text.__vector_6
+                0x00000000000001ec       0x4e avr_release/asx/src/digital_input.o
+                0x00000000000001ec                __vector_6
+ .text.__vector_7
+                0x000000000000023a       0x4e avr_release/asx/src/digital_input.o
+                0x000000000000023a                __vector_7
+ .text.mem_calloc
+                0x0000000000000288       0x64 avr_release/asx/src/mem.o
+                0x0000000000000288                mem_calloc
+ .text.queue_init
+                0x00000000000002ec       0x44 avr_release/asx/src/queue.o
+                0x00000000000002ec                queue_init
+ .text.queue_is_empty
+                0x0000000000000330       0x18 avr_release/asx/src/queue.o
+                0x0000000000000330                queue_is_empty
+ .text.queue_leftpop
+                0x0000000000000348       0x4c avr_release/asx/src/queue.o
+                0x0000000000000348                queue_leftpop
+ .text.queue_ringpush
+                0x0000000000000394       0x56 avr_release/asx/src/queue.o
+                0x0000000000000394                queue_ringpush
+ .text.compare_prio
+                0x00000000000003ea       0x22 avr_release/asx/src/reactor.o
+ .text.reactor_init
+                0x000000000000040c       0x20 avr_release/asx/src/reactor.o
+                0x000000000000040c                reactor_init
+ .text.reactor_register
+                0x000000000000042c       0x70 avr_release/asx/src/reactor.o
+                0x000000000000042c                reactor_register
+ .text.reactor_notify
+                0x000000000000049c       0x34 avr_release/asx/src/reactor.o
+                0x000000000000049c                reactor_notify
+ .text.reactor_run
+                0x00000000000004d0      0x1d8 avr_release/asx/src/reactor.o
+                0x00000000000004d0                reactor_run
+ .text.timer_get_count_from_now
+                0x00000000000006a8       0x22 avr_release/asx/src/timer.o
+                0x00000000000006a8                timer_get_count_from_now
+ .text.timer_arm
+                0x00000000000006ca      0x19c avr_release/asx/src/timer.o
+                0x00000000000006ca                timer_arm
+ .text.__vector_25
+                0x0000000000000866       0x80 avr_release/asx/src/timer.o
+                0x0000000000000866                __vector_25
+ .text.TWI_SlaveInitializeDriver
+                0x00000000000008e6       0x16 avr_release/asx/src/twis.o
+                0x00000000000008e6                TWI_SlaveInitializeDriver
+ .text.TWI_SlaveInitializeModule
+                0x00000000000008fc       0x16 avr_release/asx/src/twis.o
+                0x00000000000008fc                TWI_SlaveInitializeModule
+ .text.TWI_SlaveAddressMatchHandler
+                0x0000000000000912       0x3e avr_release/asx/src/twis.o
+                0x0000000000000912                TWI_SlaveAddressMatchHandler
+ .text.TWI_SlaveStopHandler
+                0x0000000000000950       0x2a avr_release/asx/src/twis.o
+                0x0000000000000950                TWI_SlaveStopHandler
+ .text.TWI_SlaveReadHandler
+                0x000000000000097a       0x60 avr_release/asx/src/twis.o
+                0x000000000000097a                TWI_SlaveReadHandler
+ .text.TWI_SlaveWriteHandler
+                0x00000000000009da       0x5a avr_release/asx/src/twis.o
+                0x00000000000009da                TWI_SlaveWriteHandler
+ .text.TWI_SlaveDataHandler
+                0x0000000000000a34       0x12 avr_release/asx/src/twis.o
+                0x0000000000000a34                TWI_SlaveDataHandler
+ .text.TWI_SlaveInterruptHandler
+                0x0000000000000a46       0x48 avr_release/asx/src/twis.o
+                0x0000000000000a46                TWI_SlaveInterruptHandler
+ .text.board_init
+                0x0000000000000a8e       0x3e avr_release/board.o
+                0x0000000000000a8e                board_init
+ .text._on_accept_command_again
+                0x0000000000000acc        0x8 avr_release/protocol.o
+                0x0000000000000acc                _on_accept_command_again
+ .text.protocol_process
+                0x0000000000000ad4      0x140 avr_release/protocol.o
+                0x0000000000000ad4                protocol_process
+ .text._on_check_comms
+                0x0000000000000c14       0x4e avr_release/protocol.o
+ .text.protocol_init
+                0x0000000000000c62       0x54 avr_release/protocol.o
+                0x0000000000000c62                protocol_init
+ .text.slave_process
+                0x0000000000000cb6       0x36 avr_release/i2c_slave.o
+ .text.__vector_14
+                0x0000000000000cec       0x4c avr_release/i2c_slave.o
+                0x0000000000000cec                __vector_14
+ .text.i2c_slave_init
+                0x0000000000000d38       0x1a avr_release/i2c_slave.o
+                0x0000000000000d38                i2c_slave_init
+ .text._on_time_to_sample
+                0x0000000000000d52       0x78 avr_release/pressure_mon.o
+ .text.pressure_mon_init
+                0x0000000000000dca       0x52 avr_release/pressure_mon.o
+                0x0000000000000dca                pressure_mon_init
+ .text.pressure_mon_get_status
+                0x0000000000000e1c        0x6 avr_release/pressure_mon.o
+                0x0000000000000e1c                pressure_mon_get_status
+ .text.startup.main
+                0x0000000000000e22       0x1e avr_release/main.o
+                0x0000000000000e22                main
+ .text.libgcc.div
+                0x0000000000000e40       0x28 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_divmodhi4.o)
+                0x0000000000000e40                __divmodhi4
+                0x0000000000000e40                _div
+ .text.libgcc.div
+                0x0000000000000e68       0x28 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_udivmodhi4.o)
+                0x0000000000000e68                __udivmodhi4
+ .text.avr-libc
+                0x0000000000000e90      0x3ca /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(qsort.o)
+                0x0000000000000f12                qsort
+ .text.avr-libc
+                0x000000000000125a        0xe /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(memset.o)
+                0x000000000000125a                memset
+ .text.libgcc.prologue
+                0x0000000000001268       0x32 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_prologue.o)
+                0x0000000000001268                __prologue_saves__
+ .text.libgcc.prologue
+                0x000000000000129a       0x30 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_epilogue.o)
+                0x000000000000129a                __epilogue_restores__
+                0x00000000000012ca                . = ALIGN (0x2)
+ *(.fini9)
+ .fini9         0x00000000000012ca        0x0 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+                0x00000000000012ca                exit
+                0x00000000000012ca                _exit
+ *(.fini9)
+ *(.fini8)
+ *(.fini8)
+ *(.fini7)
+ *(.fini7)
+ *(.fini6)
+ *(.fini6)
+ *(.fini5)
+ *(.fini5)
+ *(.fini4)
+ *(.fini4)
+ *(.fini3)
+ *(.fini3)
+ *(.fini2)
+ *(.fini2)
+ *(.fini1)
+ *(.fini1)
+ *(.fini0)
+ .fini0         0x00000000000012ca        0x4 /usr/lib/gcc/avr/5.4.0/avrxmega3/libgcc.a(_exit.o)
+ *(.fini0)
+                0x00000000000012ce                _etext = .
+
+.rodata         0x00000000000092ce       0x39 load address 0x00000000000012ce
+ *(.rodata)
+ *(.rodata*)
+ .rodata.str1.1
+                0x00000000000092ce       0x11 avr_release/asx/src/mem.o
+ .rodata.str1.1
+                0x00000000000092df       0x15 avr_release/asx/src/reactor.o
+ .rodata.str1.1
+                0x00000000000092f4       0x13 avr_release/asx/src/timer.o
+ *(.gnu.linkonce.r*)
+
+.data           0x0000000000803800        0xa load address 0x0000000000001307
+                0x0000000000803800                PROVIDE (__data_start, .)
+ *(.data)
+ *(.data*)
+ .data._digital_input_next_direct_entry
+                0x0000000000803800        0x1 avr_release/asx/src/digital_input.o
+ .data._heap_allocation_next_block
+                0x0000000000803801        0x2 avr_release/asx/src/mem.o
+ .data._timer_current_instance
+                0x0000000000803803        0x4 avr_release/asx/src/timer.o
+ .data.ready_to_accept_new_command
+                0x0000000000803807        0x1 avr_release/protocol.o
+                0x0000000000803807                ready_to_accept_new_command
+ .data.current  0x0000000000803808        0x1 avr_release/protocol.o
+ *(.gnu.linkonce.d*)
+                0x000000000080380a                . = ALIGN (0x2)
+ *fill*         0x0000000000803809        0x1 
+                0x000000000080380a                _edata = .
+                0x000000000080380a                PROVIDE (__data_end, .)
+
+.bss            0x000000000080380a      0x218
+                0x000000000080380a                PROVIDE (__bss_start, .)
+ *(.bss)
+ *(.bss*)
+ .bss._digital_input
+                0x000000000080380a       0x38 avr_release/asx/src/digital_input.o
+ .bss.reactor_lock
+                0x0000000000803842        0x1 avr_release/asx/src/reactor.o
+                0x0000000000803842                reactor_lock
+ .bss._handlers
+                0x0000000000803843       0xb0 avr_release/asx/src/reactor.o
+ .bss._next_handle
+                0x00000000008038f3        0x1 avr_release/asx/src/reactor.o
+ .bss._handle_lookup
+                0x00000000008038f4       0x10 avr_release/asx/src/reactor.o
+ .bss._timer_reactor_handle
+                0x0000000000803904        0x1 avr_release/asx/src/timer.o
+ .bss._timer_slot_avail
+                0x0000000000803905        0x1 avr_release/asx/src/timer.o
+ .bss._timer_slot_active
+                0x0000000000803906        0x1 avr_release/asx/src/timer.o
+ .bss._timer_free_running_ms_counter
+                0x0000000000803907        0x4 avr_release/asx/src/timer.o
+ .bss._timer_future_sorted_list
+                0x000000000080390b       0xf0 avr_release/asx/src/timer.o
+ .bss.previous_pin.4114
+                0x00000000008039fb        0x1 avr_release/protocol.o
+ .bss.message_received_counter
+                0x00000000008039fc        0x2 avr_release/protocol.o
+                0x00000000008039fc                message_received_counter
+ .bss.current_filtered_state
+                0x00000000008039fe        0x1 avr_release/pressure_mon.o
+                0x00000000008039fe                current_filtered_state
+ .bss.timer_count
+                0x00000000008039ff        0x4 avr_release/pressure_mon.o
+                0x00000000008039ff                timer_count
+ .bss.filter_level
+                0x0000000000803a03        0x1 avr_release/pressure_mon.o
+ *(COMMON)
+ COMMON         0x0000000000803a04        0x2 avr_release/asx/src/reactor.o
+                0x0000000000803a04                reactor_notifications
+ COMMON         0x0000000000803a06        0x2 avr_release/protocol.o
+                0x0000000000803a06                react_accept_comms
+                0x0000000000803a07                react_check_comms
+ COMMON         0x0000000000803a08       0x19 avr_release/i2c_slave.o
+                0x0000000000803a08                slave
+ COMMON         0x0000000000803a21        0x1 avr_release/pressure_mon.o
+                0x0000000000803a21                react_on_sample
+                0x0000000000803a22                PROVIDE (__bss_end, .)
+                0x0000000000001307                __data_load_start = LOADADDR (.data)
+                0x0000000000001311                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x0000000000803a22        0x0
+                [!provide]                        PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                [!provide]                        PROVIDE (__noinit_end, .)
+                0x0000000000803a22                _end = .
+                0x0000000000803a22                PROVIDE (__heap_start, .)
+
+.eeprom         0x0000000000810000        0x0
+ *(.eeprom*)
+                0x0000000000810000                __eeprom_end = .
+
+.fuse
+ *(.fuse)
+ *(.lfuse)
+ *(.hfuse)
+ *(.efuse)
+
+.lock
+ *(.lock*)
+
+.signature
+ *(.signature*)
+
+.user_signatures
+ *(.user_signatures*)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x11
+ *(.comment)
+ .comment       0x0000000000000000       0x11 avr_release/asx/src/alert.o
+                                         0x12 (size before relaxing)
+ .comment       0x0000000000000011       0x12 avr_release/asx/src/digital_input.o
+ .comment       0x0000000000000011       0x12 avr_release/asx/src/mem.o
+ .comment       0x0000000000000011       0x12 avr_release/asx/src/queue.o
+ .comment       0x0000000000000011       0x12 avr_release/asx/src/reactor.o
+ .comment       0x0000000000000011       0x12 avr_release/asx/src/timer.o
+ .comment       0x0000000000000011       0x12 avr_release/asx/src/twis.o
+ .comment       0x0000000000000011       0x12 avr_release/board.o
+ .comment       0x0000000000000011       0x12 avr_release/protocol.o
+ .comment       0x0000000000000011       0x12 avr_release/i2c_slave.o
+ .comment       0x0000000000000011       0x12 avr_release/pressure_mon.o
+ .comment       0x0000000000000011       0x12 avr_release/main.o
+ .comment       0x0000000000000011       0x12 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avrxmega3/libc.a(qsort.o)
+
+.note.gnu.avr.deviceinfo
+                0x0000000000000000       0x40
+ .note.gnu.avr.deviceinfo
+                0x0000000000000000       0x40 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+
+.note.gnu.build-id
+ *(.note.gnu.build-id)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x0000000000000000      0x2b0
+ *(.debug_aranges)
+ .debug_aranges
+                0x0000000000000000       0x28 avr_release/asx/src/alert.o
+ .debug_aranges
+                0x0000000000000028       0x48 avr_release/asx/src/digital_input.o
+ .debug_aranges
+                0x0000000000000070       0x20 avr_release/asx/src/mem.o
+ .debug_aranges
+                0x0000000000000090       0x50 avr_release/asx/src/queue.o
+ .debug_aranges
+                0x00000000000000e0       0x40 avr_release/asx/src/reactor.o
+ .debug_aranges
+                0x0000000000000120       0x58 avr_release/asx/src/timer.o
+ .debug_aranges
+                0x0000000000000178       0x60 avr_release/asx/src/twis.o
+ .debug_aranges
+                0x00000000000001d8       0x20 avr_release/board.o
+ .debug_aranges
+                0x00000000000001f8       0x38 avr_release/protocol.o
+ .debug_aranges
+                0x0000000000000230       0x30 avr_release/i2c_slave.o
+ .debug_aranges
+                0x0000000000000260       0x30 avr_release/pressure_mon.o
+ .debug_aranges
+                0x0000000000000290       0x20 avr_release/main.o
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x0000000000000000     0x6294
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x0000000000000000     0x1b97 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+ .debug_info    0x0000000000001b97       0xe8 avr_release/asx/src/alert.o
+ .debug_info    0x0000000000001c7f      0xbed avr_release/asx/src/digital_input.o
+ .debug_info    0x000000000000286c      0x17d avr_release/asx/src/mem.o
+ .debug_info    0x00000000000029e9      0x2fc avr_release/asx/src/queue.o
+ .debug_info    0x0000000000002ce5      0x5f3 avr_release/asx/src/reactor.o
+ .debug_info    0x00000000000032d8      0x95f avr_release/asx/src/timer.o
+ .debug_info    0x0000000000003c37      0x78b avr_release/asx/src/twis.o
+ .debug_info    0x00000000000043c2      0x885 avr_release/board.o
+ .debug_info    0x0000000000004c47      0xa6e avr_release/protocol.o
+ .debug_info    0x00000000000056b5      0x523 avr_release/i2c_slave.o
+ .debug_info    0x0000000000005bd8      0x597 avr_release/pressure_mon.o
+ .debug_info    0x000000000000616f      0x125 avr_release/main.o
+
+.debug_abbrev   0x0000000000000000     0x307a
+ *(.debug_abbrev)
+ .debug_abbrev  0x0000000000000000     0x1a20 /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+ .debug_abbrev  0x0000000000001a20       0x80 avr_release/asx/src/alert.o
+ .debug_abbrev  0x0000000000001aa0      0x350 avr_release/asx/src/digital_input.o
+ .debug_abbrev  0x0000000000001df0       0xea avr_release/asx/src/mem.o
+ .debug_abbrev  0x0000000000001eda       0xec avr_release/asx/src/queue.o
+ .debug_abbrev  0x0000000000001fc6      0x27e avr_release/asx/src/reactor.o
+ .debug_abbrev  0x0000000000002244      0x333 avr_release/asx/src/timer.o
+ .debug_abbrev  0x0000000000002577      0x2a7 avr_release/asx/src/twis.o
+ .debug_abbrev  0x000000000000281e      0x188 avr_release/board.o
+ .debug_abbrev  0x00000000000029a6      0x29c avr_release/protocol.o
+ .debug_abbrev  0x0000000000002c42      0x1d5 avr_release/i2c_slave.o
+ .debug_abbrev  0x0000000000002e17      0x1fb avr_release/pressure_mon.o
+ .debug_abbrev  0x0000000000003012       0x68 avr_release/main.o
+
+.debug_line     0x0000000000000000     0x2c0a
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x0000000000000000      0x14b /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+ .debug_line    0x000000000000014b      0x1ab avr_release/asx/src/alert.o
+ .debug_line    0x00000000000002f6      0x595 avr_release/asx/src/digital_input.o
+ .debug_line    0x000000000000088b      0x1ba avr_release/asx/src/mem.o
+ .debug_line    0x0000000000000a45      0x2c3 avr_release/asx/src/queue.o
+ .debug_line    0x0000000000000d08      0x3cc avr_release/asx/src/reactor.o
+ .debug_line    0x00000000000010d4      0x56b avr_release/asx/src/timer.o
+ .debug_line    0x000000000000163f      0x4f4 avr_release/asx/src/twis.o
+ .debug_line    0x0000000000001b33      0x2c9 avr_release/board.o
+ .debug_line    0x0000000000001dfc      0x450 avr_release/protocol.o
+ .debug_line    0x000000000000224c      0x368 avr_release/i2c_slave.o
+ .debug_line    0x00000000000025b4      0x35d avr_release/pressure_mon.o
+ .debug_line    0x0000000000002911      0x2f9 avr_release/main.o
+
+.debug_frame    0x0000000000000000      0x7cc
+ *(.debug_frame)
+ .debug_frame   0x0000000000000000       0x34 avr_release/asx/src/alert.o
+ .debug_frame   0x0000000000000034      0x1c8 avr_release/asx/src/digital_input.o
+ .debug_frame   0x00000000000001fc       0x38 avr_release/asx/src/mem.o
+ .debug_frame   0x0000000000000234       0xa4 avr_release/asx/src/queue.o
+ .debug_frame   0x00000000000002d8       0x88 avr_release/asx/src/reactor.o
+ .debug_frame   0x0000000000000360      0x1d0 avr_release/asx/src/timer.o
+ .debug_frame   0x0000000000000530       0xbc avr_release/asx/src/twis.o
+ .debug_frame   0x00000000000005ec       0x24 avr_release/board.o
+ .debug_frame   0x0000000000000610       0x98 avr_release/protocol.o
+ .debug_frame   0x00000000000006a8       0x94 avr_release/i2c_slave.o
+ .debug_frame   0x000000000000073c       0x6c avr_release/pressure_mon.o
+ .debug_frame   0x00000000000007a8       0x24 avr_release/main.o
+
+.debug_str      0x0000000000000000    0x1b681
+ *(.debug_str)
+ .debug_str     0x0000000000000000      0xbdd /opt/ATtiny_DFP.2.0.368/gcc/dev/attiny1626/avrxmega3/crtattiny1626.o
+ .debug_str     0x0000000000000bdd    0x11803 avr_release/asx/src/alert.o
+                                      0x11b30 (size before relaxing)
+ .debug_str     0x00000000000123e0     0x7b32 avr_release/asx/src/digital_input.o
+                                      0x19389 (size before relaxing)
+ .debug_str     0x0000000000019f12       0xc8 avr_release/asx/src/mem.o
+                                      0x11828 (size before relaxing)
+ .debug_str     0x0000000000019fda       0xa2 avr_release/asx/src/queue.o
+                                       0x38c7 (size before relaxing)
+ .debug_str     0x000000000001a07c      0x67d avr_release/asx/src/reactor.o
+                                      0x1273e (size before relaxing)
+ .debug_str     0x000000000001a6f9      0x588 avr_release/asx/src/timer.o
+                                      0x19556 (size before relaxing)
+ .debug_str     0x000000000001ac81      0x391 avr_release/asx/src/twis.o
+                                      0x18a0f (size before relaxing)
+ .debug_str     0x000000000001b012       0x79 avr_release/board.o
+                                      0x18adb (size before relaxing)
+ .debug_str     0x000000000001b08b      0x2fc avr_release/protocol.o
+                                      0x19352 (size before relaxing)
+ .debug_str     0x000000000001b387      0x230 avr_release/i2c_slave.o
+                                      0x18e17 (size before relaxing)
+ .debug_str     0x000000000001b5b7       0xb0 avr_release/pressure_mon.o
+                                      0x19210 (size before relaxing)
+ .debug_str     0x000000000001b667       0x1a avr_release/main.o
+                                      0x18a4e (size before relaxing)
+
+.debug_loc      0x0000000000000000     0x22a0
+ *(.debug_loc)
+ .debug_loc     0x0000000000000000      0x752 avr_release/asx/src/digital_input.o
+ .debug_loc     0x0000000000000752      0x149 avr_release/asx/src/mem.o
+ .debug_loc     0x000000000000089b      0x37c avr_release/asx/src/queue.o
+ .debug_loc     0x0000000000000c17      0x349 avr_release/asx/src/reactor.o
+ .debug_loc     0x0000000000000f60      0x672 avr_release/asx/src/timer.o
+ .debug_loc     0x00000000000015d2      0x47f avr_release/asx/src/twis.o
+ .debug_loc     0x0000000000001a51      0x21c avr_release/board.o
+ .debug_loc     0x0000000000001c6d      0x42c avr_release/protocol.o
+ .debug_loc     0x0000000000002099      0x13b avr_release/i2c_slave.o
+ .debug_loc     0x00000000000021d4       0xcc avr_release/pressure_mon.o
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges   0x0000000000000000      0x358
+ *(.debug_ranges)
+ .debug_ranges  0x0000000000000000       0x18 avr_release/asx/src/alert.o
+ .debug_ranges  0x0000000000000018       0xe0 avr_release/asx/src/digital_input.o
+ .debug_ranges  0x00000000000000f8       0x10 avr_release/asx/src/mem.o
+ .debug_ranges  0x0000000000000108       0x40 avr_release/asx/src/queue.o
+ .debug_ranges  0x0000000000000148       0x78 avr_release/asx/src/reactor.o
+ .debug_ranges  0x00000000000001c0       0xa8 avr_release/asx/src/timer.o
+ .debug_ranges  0x0000000000000268       0x68 avr_release/asx/src/twis.o
+ .debug_ranges  0x00000000000002d0       0x10 avr_release/board.o
+ .debug_ranges  0x00000000000002e0       0x28 avr_release/protocol.o
+ .debug_ranges  0x0000000000000308       0x20 avr_release/i2c_slave.o
+ .debug_ranges  0x0000000000000328       0x20 avr_release/pressure_mon.o
+ .debug_ranges  0x0000000000000348       0x10 avr_release/main.o
+
+.debug_macro    0x0000000000000000     0x75d5
+ *(.debug_macro)
+ .debug_macro   0x0000000000000000       0xe3 avr_release/asx/src/alert.o
+ .debug_macro   0x00000000000000e3      0xa60 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000000b43       0x10 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000000b53      0x1c9 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000000d1c      0x2fc avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000001018       0x9e avr_release/asx/src/alert.o
+ .debug_macro   0x00000000000010b6       0x19 avr_release/asx/src/alert.o
+ .debug_macro   0x00000000000010cf     0x3cdf avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000004dae       0x9a avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000004e48       0xa5 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000004eed       0x34 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000004f21       0x16 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000004f37       0x18 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000004f4f       0x34 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000004f83       0x62 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000004fe5       0x1c avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000005001      0x10e avr_release/asx/src/alert.o
+ .debug_macro   0x000000000000510f       0x66 avr_release/asx/src/alert.o
+ .debug_macro   0x0000000000005175       0x16 avr_release/asx/src/alert.o
+ .debug_macro   0x000000000000518b       0x22 avr_release/asx/src/alert.o
+ .debug_macro   0x00000000000051ad       0x16 avr_release/asx/src/alert.o
+ .debug_macro   0x00000000000051c3      0x1da avr_release/asx/src/digital_input.o
+ .debug_macro   0x000000000000539d       0x69 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000005406       0x10 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000005416      0x174 avr_release/asx/src/digital_input.o
+ .debug_macro   0x000000000000558a       0x35 avr_release/asx/src/digital_input.o
+ .debug_macro   0x00000000000055bf       0x96 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000005655       0x17 avr_release/asx/src/digital_input.o
+ .debug_macro   0x000000000000566c      0x250 avr_release/asx/src/digital_input.o
+ .debug_macro   0x00000000000058bc       0x76 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000005932       0x16 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000005948      0x6d9 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000006021       0x10 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000006031       0xe2 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000006113       0x40 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000006153       0x1c avr_release/asx/src/digital_input.o
+ .debug_macro   0x000000000000616f       0xe4 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000006253       0x34 avr_release/asx/src/digital_input.o
+ .debug_macro   0x0000000000006287       0x16 avr_release/asx/src/digital_input.o
+ .debug_macro   0x000000000000629d       0x28 avr_release/asx/src/digital_input.o
+ .debug_macro   0x00000000000062c5       0xe2 avr_release/asx/src/mem.o
+ .debug_macro   0x00000000000063a7       0x97 avr_release/asx/src/mem.o
+ .debug_macro   0x000000000000643e       0x16 avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000006454       0x97 avr_release/asx/src/mem.o
+ .debug_macro   0x00000000000064eb       0x5a avr_release/asx/src/mem.o
+ .debug_macro   0x0000000000006545       0x6f avr_release/asx/src/queue.o
+ .debug_macro   0x00000000000065b4      0x130 avr_release/asx/src/reactor.o
+ .debug_macro   0x00000000000066e4       0x42 avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000006726       0x1c avr_release/asx/src/reactor.o
+ .debug_macro   0x0000000000006742       0x64 avr_release/asx/src/reactor.o
+ .debug_macro   0x00000000000067a6       0x1c avr_release/asx/src/reactor.o
+ .debug_macro   0x00000000000067c2       0x20 avr_release/asx/src/reactor.o
+ .debug_macro   0x00000000000067e2      0x1e6 avr_release/asx/src/timer.o
+ .debug_macro   0x00000000000069c8       0xfd avr_release/asx/src/timer.o
+ .debug_macro   0x0000000000006ac5      0x178 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000006c3d       0x22 avr_release/asx/src/twis.o
+ .debug_macro   0x0000000000006c5f      0x177 avr_release/board.o
+ .debug_macro   0x0000000000006dd6      0x1e0 avr_release/protocol.o
+ .debug_macro   0x0000000000006fb6       0x63 avr_release/protocol.o
+ .debug_macro   0x0000000000007019       0x2e avr_release/protocol.o
+ .debug_macro   0x0000000000007047      0x1db avr_release/i2c_slave.o
+ .debug_macro   0x0000000000007222       0x16 avr_release/i2c_slave.o
+ .debug_macro   0x0000000000007238      0x1db avr_release/pressure_mon.o
+ .debug_macro   0x0000000000007413      0x1c2 avr_release/main.o
+OUTPUT(avr_release/hub.elf elf32-avr)
+LOAD linker stubs
