@@ -3,3 +3,5 @@
 **/Release
 **/*.map
 
+controller/controller.map
+hub/hub.map
