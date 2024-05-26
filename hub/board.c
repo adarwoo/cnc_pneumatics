@@ -26,7 +26,7 @@ void board_init(void)
 	 */
 
     // Force a zero on output the set as output
- 	 ioport_set_pin_level(IOPORT_TOOL_SETTER_AIR_BLAST, false);
+ 	ioport_set_pin_level(IOPORT_TOOL_SETTER_AIR_BLAST, false);
     ioport_set_pin_dir(IOPORT_TOOL_SETTER_AIR_BLAST, IOPORT_DIR_OUTPUT);
 
     // Force a zero on output the set as output

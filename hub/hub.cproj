@@ -130,7 +130,7 @@
     <ExternalMakeFilePath>Makefile</ExternalMakeFilePath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="board_init.c">
+    <Compile Include="board.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="conf\conf_board.h">

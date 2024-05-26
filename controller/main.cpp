@@ -1,5 +1,5 @@
 /*
- * pdc.cpp
+ * main.cpp
  *
  * Created: 03/05/2024 10:33:54
  * Author : micro
@@ -31,36 +31,6 @@ typedef struct
    opcodes_cmd_t opcode; ///< Matching opcode
    bool state;           ///< Last seen state of this output
 } output_status_t;
-
-/************************************************************************/
-/* Piezzo internals                                                     */
-/************************************************************************/
-struct piezzo_s
-{
-   /** Number of shift of the octave from the reference note (the lowest octave) */
-   uint8_t octave_shift;
-
-   /** Duration in ms of a full note at the given tempo */
-   uint16_t tempo_full_period;
-
-   /** Note duration in pow(2), so 0 is a full, and 2 a quaver */
-   uint8_t note_duration_pow_number;
-
-   /** If true, slur the notes and skip the added pause between notes */
-   bool slur;
-
-   /** Store the slur for the next note */
-   bool slur_next;
-
-   /** Calculated value to load in the PWM to hit the right note */
-   uint16_t pwm_compare_value;
-
-   /** Duration in timer count of the note or the rest */
-   timer_count_t duration;
-
-   /** Points to the character of the next note text description */
-   const char *next_note;
-} piezzo;
 
 
 /************************************************************************/
@@ -112,7 +82,6 @@ reactor_handle_t react_sm_event =
     reactor_register(on_sm_event,
     reactor_prio_medium, 1);
 
-
 /** Command to send via i2c */
 opcodes_cmd_t current_command = opcodes_cmd_idle;
 
@@ -133,6 +102,9 @@ timer_instance_t connection_check_timer_t;
 
 /** Count the number of transmit errors */
 uint8_t comms_error_count = 0;
+
+/** Sounding door alarm */
+bool sound_door_alarm = false;
 
 /************************************************************************/
 /* Outputs                                                              */
@@ -228,10 +200,17 @@ void on_door_down_input_change(void *arg)
 /** A key was pushed - sound it */
 void on_beep_input(void *arg)
 {
-   piezzo_play(200, "C'2");
+   // Only play if the door alarm is off
+   if ( ! sound_door_alarm )
+   {
+      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(1400), TIMER_MILLISECONDS(200));
+   }
 }
 
-/** The sounder is beeping */
+/**
+ * The sounder is beeping 
+ * Note: st
+ */
 void on_sounder(void *arg)
 {
    pin_and_value_t pin_and_value;
@@ -240,11 +219,15 @@ void on_sounder(void *arg)
    if (pin_and_value.value)
    {
       // Play long continuous tone
-      piezzo_play(60, "E'0");
+      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(800), 0);
+      
+      sound_door_alarm = true;
    }
    else
    {
-      piezzo_stop();
+      piezzo_stop_tone();
+
+      sound_door_alarm = false;
    }
 }
 
@@ -256,7 +239,14 @@ void on_door_status_change(void *arg)
    pav.as_arg = arg;
 
    // Pump into the state machine
-   // TODO
+   if (pav.value)
+   {
+      // process_event(sm, door_opening{});
+   }
+   else
+   {
+      // process_event(sm, door_closing{});
+   }
 }
 
 /** Input has change, let the i2c master forward the information to the hub */
@@ -287,13 +277,12 @@ void on_i2c_error(void *arg)
 {
    status_code_t status = (status_code_t)((uint16_t)arg);
 
-   //   digitial_output_start(led_fault, 200, "+-+-+-+-", true);
    comms_error_count += 2;
 
    if ( comms_error_count > COMMS_TOO_MANY_ERRORS )
    {
       digitial_output_start(led_fault, TIMER_MILLISECONDS(500), "+-+-+-+-", true);
-      piezzo_play(60, "E' R E R E");
+      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(2000), TIMER_SECONDS(5));
    }
    else
    {

@@ -58,6 +58,9 @@
 extern "C" {
 #endif
 
+/** Create a timer period from a frequency */
+#define PIEZZO_FREQ_TO_PWM(f) (10000000ul / (uint32_t)f)
+
 /** To call once prior to using any other API */
 void piezzo_init(void);
 
@@ -65,7 +68,7 @@ void piezzo_init(void);
 void piezzo_play( uint8_t tempo, const char *music );
 
 /** Play a single tone on top of whatever is playing right now */
-bool piezzo_start_tone(const char *tone, timer_count_t duration);
+void piezzo_start_tone(uint16_t pwm_value, timer_count_t duration);
 
 /** Stop playing */
 void piezzo_stop(void);
