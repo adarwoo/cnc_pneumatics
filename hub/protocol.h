@@ -12,21 +12,11 @@
 
 #include <stdint.h>
 
+#include "op_codes.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/** Values for the various actions with largest hamming distance */
-typedef enum protocol_enum {
-   cmd_idle_e = 0x5A,
-   cmd_door_push_e = 0x6B,
-   cmd_door_pull_e = 0x05,
-   cmd_toolsetter_air_blast = 0x34,
-   cmd_spindle_chuck_open = 0xD0,
-   cmd_spindle_air_clean = 0xE1,
-   cmd_pressure_on = 0x8F,
-   cmd_pressure_off = 0xBC
-} protocol_send_receive_t;
 
 void protocol_init(void);
 bool protocol_process(uint8_t raw_data);

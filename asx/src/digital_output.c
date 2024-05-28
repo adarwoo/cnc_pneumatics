@@ -224,7 +224,7 @@ void digital_output_init(void)
 
 /**
  * Declare a digital output and make it manageable.
- * This call will dynamically allocate the memory for the structure.
+ * This call will dynamically allocate the memory for thtimer_inite structure.
  */
 digital_output_t digital_output(ioport_pin_t pin)
 {

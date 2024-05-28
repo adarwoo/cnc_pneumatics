@@ -310,6 +310,10 @@ void _stop_tone(void *arg)
    else
    {
       _stop_timer_compare();
+      PIEZZO_TCB.CTRLA &= ~TCB_ENABLE_bm;
+      
+      // Drop the piezzo voltage too
+      ioport_set_pin_level(PIEZZO_DRIVE_PIN, false);
    }
 
    playing_tone_recovery_value = 0;
@@ -322,8 +326,6 @@ void _stop_tone(void *arg)
 
 void piezzo_init(void)
 {
-   // Promote the interrupt to a higher level
-   CPUINT.LVL1VEC = PIEZZO_TCB_INT_VECTOR_NUM;
    // Ready the PWM
 #ifndef _WIN32
    // Use the Timer type B 1 to drive the piezzo transistor
@@ -399,6 +401,8 @@ void piezzo_start_tone(uint16_t pwm_value, timer_count_t duration)
    // Restart the timer with the new value
    PIEZZO_TCB.CNT = 0;
    PIEZZO_TCB.CCMP = pwm_value;
+   PIEZZO_TCB.CTRLA |= TCB_ENABLE_bm;
+
 
    // If a duration is given, start a timer
    if ( duration )

@@ -225,7 +225,7 @@ static inline void _reactor_sort_by_priority(void)
 void reactor_run(void)
 {
    size_t i;
-   reactor_handle_t flags;
+   reactor_mask_t flags;
 
    // Sort all items by priority
    _reactor_sort_by_priority();

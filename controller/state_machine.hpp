@@ -1,25 +1,3 @@
-/******************************************************************************
-The MIT License(MIT)
-https://github.com/adarwoo/pneumatic_door_controller
-
-Copyright(c) 2021 Guillaume ARRECKX - software@arreckx.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files(the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions :
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-******************************************************************************/
 #ifndef state_machine_h_included
 #define state_machine_h_included
 
@@ -33,35 +11,67 @@ struct on_close {};
 struct door_is_up {};
 struct door_is_down {};
 struct timeout {};
-struct comms_established; {};
+struct comms_established {};
 struct comms_error {};
    
-   
-namespace
+extern void on_pneumatic_input_change(void *);
+
+namespace valve
 {
-   ///< Dummy event to all processing forks in SM
-   struct next
-   {};
+   static constexpr auto push_on  = [] { 
+      pin_and_value_t pav{.pin=IN_DOOR_UP}; pav.value=true;
+      on_pneumatic_input_change( pav.as_arg ); 
+      digitial_output_start(led_door_opening, TIMER_SECONDS(1), "+1-", true);
+   };
+   
+   static constexpr auto push_off = [] { 
+      pin_and_value_t pav{.pin=IN_DOOR_UP}; pav.value=false;
+      on_pneumatic_input_change( pav.as_arg );
+      digitial_output_set(led_door_opening, false);
+   };
 
-   ///< Marker to force the SM to evaluate 'next'
-   bool controller_process_next{ false };
-}  // namespace
+   static constexpr auto push_timeout = [] {
+      pin_and_value_t pav{.pin=IN_DOOR_UP}; pav.value=false;
+      on_pneumatic_input_change( pav.as_arg );
+      digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+3-", true);
+   };
+   
+   static constexpr auto pull_on  = [] {
+      pin_and_value_t pav{.pin=IN_DOOR_DOWN}; pav.value=true;
+      on_pneumatic_input_change( pav.as_arg );
+      digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+1-", true);
+   };
+   
+   static constexpr auto pull_off = [] {
+      pin_and_value_t pav{.pin=IN_DOOR_DOWN}; pav.value=false;
+      on_pneumatic_input_change( pav.as_arg );
+      digitial_output_set(led_door_closing, false);
+   };
+
+   static constexpr auto pull_timeout = [] {
+      pin_and_value_t pav{.pin=IN_DOOR_DOWN}; pav.value=false;
+      on_pneumatic_input_change( pav.as_arg );
+      digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+3-", true);
+   };
+};
 
 
-struct sm_pdc
+struct door_sm
 {
    auto operator()() const noexcept
    {
       using namespace sml;
 
       return make_transition_table(
-         *"init"_s + event<comms_established> = state<mode_manual>,
-         "splash"_s + sml::on_entry<_> / []( UIView &v ) { v.draw_splash(); }
-
-         ,
-         state<mode_manual> + sml::on_entry<_> / []( UIView &v ) { v.draw(); },
-         state<mode_manual> + event<usb_on> / []( UIView &v ) { v.draw_usb(); } = state<mode_usb>,
-         state<mode_usb> + event<usb_off> = state<mode_manual> );
+         *"unknown"_s + event<door_is_up>                          = "opened"_s,
+          "unknown"_s + event<door_is_down>                        = "closed"_s,
+          "closed"_s  + event<on_open>      / valve::push_on       = "opening"_s,
+          "opened"_s  + event<on_close>     / valve::pull_on       = "closing"_s,
+          "opening"_s + event<timeout>      / valve::push_timeout  = "unknown"_s,
+          "opening"_s + event<door_is_up>   / valve::push_off      = "opened"_s,
+          "closing"_s + event<timeout>      / valve::pull_timeout  = "unknown"_s,
+          "closing"_s + event<door_is_down> / valve::pull_off      = "closed"_s
+      );
    }
 };
 

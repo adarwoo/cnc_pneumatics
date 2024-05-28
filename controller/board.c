@@ -72,4 +72,7 @@ void board_init(void)
    digital_output_init();
    digital_input_init();
    piezzo_init();
+
+   // Promote the i2c interrupt
+   CPUINT.LVL1VEC = TWI0_TWIM_vect_num;
 }

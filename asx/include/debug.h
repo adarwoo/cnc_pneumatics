@@ -21,9 +21,10 @@
  * @file
  * Reactor API definition
  * @author software@arreckx.com
- */ 
+ */
 
 #include "cpp.h"
+#include "ioport.h"
 
 /** Define macro to check if the argument x expands to DEBUG_x */
 #define IS_DEBUG_PORT(x) IS_PAREN( CAT(DEBUG_, x) (()) )

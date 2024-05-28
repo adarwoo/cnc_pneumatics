@@ -1,0 +1,344 @@
+
+controller.elf:     file format elf32-avr
+
+SYMBOL TABLE:
+00803800 l    d  .data	00000000 .data
+00000000 l    d  .text	00000000 .text
+0000a038 l    d  .rodata	00000000 .rodata
+0080384c l    d  .bss	00000000 .bss
+00000000 l    d  .comment	00000000 .comment
+00000000 l    d  .note.gnu.avr.deviceinfo	00000000 .note.gnu.avr.deviceinfo
+00000000 l    d  .debug_aranges	00000000 .debug_aranges
+00000000 l    d  .debug_info	00000000 .debug_info
+00000000 l    d  .debug_abbrev	00000000 .debug_abbrev
+00000000 l    d  .debug_line	00000000 .debug_line
+00000000 l    d  .debug_frame	00000000 .debug_frame
+00000000 l    d  .debug_str	00000000 .debug_str
+00000000 l    d  .debug_loc	00000000 .debug_loc
+00000000 l    d  .debug_ranges	00000000 .debug_ranges
+00000000 l    d  .debug_macro	00000000 .debug_macro
+00000000 l    df *ABS*	00000000 digital_input.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+0080384d l     O .bss	00000001 _digital_input_next_sampled_entry
+0080384e l     O .bss	00000038 _digital_input
+000001a4 l     F .text	00000130 _handle_pin_change_isr
+00803800 l     O .data	00000001 _digital_input_next_direct_entry
+0080384c l     O .bss	00000001 _react_handle_change
+00000000 l    df *ABS*	00000000 mem.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00803801 l     O .data	00000002 _heap_allocation_next_block
+00000000 l    df *ABS*	00000000 piezzo.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00803889 l     O .bss	00000002 new_tc_value.4179
+00803887 l     O .bss	00000002 last_tc_value.4178
+00000000 l    df *ABS*	00000000 timer.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00803957 l     O .bss	00000004 _timer_free_running_ms_counter
+0080395b l     O .bss	000000f0 _timer_future_sorted_list
+00803954 l     O .bss	00000001 _timer_reactor_handle
+00803956 l     O .bss	00000001 _timer_slot_active
+00803955 l     O .bss	00000001 _timer_slot_avail
+0080382d l     O .data	00000004 _timer_current_instance
+00000000 l    df *ABS*	00000000 main.cpp
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+000015fc l     F .text	00000006 _ZL19on_comms_grace_overPv
+00001634 l     F .text	00000022 _ZL11on_i2c_readPv
+00001656 l     F .text	0000005a _ZL12on_i2c_errorPv
+000016b0 l     F .text	0000001a _ZL13on_beep_inputPv
+000016ca l     F .text	0000001e _ZL19on_send_i2c_commandPv
+000016e8 l     F .text	00000024 _ZL10on_sounderPv
+0000170c l     F .text	00000048 _ZL11on_door_cmdPv
+00001754 l     F .text	0000006a _ZL21on_door_sensor_changePv
+00803831 l     O .data	00000004 _ZZ23start_periodic_transmitbE16transmit_timer_t
+0000187c l     F .text	00000052 _ZL25on_pneumatic_input_changePv
+000018ce l     F .text	00000034 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_5front10transitionIJNS5_5stateINS2_3aux6stringIcJLc111ELc112ELc101ELc110ELc105ELc110ELc103EEEEEENS7_INS9_IcJLc99ELc108ELc111ELc115ELc101ELc100EEEEEENS5_5eventI7on_openEENS5_6alwaysENS8_12zero_wrapperIN5valveUlvE_EvEEEEEEE7executeISF_NS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS8_4poolIJEEENSU_IJST_EEEEEbRKT_RT0_RT1_RT2_RNS10_7state_tE
+00001902 l     F .text	00000034 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_5front10transitionIJNS5_5stateINS2_3aux6stringIcJLc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEENS7_INS9_IcJLc111ELc112ELc101ELc110ELc101ELc100EEEEEENS5_5eventI8on_closeEENS5_6alwaysENS8_12zero_wrapperIN5valveUlvE2_EvEEEEEEE7executeISF_NS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS8_4poolIJEEENSU_IJST_EEEEEbRKT_RT0_RT1_RT2_RNS10_7state_tE
+00001936 l     F .text	00000028 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_5front10transitionIJNS5_5stateINS2_3aux6stringIcJLc99ELc108ELc111ELc115ELc101ELc100EEEEEENS7_INS9_IcJLc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEENS5_5eventI12door_is_downEENS5_6alwaysENS8_12zero_wrapperIN5valveUlvE3_EvEEEEEEE7executeISF_NS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS8_4poolIJEEENSU_IJST_EEEEEbRKT_RT0_RT1_RT2_RNS10_7state_tE
+0000195e l     F .text	00000028 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_5front10transitionIJNS5_5stateINS2_3aux6stringIcJLc111ELc112ELc101ELc110ELc101ELc100EEEEEENS7_INS9_IcJLc111ELc112ELc101ELc110ELc105ELc110ELc103EEEEEENS5_5eventI10door_is_upEENS5_6alwaysENS8_12zero_wrapperIN5valveUlvE0_EvEEEEEEE7executeISF_NS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS8_4poolIJEEENSU_IJST_EEEEEbRKT_RT0_RT1_RT2_RNS10_7state_tE
+00001aaa l     F .text	000000dc _GLOBAL__sub_I_react_input_change
+00000000 l    df *ABS*	00000000 _clear_bss.o
+000000a6 l       .text	00000000 .do_clear_bss_start
+000000a4 l       .text	00000000 .do_clear_bss_loop
+00000000 l    df *ABS*	00000000 alert.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00000000 l    df *ABS*	00000000 digital_output.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00000000 l    df *ABS*	00000000 queue.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00000000 l    df *ABS*	00000000 reactor.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00000b7e l     F .text	00000022 compare_prio
+00803943 l     O .bss	00000001 _next_handle
+00803944 l     O .bss	00000010 _handle_lookup
+00803893 l     O .bss	000000b0 _handlers
+00000000 l    df *ABS*	00000000 sysclk.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00000000 l    df *ABS*	00000000 twim.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00803a4b l     O .bss	0000000b transfer
+00000000 l    df *ABS*	00000000 board.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00000000 l    df *ABS*	00000000 i2c.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+000014e4 l     F .text	00000040 i2c_data_handler
+00803a63 l     O .bss	00000001 buffer
+00803a61 l     O .bss	00000002 last_sent
+00803a56 l     O .bss	0000000b package.3948
+00000000 l    df *ABS*	00000000 _udivmodqi4.o
+00001b94 l       .text	00000000 __udivmodqi4_ep
+00001b8c l       .text	00000000 __udivmodqi4_loop
+00000000 l    df *ABS*	00000000 _divmodhi4.o
+00001bb6 l       .text	00000000 __divmodhi4_neg1
+00001bbe l       .text	00000000 __divmodhi4_neg2
+00001bc4 l       .text	00000000 __divmodhi4_exit
+00000000 l    df *ABS*	00000000 _udivmodhi4.o
+00001bdc l       .text	00000000 __udivmodhi4_ep
+00001bce l       .text	00000000 __udivmodhi4_loop
+00000000 l    df *ABS*	00000000 qsort.c
+0000003e l       *ABS*	00000000 __SP_H__
+0000003d l       *ABS*	00000000 __SP_L__
+0000003f l       *ABS*	00000000 __SREG__
+00000034 l       *ABS*	00000000 __CCP__
+00000000 l       *ABS*	00000000 __tmp_reg__
+00000001 l       *ABS*	00000000 __zero_reg__
+00001bfa l     F .text	00000018 swapfunc
+00001c12 l     F .text	0000006a med3
+00000000 l    df *ABS*	00000000 _exit.o
+00002036 l       .text	00000000 __stop_program
+000013dc g     F .text	00000088 twi_master_transfer
+00803a8a g     O .bss	00000002 reactor_notifications
+00803a74 g     O .bss	00000001 react_i2c_error
+000000ca  w      .text	00000000 __vector_22
+000000ca  w      .text	00000000 __vector_28
+00803a72 g     O .bss	00000001 react_comms_grace_over
+000000ca  w      .text	00000000 __vector_1
+00000adc g     F .text	0000004c queue_leftpop
+00000eca g     F .text	00000194 timer_arm
+00803a8c g     O .bss	00000001 on_data_received
+0000160a  w    F .text	00000012 _ZN5boost3ext3sml6v1_1_44back11transitionsIINS2_5front10transitionIINS5_5stateINS2_3aux6stringIcILc99ELc108ELc111ELc115ELc101ELc100EEEEEENS7_INS9_IcILc117ELc110ELc107ELc110ELc111ELc119ELc110EEEEEENS5_5eventI12door_is_downEENS5_6alwaysENS5_4noneEEEEEE7executeISF_NS3_7sm_implINS3_9sm_policyI7door_smIEEEEENS8_4poolIIEEENSR_IISQ_EEEEEbRKT_RT0_RT1_RT2_RNSX_7state_tE
+00000800 g       *ABS*	00000000 __DATA_REGION_LENGTH__
+00002004 g       .text	00000030 .hidden __epilogue_restores__
+00000000 g       *ABS*	00000000 __TEXT_REGION_ORIGIN__
+00000c30 g     F .text	00000034 reactor_notify
+00001bc6 g       .text	00000028 .hidden __udivmodhi4
+00000078 g       .text	00000000 __trampolines_start
+00002038 g       .text	00000000 _etext
+00000ba0 g     F .text	00000020 reactor_init
+0000182e g     F .text	0000004e _Z14refresh_opcodev
+00000c64 g     F .text	000001d8 reactor_run
+0000a0b3  w    O .rodata	0000000a _ZZN5boost3ext3sml6v1_1_44back8policies10jump_table8dispatchILi0ENS3_29get_event_mapping_impl_helperI8on_closeNS3_7sm_implINS3_9sm_policyI7door_smJEEEE8mappingsEEESD_hS8_NS2_3aux4poolIJEEENSH_IJSD_EEEJNSG_6stringIcJLc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENSK_IcJLc111ELc112ELc101ELc110ELc101ELc100EEEENSK_IcJLc99ELc108ELc111ELc115ELc101ELc100EEEENSK_IcJLc111ELc112ELc101ELc110ELc105ELc110ELc103EEEENSK_IcJLc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEEEbRT1_RT2_RKT3_RT4_RT5_RKNSG_9type_listIJDpT6_EEEE14dispatch_table
+000011ba g     F .text	000000a8 timer_cancel
+000000ca  w      .text	00000000 __vector_24
+00000660 g     F .text	00000012 digital_output_init
+000000ca  w      .text	00000000 __vector_12
+00001c7c g     F .text	00000348 qsort
+00803a77 g     O .bss	00000001 react_beep
+0000a09f  w    O .rodata	0000000a _ZZN5boost3ext3sml6v1_1_44back8policies10jump_table8dispatchILi0ENS3_29get_event_mapping_impl_helperI10door_is_upNS3_7sm_implINS3_9sm_policyI7door_smIEEEE8mappingsEEESD_hS8_NS2_3aux4poolIIEEENSH_IISD_EEEINSG_6stringIcILc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENSK_IcILc111ELc112ELc101ELc110ELc101ELc100EEEENSK_IcILc99ELc108ELc111ELc115ELc101ELc100EEEENSK_IcILc111ELc112ELc101ELc110ELc105ELc110ELc103EEEENSK_IcILc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEEEbRT1_RT2_RKT3_RT4_RT5_RKNSG_9type_listIIDpT6_EEEE14dispatch_table
+000000ca g       .text	00000000 __bad_interrupt
+000009e8 g     F .text	00000060 piezzo_start_tone
+0000160a  w    F .text	00000012 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_5front10transitionIJNS5_5stateINS2_3aux6stringIcJLc99ELc108ELc111ELc115ELc101ELc100EEEEEENS7_INS9_IcJLc117ELc110ELc107ELc110ELc111ELc119ELc110EEEEEENS5_5eventI12door_is_downEENS5_6alwaysENS5_4noneEEEEEE7executeISF_NS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS8_4poolIJEEENSR_IJSQ_EEEEEbRKT_RT0_RT1_RT2_RNSX_7state_tE
+00002113 g       *ABS*	00000000 __data_load_end
+0000a0a9  w    O .rodata	0000000a _ZZN5boost3ext3sml6v1_1_44back8policies10jump_table8dispatchILi0ENS3_29get_event_mapping_impl_helperI12door_is_downNS3_7sm_implINS3_9sm_policyI7door_smIEEEE8mappingsEEESD_hS8_NS2_3aux4poolIIEEENSH_IISD_EEEINSG_6stringIcILc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENSK_IcILc111ELc112ELc101ELc110ELc101ELc100EEEENSK_IcILc99ELc108ELc111ELc115ELc101ELc100EEEENSK_IcILc111ELc112ELc101ELc110ELc105ELc110ELc103EEEENSK_IcILc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEEEbRT1_RT2_RKT3_RT4_RT5_RKNSG_9type_listIIDpT6_EEEE14dispatch_table
+00000672 g     F .text	00000024 digital_output
+0000105e g     F .text	000000dc timer_dispatch
+0000a0bd  w    O .rodata	0000000a _ZZN5boost3ext3sml6v1_1_44back8policies10jump_table8dispatchILi0ENS3_29get_event_mapping_impl_helperI7on_openNS3_7sm_implINS3_9sm_policyI7door_smIEEEE8mappingsEEESD_hS8_NS2_3aux4poolIIEEENSH_IISD_EEEINSG_6stringIcILc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENSK_IcILc111ELc112ELc101ELc110ELc101ELc100EEEENSK_IcILc99ELc108ELc111ELc115ELc101ELc100EEEENSK_IcILc111ELc112ELc101ELc110ELc105ELc110ELc103EEEENSK_IcILc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEEEbRT1_RT2_RKT3_RT4_RT5_RKNSG_9type_listIIDpT6_EEEE14dispatch_table
+00803a75 g     O .bss	00000001 react_i2c_command
+0000041a g     F .text	0000004e __vector_6
+000005b2 g     F .text	00000058 digitial_output_set
+00001630  w    F .text	00000004 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_3aux17integral_constantIbLb0EEEEE7executeI10door_is_upNS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS5_4poolIJEEENSG_IJSF_EEEEEbRKT_RT0_RT1_RT2_RNSM_7state_tE
+0000161c  w    F .text	00000004 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_3aux17integral_constantIbLb0EEEEE7executeI12door_is_downNS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS5_4poolIJEEENSG_IJSF_EEEEEbRKT_RT0_RT1_RT2_RNSM_7state_tE
+00803836 g     O .data	00000014 output_statuses
+0000a0bd  w    O .rodata	0000000a _ZZN5boost3ext3sml6v1_1_44back8policies10jump_table8dispatchILi0ENS3_29get_event_mapping_impl_helperI7on_openNS3_7sm_implINS3_9sm_policyI7door_smJEEEE8mappingsEEESD_hS8_NS2_3aux4poolIJEEENSH_IJSD_EEEJNSG_6stringIcJLc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENSK_IcJLc111ELc112ELc101ELc110ELc101ELc100EEEENSK_IcJLc99ELc108ELc111ELc115ELc101ELc100EEEENSK_IcJLc111ELc112ELc101ELc110ELc105ELc110ELc103EEEENSK_IcJLc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEEEbRT1_RT2_RKT3_RT4_RT5_RKNSG_9type_listIJDpT6_EEEE14dispatch_table
+00000078 g       .text	00000000 __trampolines_end
+000000ca  w      .text	00000000 __vector_3
+00803a78 g     O .bss	00000001 react_input_change
+00803803 g     O .data	0000002a _note_to_pwm
+000000ca  w      .text	00000000 __vector_23
+000020c7 g       *ABS*	00000000 __data_load_start
+0000007a g       .text	00000000 __dtors_end
+00000b28 g     F .text	00000056 queue_ringpush
+00803a8f g       .bss	00000000 __bss_end
+00000400 g       *ABS*	00000000 __LOCK_REGION_LENGTH__
+00001606  w    F .text	00000004 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_3aux17integral_constantIbLb0EEEEE7executeI8on_closeNS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS5_4poolIJEEENSG_IJSF_EEEEEbRKT_RT0_RT1_RT2_RNSM_7state_tE
+0000113a g     F .text	00000080 __vector_25
+00000bc0 g     F .text	00000070 reactor_register
+0000a0b3  w    O .rodata	0000000a _ZZN5boost3ext3sml6v1_1_44back8policies10jump_table8dispatchILi0ENS3_29get_event_mapping_impl_helperI8on_closeNS3_7sm_implINS3_9sm_policyI7door_smIEEEE8mappingsEEESD_hS8_NS2_3aux4poolIIEEENSH_IISD_EEEINSG_6stringIcILc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENSK_IcILc111ELc112ELc101ELc110ELc101ELc100EEEENSK_IcILc99ELc108ELc111ELc115ELc101ELc100EEEENSK_IcILc111ELc112ELc101ELc110ELc105ELc110ELc103EEEENSK_IcILc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEEEbRT1_RT2_RKT3_RT4_RT5_RKNSG_9type_listIIDpT6_EEEE14dispatch_table
+00008000 g       *ABS*	00000000 __RODATA_PM_OFFSET__
+000000ca  w      .text	00000000 __vector_11
+00803a70 g     O .bss	00000001 react_door_cmd
+0000007a  w      .text	00000000 __init
+00803a6f g     O .bss	00000001 sound_door_alarm
+000013bc g     F .text	00000020 twi_master_init
+00000e5c g     F .text	0000004c timer_init
+0000035a g     F .text	000000c0 digital_input_init
+00000ea8 g     F .text	00000022 timer_get_count_from_now
+00000a50 g     F .text	00000030 __vector_13
+000000ca  w      .text	00000000 __vector_17
+00803a76 g     O .bss	00000001 react_sounder
+000000ca  w      .text	00000000 __vector_19
+00000468 g     F .text	0000004e __vector_7
+00803835 g     O .data	00000001 comms_error_count
+00803a69 g     O .bss	00000002 led_door_opening
+000004b6 g     F .text	000000fc _digital_output_reactor_handler
+00001630  w    F .text	00000004 _ZN5boost3ext3sml6v1_1_44back11transitionsIINS2_3aux17integral_constantIbLb0EEEEE7executeI10door_is_upNS3_7sm_implINS3_9sm_policyI7door_smIEEEEENS5_4poolIIEEENSG_IISF_EEEEEbRKT_RT0_RT1_RT2_RNSM_7state_tE
+0000161c  w    F .text	00000004 _ZN5boost3ext3sml6v1_1_44back11transitionsIINS2_3aux17integral_constantIbLb0EEEEE7executeI12door_is_downNS3_7sm_implINS3_9sm_policyI7door_smIEEEEENS5_4poolIIEEENSG_IISF_EEEEEbRKT_RT0_RT1_RT2_RNSM_7state_tE
+0000096e g     F .text	00000042 _stop_tone
+00803a8d g     O .bss	00000001 on_error
+00803a8e g     O .bss	00000001 i2c_reactor_handle
+00803886 g     O .bss	00000001 _number_of_outputs
+0000009c g       .text	00000010 .hidden __do_clear_bss
+00810000 g       .comment	00000000 __eeprom_end
+0080384a g     O .data	00000002 current_command
+00001602  w    F .text	00000004 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_3aux17integral_constantIbLb0EEEEE7executeI7on_openNS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS5_4poolIJEEENSG_IJSF_EEEEEbRKT_RT0_RT1_RT2_RNSM_7state_tE
+00000ac4 g     F .text	00000018 queue_is_empty
+00001606  w    F .text	00000004 _ZN5boost3ext3sml6v1_1_44back11transitionsIINS2_3aux17integral_constantIbLb0EEEEE7executeI8on_closeNS3_7sm_implINS3_9sm_policyI7door_smIEEEEENS5_4poolIIEEENSG_IISF_EEEEEbRKT_RT0_RT1_RT2_RNSM_7state_tE
+00000000 g       .text	00000000 __vectors
+00803a7a g     O .bss	0000000e piezzo
+00803a88 g     O .bss	00000001 react_piezzo
+000000ca  w      .text	00000000 __vector_27
+0080384c g       .data	00000000 __data_end
+000000d4 g     F .text	0000000a ccp_write_io
+0080388d g     O .bss	00000001 playing_tone
+0000a09f  w    O .rodata	0000000a _ZZN5boost3ext3sml6v1_1_44back8policies10jump_table8dispatchILi0ENS3_29get_event_mapping_impl_helperI10door_is_upNS3_7sm_implINS3_9sm_policyI7door_smJEEEE8mappingsEEESD_hS8_NS2_3aux4poolIJEEENSH_IJSD_EEEJNSG_6stringIcJLc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENSK_IcJLc111ELc112ELc101ELc110ELc101ELc100EEEENSK_IcJLc99ELc108ELc111ELc115ELc101ELc100EEEENSK_IcJLc111ELc112ELc101ELc110ELc105ELc110ELc103EEEENSK_IcJLc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEEEbRT1_RT2_RKT3_RT4_RT5_RKNSG_9type_listIJDpT6_EEEE14dispatch_table
+00000000  w      .text	00000000 __vector_default
+00001b9e g       .text	00000028 .hidden __divmodhi4
+000000ca  w      .text	00000000 __vector_5
+00001262 g     F .text	00000034 twim_release
+00000400 g       *ABS*	00000000 __SIGNATURE_REGION_LENGTH__
+00001bee g       .text	0000000c .hidden __tablejump2__
+00803a79 g     O .bss	00000001 _reactor
+00000078 g       .text	00000000 __ctors_start
+00001464 g     F .text	00000080 board_init
+00001296 g     F .text	00000126 twim_interrupt_handler
+00000086 g       .text	00000016 .hidden __do_copy_data
+0080384c g       .bss	00000000 __bss_start
+00001fc4 g     F .text	0000000e memset
+00001986 g     F .text	00000124 main
+00803a6b g     O .bss	00000002 led_chuck
+000000ca  w      .text	00000000 __vector_4
+00803800 g       *ABS*	00000000 __DATA_REGION_ORIGIN__
+000000ce g     F .text	00000006 alert_record
+0000060a g     F .text	00000056 digitial_output_start
+00001602  w    F .text	00000004 _ZN5boost3ext3sml6v1_1_44back11transitionsIINS2_3aux17integral_constantIbLb0EEEEE7executeI7on_openNS3_7sm_implINS3_9sm_policyI7door_smIEEEEENS5_4poolIIEEENSG_IISF_EEEEEbRKT_RT0_RT1_RT2_RNSM_7state_tE
+00000000  w      *ABS*	00000000 __heap_end
+00803a73 g     O .bss	00000001 react_i2c_read
+000000ca  w      .text	00000000 __vector_9
+000000ca  w      .text	00000000 __vector_2
+00000400 g       *ABS*	00000000 __USER_SIGNATURE_REGION_LENGTH__
+000000ca  w      .text	00000000 __vector_21
+000015a8 g     F .text	00000054 __vector_15
+00001524 g     F .text	0000002c i2c_init
+00001b86 g       .text	00000018 .hidden __udivmodqi4
+0000a0a9  w    O .rodata	0000000a _ZZN5boost3ext3sml6v1_1_44back8policies10jump_table8dispatchILi0ENS3_29get_event_mapping_impl_helperI12door_is_downNS3_7sm_implINS3_9sm_policyI7door_smJEEEE8mappingsEEESD_hS8_NS2_3aux4poolIJEEENSH_IJSD_EEEJNSG_6stringIcJLc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENSK_IcJLc111ELc112ELc101ELc110ELc101ELc100EEEENSK_IcJLc99ELc108ELc111ELc115ELc101ELc100EEEENSK_IcJLc111ELc112ELc101ELc110ELc105ELc110ELc103EEEENSK_IcJLc99ELc108ELc111ELc115ELc105ELc110ELc103EEEEEEEbRT1_RT2_RKT3_RT4_RT5_RKNSG_9type_listIJDpT6_EEEE14dispatch_table
+000000ca  w      .text	00000000 __vector_29
+00803a8f g       .comment	00000000 __heap_start
+000000de g     F .text	000000c6 _digital_input_sample
+000006fa g     F .text	00000274 _play_next_note
+0000007a g       .text	00000000 __dtors_start
+0000007a g       .text	00000000 __ctors_end
+00003fff  w      *ABS*	00000000 __stack
+00803a64 g     O .bss	00000001 sm
+0080388e g     O .bss	00000004 timer_instance
+0080384c g       .data	00000000 _edata
+00001620  w    F .text	00000010 _ZN5boost3ext3sml6v1_1_44back11transitionsIJNS2_5front10transitionIJNS5_5stateINS2_3aux6stringIcJLc111ELc112ELc101ELc110ELc101ELc100EEEEEENS7_IFNS9_IcJLc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENS5_13initial_stateEEEENS5_5eventI10door_is_upEENS5_6alwaysENS5_4noneEEEEEE7executeISH_NS3_7sm_implINS3_9sm_policyI7door_smJEEEEENS8_4poolIJEEENST_IJSS_EEEEEbRKT_RT0_RT1_RT2_RNSZ_7state_tE
+00001620  w    F .text	00000010 _ZN5boost3ext3sml6v1_1_44back11transitionsIINS2_5front10transitionIINS5_5stateINS2_3aux6stringIcILc111ELc112ELc101ELc110ELc101ELc100EEEEEENS7_IFNS9_IcILc117ELc110ELc107ELc110ELc111ELc119ELc110EEEENS5_13initial_stateEEEENS5_5eventI10door_is_upEENS5_6alwaysENS5_4noneEEEEEE7executeISH_NS3_7sm_implINS3_9sm_policyI7door_smIEEEEENS8_4poolIIEEENST_IISS_EEEEEbRKT_RT0_RT1_RT2_RNSZ_7state_tE
+00803a8f g       .comment	00000000 _end
+000000ca  w      .text	00000000 __vector_8
+00000a48 g     F .text	00000008 piezzo_stop_tone
+000000ca  w      .text	00000000 __vector_26
+00803a67 g     O .bss	00000002 led_door_closing
+00002034  w      .text	00000000 .hidden exit
+00000696 g     F .text	00000064 mem_calloc
+00001b9e g       .text	00000000 .hidden _div
+000002d4 g     F .text	00000086 digital_input
+00803a6d g     O .bss	00000002 led_fault
+00803a89 g     O .bss	00000001 react_tone_stop
+00000100 g       *ABS*	00000000 __EEPROM_REGION_LENGTH__
+00002034 g       .text	00000000 .hidden _exit
+00000e3c g     F .text	0000000a sysclk_init
+000000ca  w      .text	00000000 __vector_14
+00000e46 g     F .text	00000016 timer_get_count
+000000ca  w      .text	00000000 __vector_10
+000000ca  w      .text	00000000 __vector_16
+00803800 g       .data	00000000 __data_start
+000000ca  w      .text	00000000 __vector_18
+0080388b g     O .bss	00000002 playing_tone_recovery_value
+0000000a g       *ABS*	00000000 __FUSE_REGION_LENGTH__
+00004000 g       *ABS*	00000000 __TEXT_REGION_LENGTH__
+00803a65 g     O .bss	00000002 chuck_released_oc
+000009b0 g     F .text	00000038 piezzo_init
+000000ca  w      .text	00000000 __vector_20
+00000a80 g     F .text	00000044 queue_init
+00803892 g     O .bss	00000001 reactor_lock
+00001fd2 g       .text	00000032 .hidden __prologue_saves__
+000017be g     F .text	00000070 _Z23start_periodic_transmitb
+00803a71 g     O .bss	00000001 react_door_sensor
+00001550 g     F .text	00000058 i2c_master_send
+000000ac g       .text	00000016 .hidden __do_global_ctors
+
+

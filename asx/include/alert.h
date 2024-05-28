@@ -10,12 +10,12 @@
  *  an internal assertion without crashing the AVR.
  * This API can be configured by the product to signal the assertion to the
  *  outside world through some I/Os or serial output.
- * This API allow the user to report to the outside that a internal 
+ * This API allow the user to report to the outside that a internal
  *  fault has occurred.
  * The output mode goes from :
- *  - flashing an LED 
+ *  - flashing an LED
  *  - writing to the internal EEPROM
- *  - writing to the UART 
+ *  - writing to the UART
  * ... depending on the configuration.
  *****************************************************************************
  * @file
@@ -25,7 +25,8 @@
 #include <stdbool.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /************************************************************************/
@@ -33,10 +34,10 @@ extern "C" {
 /************************************************************************/
 
 /** Ready the alert stack */
-void alert_init( void );
+void alert_init(void);
 
 /** Each application must customize this function */
-void alert_record( bool abort, int line, const char *file );
+void alert_record(bool abort, int line, const char *file);
 
 /** Raise and alert. This macro adds the line and file automatically */
 #define alert() alert_record(false, __LINE__, __FILE__)
@@ -46,12 +47,15 @@ void alert_record( bool abort, int line, const char *file );
 
 /**
  * Conditionally raise and alert and stop.
- * This macro adds the line and file automatically 
+ * This macro adds the line and file automatically
  *
  * @param cond Condition evaluated as a boolean upon which to alert
  */
-#define alert_and_stop_if(cond) \
-   if (cond) { alert_record(true, __LINE__, __FILE__); }
+#define alert_and_stop_if(cond)               \
+   if (cond)                                  \
+   {                                          \
+      alert_record(true, __LINE__, __FILE__); \
+   }
 
 #ifdef __cplusplus
 }

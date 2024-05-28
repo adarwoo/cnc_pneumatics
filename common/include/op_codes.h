@@ -44,6 +44,27 @@ typedef enum {
 #define OPCODE_INPUT_IS_ON_MASK 0xA5
 #define OPCODE_INPUT_IS_OFF_MASK 0x5A
 
+/** 
+ * @return The opcode if the opcode is a valid command or opcodes_cmd_error (0)
+ */
+static inline opcodes_cmd_t opcodes_check_cmd_valid( uint8_t value )
+{
+   if ( 
+      value == opcodes_cmd_idle || 
+      value == opcodes_cmd_push_door ||
+      value == opcodes_cmd_pull_door ||
+      value == opcodes_cmd_blast_toolsetter ||
+      value == opcodes_cmd_blast_spindle ||
+      value == opcodes_cmd_unclamp_chuck ||
+      value == opcodes_cmd_reserved0 ||
+      value == opcodes_cmd_reserved1
+      )
+   {
+      return (opcodes_cmd_t)value;
+   }
+   
+   return opcodes_cmd_error;
+}
 
 /**
  * Extract the value

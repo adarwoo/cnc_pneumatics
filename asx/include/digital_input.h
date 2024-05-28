@@ -25,6 +25,7 @@
 
 #include "ioport.h"
 #include "reactor.h"
+#include "timer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,15 +46,54 @@ typedef union
    };
 } pin_and_value_t;
 
-/** Abstract handle for the digital input */
-typedef uint8_t digital_input_t;
+/** Hold digital input persistent information */
+typedef struct _digital_input_s
+{
+   /** An ioport pin to sample */
+   ioport_pin_t pin;
+
+   /** Reactor handler to call on change */
+   reactor_handle_t handler;
+   
+   union
+   {
+      struct
+      {
+         /** Last known status of the filtered input */
+         bool input;
+         /** Internal value of the integrator */
+         uint8_t integrator_threshold;
+         /** Threshold value of the integrator */
+         uint8_t integrator;
+      } sampled;
+      
+      struct
+      {
+         /** Last known status of the filtered input */
+         uint8_t sense_mode;
+         /** Internal value of the integrator */
+         timer_count_t filter;
+      } direct;
+   };
+
+   /** Pointer to the next input */
+   struct _digital_input_s *next;
+} digital_input_t;
+
+typedef digital_input_t *digital_input_handle_t;
 
 /** Initialize the digital input API */
 void digital_input_init(void);
 
 /** Add an input for processing */
-void digital_input(ioport_pin_t, reactor_handle_t, uint8_t, uint8_t);
-
+digital_input_handle_t digital_input(
+   ioport_pin_t pin,
+   reactor_handle_t reactor,
+   uint8_t sense_mode,
+   timer_count_t filter_value);
+   
+/** Grab the value directly */
+bool digital_input_value( digital_input_handle_t );
 
 #ifdef __cplusplus
 }

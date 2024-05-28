@@ -84,7 +84,7 @@ void i2c_master_send(opcodes_cmd_t code)
 
    // The reactor will have some data to process once the send is over
    // If an error is return, report it
-   if ( status != OPERATION_IN_PROGRESS )
+   if ( status != STATUS_OK )
    {
       reactor_notify(on_error, (void *)status);
    }

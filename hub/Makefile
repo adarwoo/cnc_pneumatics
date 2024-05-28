@@ -1,7 +1,7 @@
 TOP=..
 
 # Select the architecture
-ARCH=attiny1626
+ARCH=attiny824
 
 # Name of the binary to produce
 BIN := hub
@@ -40,7 +40,7 @@ SRCS := \
    $(ASX_DIR)/src/sysclk.c \
    $(ASX_DIR)/src/timer.c \
    $(ASX_DIR)/src/twis.c \
-   
+   $(ASX_DIR)/src/digital_input.c \
 
 # Project own files
 SRCS += \

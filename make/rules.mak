@@ -20,7 +20,7 @@ MKDIR ?=	mkdir -p
 BUILD_DIR       ?= $(build_type)
 
 # Pre-processor flags
-CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p))
+CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p)) -D$(if $(NDEBUG),NDEBUG,DEBUG)
 
 # Flags for the compilation of C files
 CFLAGS          += -ggdb3 -Wall
@@ -57,7 +57,7 @@ LD               = $(if $(findstring .cpp,$(suffix $(SRCS))),$(LINK.cxx),$(LINK.
 # Allow the source to be in sub-directories
 BUILDDIRS        = $(sort $(dir $(OBJS)))
 
-all : $(BUILDDIRS) $(BUILD_DIR)/$(BIN)$(BIN_EXT)
+all : $(BUILDDIRS) $(BIN)$(BIN_EXT)
 
 sim :
 	$(MUTE)$(MAKE) --no-print-directory $(MAKEFLAGS) SIM=1 all
@@ -66,6 +66,10 @@ sim :
 
 # Create the build directory
 $(BUILD_DIR): ; @-mkdir -p $@
+
+$(BIN)$(BIN_EXT) : $(BUILD_DIR)/$(BIN)$(BIN_EXT)
+	@echo Copying $^ to $@
+	@cp $^ $@
 
 $(BUILD_DIR)/$(BIN)$(BIN_EXT) : $(OBJS)
 	@echo Linking to $@

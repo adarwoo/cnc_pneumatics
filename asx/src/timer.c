@@ -151,8 +151,12 @@ timer_count_t timer_get_count(void)
 {
 	timer_count_t retval;
 
+	// Stop a race between this accessor and the interrupt
+	// Especially true for 32 bits counters which takes many assembly instructions
+	sei();
 	retval = _timer_free_running_ms_counter;
-
+	cli();
+	
 	return retval;
 }
 
@@ -212,10 +216,9 @@ timer_count_t timer_time_lapsed_since(timer_count_t count)
 }
 
 /**
- * Arm a timer.
+ * Arm a timer
  * This function checks for several conditions:
  *  * Now more slots!
- *  * Time given too short
  * The list is sorted to help the interrupt be short.
  * This function can be safely called from within an interrupt context.
  *
@@ -228,7 +231,7 @@ timer_count_t timer_time_lapsed_since(timer_count_t count)
  *              If 0, does not repeat
  * @param arg   Extra argument passed to the caller.
  * 				 If NULL, the timer instance is passed as arg.
- * 				 If the timer is repeating, the initial value is passed everytime
+ * 				 If the timer is repeating, the initial value is passed every time
  * @return      The handle (slot position of the timer)
  */
 timer_instance_t timer_arm(
@@ -337,7 +340,7 @@ void timer_dispatch(void *arg)
 		if (timeNow >= pFuture->count)
 		{
 			// Notify the reactor
-			reactor_notify(pFuture->reactor,	pFuture->arg);
+			reactor_notify(pFuture->reactor, pFuture->arg);
 
 			// Is it a repeating instance
 			if (pFuture->repeat)
@@ -406,6 +409,8 @@ bool timer_cancel(timer_instance_t to_cancel)
 
 			return true;
 		}
+      
+      ++insertPoint;
 	}
    
    return false;

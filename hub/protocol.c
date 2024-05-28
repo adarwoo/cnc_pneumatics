@@ -25,7 +25,7 @@
 /************************************************************************/
 
 // Current command
-static protocol_send_receive_t current = cmd_idle_e;
+static opcodes_cmd_t current = opcodes_cmd_idle;
 
 // Set by the timer to indicate a new command can be processed
 bool ready_to_accept_new_command = true;
@@ -51,7 +51,7 @@ static void _on_check_comms(void *arg)
    
    if ( counter == 0 )
    {
-      protocol_process(cmd_idle_e);
+      protocol_process(opcodes_cmd_idle);
    }
    
    // Atomically reset the counter and check again in 1 second
@@ -76,27 +76,19 @@ void _on_accept_command_again(void *arg)
  */
 bool protocol_process(uint8_t raw_data)
 {
-   protocol_send_receive_t received = (protocol_send_receive_t )raw_data;
    static ioport_pin_t previous_pin = 0;
    ioport_pin_t new_pin = 0;
+   opcodes_cmd_t cmd = opcodes_check_cmd_valid(raw_data);
    
-   bool command_is_valid =
-      cmd_idle_e == received ||
-      cmd_door_push_e == received ||
-      cmd_door_pull_e == received ||
-      cmd_toolsetter_air_blast == received ||
-      cmd_spindle_chuck_open == received ||
-      cmd_spindle_air_clean == received;
-      
-   if ( command_is_valid )
+   if ( cmd != opcodes_cmd_error )
    {
       ++message_received_counter;
       
-      if ( current != received && ready_to_accept_new_command)
+      if ( current != cmd && ready_to_accept_new_command)
       {
          // If the command is valid - store it
-         switch ( received ) {
-         case cmd_idle_e:
+         switch ( cmd ) {
+         case opcodes_cmd_idle:
             ioport_set_pin_level(IOPORT_TOOL_SETTER_AIR_BLAST, false);
             ioport_set_pin_level(IOPORT_CHUCK_CLAMP, false);
             ioport_set_pin_level(IOPORT_SPINDLE_CLEAN, false);
@@ -107,15 +99,15 @@ bool protocol_process(uint8_t raw_data)
             previous_pin = 0;
             new_pin = 0;
             break;
-         case cmd_door_push_e: 
+         case opcodes_cmd_push_door: 
             new_pin = IOPORT_DOOR_PUSH; break;
-         case cmd_door_pull_e: 
+         case opcodes_cmd_pull_door: 
             new_pin = IOPORT_DOOR_PULL; break;
-         case cmd_toolsetter_air_blast:  
+         case opcodes_cmd_blast_toolsetter:  
             new_pin = IOPORT_TOOL_SETTER_AIR_BLAST; break;
-         case cmd_spindle_chuck_open:  
+         case opcodes_cmd_unclamp_chuck:  
             new_pin = IOPORT_CHUCK_CLAMP; break;
-         case cmd_spindle_air_clean:  
+         case opcodes_cmd_blast_spindle:  
             new_pin = IOPORT_SPINDLE_CLEAN; break;
          default:
             break;
@@ -135,7 +127,7 @@ bool protocol_process(uint8_t raw_data)
          }
          
          // Update the current command
-         current = received;
+         current = cmd;
          
          // Do not allow a new command to be accounted for in the next T cycle
          ready_to_accept_new_command = false;
@@ -143,7 +135,7 @@ bool protocol_process(uint8_t raw_data)
       }        
    }
 
-   return command_is_valid;
+   return cmd != opcodes_cmd_error;
 }
 
 

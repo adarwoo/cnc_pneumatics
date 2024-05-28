@@ -6,7 +6,6 @@
  */ 
 
 #include "board.h"
-#include "reactor.h"
 #include "pressure_mon.h"
 #include "protocol.h"
 #include "i2c_slave.h"
@@ -14,10 +13,10 @@
 
 int main(void)
 {
-   // Initialise the board hardware (clocks, IOs, buses etc.)
+   // Initialize the board hardware (clocks, IOs, buses etc.)
    board_init();
 
-   // Start measuring the input with filter
+   // Sample of 1 input (need digital input)
    pressure_mon_init();
    
    // The protocol is time sensitive - get it started
@@ -25,9 +24,6 @@ int main(void)
    
    // Turn on this board as an i2c slave
    i2c_slave_init();
-   
-   // Ready the reactor
-   reactor_init();
    
    // Off we go!
    reactor_run();
