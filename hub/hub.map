@@ -372,9 +372,12 @@ Discarded input sections
  .group         0x00000000        0x8 Debug/asx/src/reactor.o
  .group         0x00000000        0x8 Debug/asx/src/reactor.o
  .group         0x00000000        0x8 Debug/asx/src/reactor.o
+ .group         0x00000000        0x8 Debug/asx/src/reactor.o
  .text          0x00000000        0x0 Debug/asx/src/reactor.o
  .data          0x00000000        0x0 Debug/asx/src/reactor.o
  .bss           0x00000000        0x0 Debug/asx/src/reactor.o
+ .bss.DEBUG_INDEX
+                0x00000000        0x1 Debug/asx/src/reactor.o
  .debug_macro   0x00000000      0xa5a Debug/asx/src/reactor.o
  .debug_macro   0x00000000       0x10 Debug/asx/src/reactor.o
  .debug_macro   0x00000000      0x1c9 Debug/asx/src/reactor.o
@@ -1340,7 +1343,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x15f2
+.text           0x00000000     0x15f4
  *(.vectors)
  .vectors       0x00000000       0x3c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATtiny_DFP/2.0.368/gcc/dev/attiny824/avrxmega3/short-calls/crtattiny824.o
                 0x00000000                __vector_default
@@ -1387,7 +1390,7 @@ END GROUP
                 0x0000005e                __do_clear_bss
  *(.init4)
  *(.init5)
- .init5         0x0000006e       0x1e Debug/asx/src/mem.o
+ .init5         0x0000006e       0x12 Debug/asx/src/mem.o
  *(.init5)
  *(.init6)
  *(.init6)
@@ -1396,204 +1399,204 @@ END GROUP
  *(.init8)
  *(.init8)
  *(.init9)
- .init9         0x0000008c        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATtiny_DFP/2.0.368/gcc/dev/attiny824/avrxmega3/short-calls/crtattiny824.o
+ .init9         0x00000080        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATtiny_DFP/2.0.368/gcc/dev/attiny824/avrxmega3/short-calls/crtattiny824.o
  *(.init9)
  *(.text)
- .text          0x00000090        0x2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATtiny_DFP/2.0.368/gcc/dev/attiny824/avrxmega3/short-calls/crtattiny824.o
-                0x00000090                __vector_22
-                0x00000090                __vector_28
-                0x00000090                __vector_1
-                0x00000090                __vector_24
-                0x00000090                __vector_12
-                0x00000090                __bad_interrupt
-                0x00000090                __vector_3
-                0x00000090                __vector_23
-                0x00000090                __vector_11
-                0x00000090                __vector_13
-                0x00000090                __vector_17
-                0x00000090                __vector_19
-                0x00000090                __vector_27
-                0x00000090                __vector_5
-                0x00000090                __vector_4
-                0x00000090                __vector_9
-                0x00000090                __vector_2
-                0x00000090                __vector_21
-                0x00000090                __vector_15
-                0x00000090                __vector_29
-                0x00000090                __vector_8
-                0x00000090                __vector_26
-                0x00000090                __vector_10
-                0x00000090                __vector_16
-                0x00000090                __vector_18
-                0x00000090                __vector_20
-                0x00000092                . = ALIGN (0x2)
+ .text          0x00000084        0x2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATtiny_DFP/2.0.368/gcc/dev/attiny824/avrxmega3/short-calls/crtattiny824.o
+                0x00000084                __vector_22
+                0x00000084                __vector_28
+                0x00000084                __vector_1
+                0x00000084                __vector_24
+                0x00000084                __vector_12
+                0x00000084                __bad_interrupt
+                0x00000084                __vector_3
+                0x00000084                __vector_23
+                0x00000084                __vector_11
+                0x00000084                __vector_13
+                0x00000084                __vector_17
+                0x00000084                __vector_19
+                0x00000084                __vector_27
+                0x00000084                __vector_5
+                0x00000084                __vector_4
+                0x00000084                __vector_9
+                0x00000084                __vector_2
+                0x00000084                __vector_21
+                0x00000084                __vector_15
+                0x00000084                __vector_29
+                0x00000084                __vector_8
+                0x00000084                __vector_26
+                0x00000084                __vector_10
+                0x00000084                __vector_16
+                0x00000084                __vector_18
+                0x00000084                __vector_20
+                0x00000086                . = ALIGN (0x2)
  *(.text.*)
  .text.alert_record
-                0x00000092       0x18 Debug/asx/src/alert.o
-                0x00000092                alert_record
+                0x00000086       0x18 Debug/asx/src/alert.o
+                0x00000086                alert_record
  .text._digital_input_ack
-                0x000000aa       0x4e Debug/asx/src/digital_input.o
+                0x0000009e       0x4e Debug/asx/src/digital_input.o
  .text._digital_input_sample
-                0x000000f8       0x82 Debug/asx/src/digital_input.o
+                0x000000ec       0x82 Debug/asx/src/digital_input.o
  .text._handle_pin_change_isr
-                0x0000017a       0xe0 Debug/asx/src/digital_input.o
+                0x0000016e       0xe0 Debug/asx/src/digital_input.o
  .text.digital_input
-                0x0000025a       0xf4 Debug/asx/src/digital_input.o
-                0x0000025a                digital_input
+                0x0000024e       0xf4 Debug/asx/src/digital_input.o
+                0x0000024e                digital_input
  .text.digital_input_init
-                0x0000034e       0x4c Debug/asx/src/digital_input.o
-                0x0000034e                digital_input_init
+                0x00000342       0x4c Debug/asx/src/digital_input.o
+                0x00000342                digital_input_init
  .text.digital_input_value
-                0x0000039a        0x6 Debug/asx/src/digital_input.o
-                0x0000039a                digital_input_value
+                0x0000038e        0x6 Debug/asx/src/digital_input.o
+                0x0000038e                digital_input_value
  .text.__vector_6
-                0x000003a0       0x50 Debug/asx/src/digital_input.o
-                0x000003a0                __vector_6
+                0x00000394       0x50 Debug/asx/src/digital_input.o
+                0x00000394                __vector_6
  .text.__vector_7
-                0x000003f0       0x50 Debug/asx/src/digital_input.o
-                0x000003f0                __vector_7
+                0x000003e4       0x50 Debug/asx/src/digital_input.o
+                0x000003e4                __vector_7
  .text.mem_calloc
-                0x00000440       0x78 Debug/asx/src/mem.o
-                0x00000440                mem_calloc
+                0x00000434       0x72 Debug/asx/src/mem.o
+                0x00000434                mem_calloc
  .text.queue_init
-                0x000004b8       0x40 Debug/asx/src/queue.o
-                0x000004b8                queue_init
+                0x000004a6       0x40 Debug/asx/src/queue.o
+                0x000004a6                queue_init
  .text.queue_is_empty
-                0x000004f8       0x18 Debug/asx/src/queue.o
-                0x000004f8                queue_is_empty
+                0x000004e6       0x18 Debug/asx/src/queue.o
+                0x000004e6                queue_is_empty
  .text.queue_leftpop
-                0x00000510       0x52 Debug/asx/src/queue.o
-                0x00000510                queue_leftpop
+                0x000004fe       0x52 Debug/asx/src/queue.o
+                0x000004fe                queue_leftpop
  .text.queue_ringpush
-                0x00000562       0x5c Debug/asx/src/queue.o
-                0x00000562                queue_ringpush
+                0x00000550       0x5c Debug/asx/src/queue.o
+                0x00000550                queue_ringpush
  .text.compare_prio
-                0x000005be       0x22 Debug/asx/src/reactor.o
+                0x000005ac       0x22 Debug/asx/src/reactor.o
  .text.reactor_init
-                0x000005e0       0x28 Debug/asx/src/reactor.o
-                0x000005e0                reactor_init
+                0x000005ce       0x28 Debug/asx/src/reactor.o
+                0x000005ce                reactor_init
  .text.reactor_register
-                0x00000608       0x6c Debug/asx/src/reactor.o
-                0x00000608                reactor_register
+                0x000005f6       0x80 Debug/asx/src/reactor.o
+                0x000005f6                reactor_register
  .text.reactor_notify
-                0x00000674       0x32 Debug/asx/src/reactor.o
-                0x00000674                reactor_notify
+                0x00000676       0x32 Debug/asx/src/reactor.o
+                0x00000676                reactor_notify
  .text.reactor_run
-                0x000006a6      0x1de Debug/asx/src/reactor.o
-                0x000006a6                reactor_run
+                0x000006a8      0x1de Debug/asx/src/reactor.o
+                0x000006a8                reactor_run
  .text.timer_get_count
-                0x00000884       0x16 Debug/asx/src/timer.o
-                0x00000884                timer_get_count
+                0x00000886       0x16 Debug/asx/src/timer.o
+                0x00000886                timer_get_count
  .text.timer_init
-                0x0000089a       0x4e Debug/asx/src/timer.o
-                0x0000089a                timer_init
+                0x0000089c       0x4e Debug/asx/src/timer.o
+                0x0000089c                timer_init
  .text.timer_get_count_from_now
-                0x000008e8       0x20 Debug/asx/src/timer.o
-                0x000008e8                timer_get_count_from_now
+                0x000008ea       0x20 Debug/asx/src/timer.o
+                0x000008ea                timer_get_count_from_now
  .text.timer_arm
-                0x00000908      0x1a6 Debug/asx/src/timer.o
-                0x00000908                timer_arm
+                0x0000090a      0x1a6 Debug/asx/src/timer.o
+                0x0000090a                timer_arm
  .text.timer_dispatch
-                0x00000aae       0xd6 Debug/asx/src/timer.o
-                0x00000aae                timer_dispatch
+                0x00000ab0       0xd6 Debug/asx/src/timer.o
+                0x00000ab0                timer_dispatch
  .text.__vector_25
-                0x00000b84       0x7e Debug/asx/src/timer.o
-                0x00000b84                __vector_25
+                0x00000b86       0x7e Debug/asx/src/timer.o
+                0x00000b86                __vector_25
  .text.TWI_SlaveInitializeDriver
-                0x00000c02       0x16 Debug/asx/src/twis.o
-                0x00000c02                TWI_SlaveInitializeDriver
+                0x00000c04       0x16 Debug/asx/src/twis.o
+                0x00000c04                TWI_SlaveInitializeDriver
  .text.TWI_SlaveInitializeModule
-                0x00000c18       0x16 Debug/asx/src/twis.o
-                0x00000c18                TWI_SlaveInitializeModule
+                0x00000c1a       0x16 Debug/asx/src/twis.o
+                0x00000c1a                TWI_SlaveInitializeModule
  .text.TWI_SlaveTransactionFinished
-                0x00000c2e        0x8 Debug/asx/src/twis.o
-                0x00000c2e                TWI_SlaveTransactionFinished
+                0x00000c30        0x8 Debug/asx/src/twis.o
+                0x00000c30                TWI_SlaveTransactionFinished
  .text.TWI_SlaveAddressMatchHandler
-                0x00000c36       0x4c Debug/asx/src/twis.o
-                0x00000c36                TWI_SlaveAddressMatchHandler
+                0x00000c38       0x4c Debug/asx/src/twis.o
+                0x00000c38                TWI_SlaveAddressMatchHandler
  .text.TWI_SlaveStopHandler
-                0x00000c82       0x1e Debug/asx/src/twis.o
-                0x00000c82                TWI_SlaveStopHandler
+                0x00000c84       0x1e Debug/asx/src/twis.o
+                0x00000c84                TWI_SlaveStopHandler
  .text.TWI_SlaveReadHandler
-                0x00000ca0       0x68 Debug/asx/src/twis.o
-                0x00000ca0                TWI_SlaveReadHandler
+                0x00000ca2       0x68 Debug/asx/src/twis.o
+                0x00000ca2                TWI_SlaveReadHandler
  .text.TWI_SlaveWriteHandler
-                0x00000d08       0x62 Debug/asx/src/twis.o
-                0x00000d08                TWI_SlaveWriteHandler
+                0x00000d0a       0x62 Debug/asx/src/twis.o
+                0x00000d0a                TWI_SlaveWriteHandler
  .text.TWI_SlaveDataHandler
-                0x00000d6a       0x14 Debug/asx/src/twis.o
-                0x00000d6a                TWI_SlaveDataHandler
+                0x00000d6c       0x14 Debug/asx/src/twis.o
+                0x00000d6c                TWI_SlaveDataHandler
  .text.TWI_SlaveInterruptHandler
-                0x00000d7e       0x50 Debug/asx/src/twis.o
-                0x00000d7e                TWI_SlaveInterruptHandler
+                0x00000d80       0x50 Debug/asx/src/twis.o
+                0x00000d80                TWI_SlaveInterruptHandler
  .text.board_init
-                0x00000dce       0x4a Debug/board.o
-                0x00000dce                board_init
+                0x00000dd0       0x4a Debug/board.o
+                0x00000dd0                board_init
  .text._on_accept_command_again
-                0x00000e18        0x8 Debug/protocol.o
-                0x00000e18                _on_accept_command_again
+                0x00000e1a        0x8 Debug/protocol.o
+                0x00000e1a                _on_accept_command_again
  .text.protocol_process
-                0x00000e20      0x14e Debug/protocol.o
-                0x00000e20                protocol_process
+                0x00000e22      0x14e Debug/protocol.o
+                0x00000e22                protocol_process
  .text._on_check_comms
-                0x00000f6e       0x4a Debug/protocol.o
+                0x00000f70       0x4a Debug/protocol.o
  .text.protocol_init
-                0x00000fb8       0x4c Debug/protocol.o
-                0x00000fb8                protocol_init
+                0x00000fba       0x4c Debug/protocol.o
+                0x00000fba                protocol_init
  .text.slave_process
-                0x00001004       0x36 Debug/i2c_slave.o
+                0x00001006       0x36 Debug/i2c_slave.o
  .text.i2c_slave_init
-                0x0000103a       0x18 Debug/i2c_slave.o
-                0x0000103a                i2c_slave_init
+                0x0000103c       0x18 Debug/i2c_slave.o
+                0x0000103c                i2c_slave_init
  .text.__vector_14
-                0x00001052       0x4a Debug/i2c_slave.o
-                0x00001052                __vector_14
+                0x00001054       0x4a Debug/i2c_slave.o
+                0x00001054                __vector_14
  .text.pressure_mon_init
-                0x0000109c       0x22 Debug/pressure_mon.o
-                0x0000109c                pressure_mon_init
+                0x0000109e       0x22 Debug/pressure_mon.o
+                0x0000109e                pressure_mon_init
  .text.pressure_mon_reply
-                0x000010be        0xc Debug/pressure_mon.o
-                0x000010be                pressure_mon_reply
- .text.main     0x000010ca       0x10 Debug/main.o
-                0x000010ca                main
+                0x000010c0        0xc Debug/pressure_mon.o
+                0x000010c0                pressure_mon_reply
+ .text.main     0x000010cc       0x10 Debug/main.o
+                0x000010cc                main
  .text.libgcc.div
-                0x000010da       0x26 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_divmodhi4.o)
-                0x000010da                _div
-                0x000010da                __divmodhi4
+                0x000010dc       0x26 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_divmodhi4.o)
+                0x000010dc                _div
+                0x000010dc                __divmodhi4
  .text.libgcc.mul
-                0x00001100       0x4e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_umulsidi3.o)
-                0x00001100                __umulsidi3
-                0x00001102                __umulsidi3_helper
+                0x00001102       0x4e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_umulsidi3.o)
+                0x00001102                __umulsidi3
+                0x00001104                __umulsidi3_helper
  .text.libgcc.builtins
-                0x0000114e       0x3c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_ashrdi3.o)
-                0x0000114e                __ashrdi3
-                0x00001152                __lshrdi3
+                0x00001150       0x3c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_ashrdi3.o)
+                0x00001150                __ashrdi3
+                0x00001154                __lshrdi3
  .text.libgcc.div
-                0x0000118a       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_udivmodhi4.o)
-                0x0000118a                __udivmodhi4
+                0x0000118c       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_udivmodhi4.o)
+                0x0000118c                __udivmodhi4
  .text.libgcc.mul
-                0x000011b2       0x18 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_umulhisi3.o)
-                0x000011b2                __umulhisi3
+                0x000011b4       0x18 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_umulhisi3.o)
+                0x000011b4                __umulhisi3
  .text.libgcc.mul
-                0x000011ca       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_muldi3_6.o)
-                0x000011ca                __muldi3_6
+                0x000011cc       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_muldi3_6.o)
+                0x000011cc                __muldi3_6
  .text.avr-libc
-                0x000011da      0x3a4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3/short-calls\libc.a(qsort.o)
-                0x00001258                qsort
+                0x000011dc      0x3a4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3/short-calls\libc.a(qsort.o)
+                0x0000125a                qsort
  .text.avr-libc
-                0x0000157e        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3/short-calls\libc.a(memset.o)
-                0x0000157e                memset
+                0x00001580        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3/short-calls\libc.a(memset.o)
+                0x00001580                memset
  .text.libgcc.prologue
-                0x0000158c       0x32 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_prologue.o)
-                0x0000158c                __prologue_saves__
+                0x0000158e       0x32 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_prologue.o)
+                0x0000158e                __prologue_saves__
  .text.libgcc.prologue
-                0x000015be       0x30 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_epilogue.o)
-                0x000015be                __epilogue_restores__
-                0x000015ee                . = ALIGN (0x2)
+                0x000015c0       0x30 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_epilogue.o)
+                0x000015c0                __epilogue_restores__
+                0x000015f0                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x000015ee        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_exit.o)
-                0x000015ee                _exit
-                0x000015ee                exit
+ .fini9         0x000015f0        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_exit.o)
+                0x000015f0                _exit
+                0x000015f0                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -1612,21 +1615,22 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x000015ee        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_exit.o)
+ .fini0         0x000015f0        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3/short-calls\libgcc.a(_exit.o)
  *(.fini0)
-                0x000015f2                _etext = .
+                0x000015f4                _etext = .
 
-.rodata         0x000095f2       0x39 load address 0x000015f2
+.rodata         0x000095f4       0x39 load address 0x000015f4
  *(.rodata)
- .rodata        0x000095f2       0x11 Debug/asx/src/mem.o
  *(.rodata*)
  .rodata.str1.1
-                0x00009603       0x15 Debug/asx/src/reactor.o
+                0x000095f4       0x11 Debug/asx/src/mem.o
  .rodata.str1.1
-                0x00009618       0x13 Debug/asx/src/timer.o
+                0x00009605       0x15 Debug/asx/src/reactor.o
+ .rodata.str1.1
+                0x0000961a       0x13 Debug/asx/src/timer.o
  *(.gnu.linkonce.r*)
 
-.data           0x00803c00        0xa load address 0x0000162b
+.data           0x00803c00        0xa load address 0x0000162d
                 0x00803c00                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -1657,7 +1661,6 @@ END GROUP
  .bss._first    0x00803c0e        0x2 Debug/asx/src/digital_input.o
  .bss.reactor_lock
                 0x00803c10        0x1 Debug/asx/src/reactor.o
-                0x00803c10                reactor_lock
  .bss._handlers
                 0x00803c11       0xb0 Debug/asx/src/reactor.o
  .bss._next_handle
@@ -1690,8 +1693,8 @@ END GROUP
  COMMON         0x00803de9        0x2 Debug/pressure_mon.o
                 0x00803de9                _di
                 0x00803deb                PROVIDE (__bss_end, .)
-                0x0000162b                __data_load_start = LOADADDR (.data)
-                0x00001635                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x0000162d                __data_load_start = LOADADDR (.data)
+                0x00001637                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00803deb        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -1804,21 +1807,21 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x5f7b
+.debug_info     0x00000000     0x5fbc
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000     0x1b84 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATtiny_DFP/2.0.368/gcc/dev/attiny824/avrxmega3/short-calls/crtattiny824.o
  .debug_info    0x00001b84      0x133 Debug/asx/src/alert.o
  .debug_info    0x00001cb7      0xd17 Debug/asx/src/digital_input.o
  .debug_info    0x000029ce      0x1d3 Debug/asx/src/mem.o
  .debug_info    0x00002ba1      0x2fc Debug/asx/src/queue.o
- .debug_info    0x00002e9d      0x607 Debug/asx/src/reactor.o
- .debug_info    0x000034a4      0x90c Debug/asx/src/timer.o
- .debug_info    0x00003db0      0x63a Debug/asx/src/twis.o
- .debug_info    0x000043ea      0x925 Debug/board.o
- .debug_info    0x00004d0f      0xa3d Debug/protocol.o
- .debug_info    0x0000574c      0x4b2 Debug/i2c_slave.o
- .debug_info    0x00005bfe      0x267 Debug/pressure_mon.o
- .debug_info    0x00005e65      0x116 Debug/main.o
+ .debug_info    0x00002e9d      0x648 Debug/asx/src/reactor.o
+ .debug_info    0x000034e5      0x90c Debug/asx/src/timer.o
+ .debug_info    0x00003df1      0x63a Debug/asx/src/twis.o
+ .debug_info    0x0000442b      0x925 Debug/board.o
+ .debug_info    0x00004d50      0xa3d Debug/protocol.o
+ .debug_info    0x0000578d      0x4b2 Debug/i2c_slave.o
+ .debug_info    0x00005c3f      0x267 Debug/pressure_mon.o
+ .debug_info    0x00005ea6      0x116 Debug/main.o
 
 .debug_abbrev   0x00000000     0x2f19
  *(.debug_abbrev)
@@ -1836,21 +1839,21 @@ END GROUP
  .debug_abbrev  0x00002d7c      0x135 Debug/pressure_mon.o
  .debug_abbrev  0x00002eb1       0x68 Debug/main.o
 
-.debug_line     0x00000000     0x38de
+.debug_line     0x00000000     0x3928
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x14e C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATtiny_DFP/2.0.368/gcc/dev/attiny824/avrxmega3/short-calls/crtattiny824.o
  .debug_line    0x0000014e      0x2a6 Debug/asx/src/alert.o
  .debug_line    0x000003f4      0x679 Debug/asx/src/digital_input.o
- .debug_line    0x00000a6d      0x2de Debug/asx/src/mem.o
- .debug_line    0x00000d4b      0x34b Debug/asx/src/queue.o
- .debug_line    0x00001096      0x5ba Debug/asx/src/reactor.o
- .debug_line    0x00001650      0x660 Debug/asx/src/timer.o
- .debug_line    0x00001cb0      0x5d3 Debug/asx/src/twis.o
- .debug_line    0x00002283      0x41b Debug/board.o
- .debug_line    0x0000269e      0x581 Debug/protocol.o
- .debug_line    0x00002c1f      0x477 Debug/i2c_slave.o
- .debug_line    0x00003096      0x416 Debug/pressure_mon.o
- .debug_line    0x000034ac      0x432 Debug/main.o
+ .debug_line    0x00000a6d      0x2dd Debug/asx/src/mem.o
+ .debug_line    0x00000d4a      0x34b Debug/asx/src/queue.o
+ .debug_line    0x00001095      0x5e1 Debug/asx/src/reactor.o
+ .debug_line    0x00001676      0x660 Debug/asx/src/timer.o
+ .debug_line    0x00001cd6      0x5e5 Debug/asx/src/twis.o
+ .debug_line    0x000022bb      0x41b Debug/board.o
+ .debug_line    0x000026d6      0x581 Debug/protocol.o
+ .debug_line    0x00002c57      0x489 Debug/i2c_slave.o
+ .debug_line    0x000030e0      0x416 Debug/pressure_mon.o
+ .debug_line    0x000034f6      0x432 Debug/main.o
 
 .debug_frame    0x00000000      0x7b4
  *(.debug_frame)
@@ -1867,7 +1870,7 @@ END GROUP
  .debug_frame   0x00000750       0x40 Debug/pressure_mon.o
  .debug_frame   0x00000790       0x24 Debug/main.o
 
-.debug_str      0x00000000    0x1b550
+.debug_str      0x00000000    0x1b575
  *(.debug_str)
  .debug_str     0x00000000      0xbcd C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATtiny_DFP/2.0.368/gcc/dev/attiny824/avrxmega3/short-calls/crtattiny824.o
  .debug_str     0x00000bcd    0x117f8 Debug/asx/src/alert.o
@@ -1878,21 +1881,21 @@ END GROUP
                               0x11840 (size before relaxing)
  .debug_str     0x00019fe7       0x9a Debug/asx/src/queue.o
                                0x38b0 (size before relaxing)
- .debug_str     0x0001a081      0x67d Debug/asx/src/reactor.o
-                              0x195aa (size before relaxing)
- .debug_str     0x0001a6fe      0x588 Debug/asx/src/timer.o
+ .debug_str     0x0001a081      0x83f Debug/asx/src/reactor.o
+                              0x19776 (size before relaxing)
+ .debug_str     0x0001a8c0      0x3d2 Debug/asx/src/timer.o
                               0x19513 (size before relaxing)
- .debug_str     0x0001ac86      0x398 Debug/asx/src/twis.o
-                              0x189cc (size before relaxing)
- .debug_str     0x0001b01e       0xa0 Debug/board.o
+ .debug_str     0x0001ac92      0x3b1 Debug/asx/src/twis.o
+                              0x189e5 (size before relaxing)
+ .debug_str     0x0001b043       0xa0 Debug/board.o
                               0x18de7 (size before relaxing)
- .debug_str     0x0001b0be      0x36d Debug/protocol.o
+ .debug_str     0x0001b0e3      0x36d Debug/protocol.o
                               0x1937d (size before relaxing)
- .debug_str     0x0001b42b       0xea Debug/i2c_slave.o
-                              0x18dfa (size before relaxing)
- .debug_str     0x0001b515       0x21 Debug/pressure_mon.o
+ .debug_str     0x0001b450       0xea Debug/i2c_slave.o
+                              0x18e13 (size before relaxing)
+ .debug_str     0x0001b53a       0x21 Debug/pressure_mon.o
                               0x18d48 (size before relaxing)
- .debug_str     0x0001b536       0x1a Debug/main.o
+ .debug_str     0x0001b55b       0x1a Debug/main.o
                               0x18c4c (size before relaxing)
 
 .debug_loc      0x00000000     0x2304
@@ -1942,7 +1945,7 @@ END GROUP
  .debug_ranges  0x000001f0       0x18 Debug/pressure_mon.o
  .debug_ranges  0x00000208       0x10 Debug/main.o
 
-.debug_macro    0x00000000     0x77b2
+.debug_macro    0x00000000     0x7815
  *(.debug_macro)
  .debug_macro   0x00000000       0xe3 Debug/asx/src/alert.o
  .debug_macro   0x000000e3      0xa5a Debug/asx/src/alert.o
@@ -1990,24 +1993,25 @@ END GROUP
  .debug_macro   0x0000645b       0x97 Debug/asx/src/mem.o
  .debug_macro   0x000064f2       0x5a Debug/asx/src/mem.o
  .debug_macro   0x0000654c       0x6f Debug/asx/src/queue.o
- .debug_macro   0x000065bb      0x1df Debug/asx/src/reactor.o
- .debug_macro   0x0000679a       0x42 Debug/asx/src/reactor.o
- .debug_macro   0x000067dc       0x1c Debug/asx/src/reactor.o
- .debug_macro   0x000067f8       0x64 Debug/asx/src/reactor.o
- .debug_macro   0x0000685c       0x8d Debug/asx/src/reactor.o
- .debug_macro   0x000068e9       0x1c Debug/asx/src/reactor.o
- .debug_macro   0x00006905      0x1e6 Debug/asx/src/timer.o
- .debug_macro   0x00006aeb       0xfd Debug/asx/src/timer.o
- .debug_macro   0x00006be8      0x178 Debug/asx/src/twis.o
- .debug_macro   0x00006d60       0x22 Debug/asx/src/twis.o
- .debug_macro   0x00006d82      0x1c4 Debug/board.o
- .debug_macro   0x00006f46      0x1e9 Debug/protocol.o
- .debug_macro   0x0000712f       0x63 Debug/protocol.o
- .debug_macro   0x00007192       0x16 Debug/protocol.o
- .debug_macro   0x000071a8       0x2e Debug/protocol.o
- .debug_macro   0x000071d6      0x1f2 Debug/i2c_slave.o
- .debug_macro   0x000073c8       0x3a Debug/i2c_slave.o
- .debug_macro   0x00007402      0x1c9 Debug/pressure_mon.o
- .debug_macro   0x000075cb      0x1e7 Debug/main.o
+ .debug_macro   0x000065bb      0x1e8 Debug/asx/src/reactor.o
+ .debug_macro   0x000067a3       0x42 Debug/asx/src/reactor.o
+ .debug_macro   0x000067e5       0x1c Debug/asx/src/reactor.o
+ .debug_macro   0x00006801       0x64 Debug/asx/src/reactor.o
+ .debug_macro   0x00006865       0x8d Debug/asx/src/reactor.o
+ .debug_macro   0x000068f2       0x1c Debug/asx/src/reactor.o
+ .debug_macro   0x0000690e       0x46 Debug/asx/src/reactor.o
+ .debug_macro   0x00006954      0x1e6 Debug/asx/src/timer.o
+ .debug_macro   0x00006b3a       0xfd Debug/asx/src/timer.o
+ .debug_macro   0x00006c37      0x182 Debug/asx/src/twis.o
+ .debug_macro   0x00006db9       0x22 Debug/asx/src/twis.o
+ .debug_macro   0x00006ddb      0x1c4 Debug/board.o
+ .debug_macro   0x00006f9f      0x1e9 Debug/protocol.o
+ .debug_macro   0x00007188       0x63 Debug/protocol.o
+ .debug_macro   0x000071eb       0x16 Debug/protocol.o
+ .debug_macro   0x00007201       0x2e Debug/protocol.o
+ .debug_macro   0x0000722f      0x1fc Debug/i2c_slave.o
+ .debug_macro   0x0000742b       0x3a Debug/i2c_slave.o
+ .debug_macro   0x00007465      0x1c9 Debug/pressure_mon.o
+ .debug_macro   0x0000762e      0x1e7 Debug/main.o
 OUTPUT(Debug/hub.elf elf32-avr)
 LOAD linker stubs

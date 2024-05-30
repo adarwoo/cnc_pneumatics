@@ -141,9 +141,8 @@ static inline void twi_master_disable(TWI_t *twi)
   twi->MCTRLA &= (~TWI_ENABLE_bm);
 }
 
-status_code_t twim_release(void);
+status_code_t twim_release();
 
-void twim_interrupt_handler(void);
 
 /**
  * \internal

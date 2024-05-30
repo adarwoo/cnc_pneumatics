@@ -47,14 +47,10 @@ static char *_heap_allocation_next_block = &__heap_start;
 
 /**
  * Fill the heap with a 0xaa
- * This is called prior to C++ static contructors
- * The function must be un-optimized, else it will be removed
+ * This is called prior to C++ static constructors
  */
 static void
-   __attribute__ ((optimize("O0")))
-   __attribute__ ((naked))
-   __attribute__ ((section (".init5")))    /* run this right before main */
-   __attribute__ ((unused))    /* Kill the unused function warning */
+   __attribute__ ((section (".init5"), naked, used))
    _mem_stack_init(void)
 {
    memset(&__heap_start, 0xaa, HEAP_SIZE);

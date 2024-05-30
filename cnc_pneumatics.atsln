@@ -58,6 +58,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{DF6E1E
 		common\include\op_codes.h = common\include\op_codes.h
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "make", "make", "{84F229B0-7BA3-48C3-B45E-CE942DB844A4}"
+	ProjectSection(SolutionItems) = preProject
+		make\avr.mak = make\avr.mak
+		make\rules.mak = make\rules.mak
+		make\sim.mak = make\sim.mak
+		make\studio.mak = make\studio.mak
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR

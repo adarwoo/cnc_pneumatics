@@ -37,6 +37,8 @@
 #ifndef TWI_COMMON_H
 #define TWI_COMMON_H
 
+#include "utils/status_codes.h"
+
 /**
  * \defgroup group_xmega_drivers_twi TWI - Two-Wire Interface
  *
@@ -51,6 +53,11 @@
  *
  * \{
  */
+
+/*!
+ * \brief Callback from the interrupt to indicate end of the packet
+ */
+typedef void (*twi_complete_cb_t)(status_code_t);
 
 /*!
  * \brief Input parameters when initializing the twi module mode
@@ -82,6 +89,8 @@ typedef struct
   unsigned int length;
   //! Whether to wait if bus is busy (false) or return immediately (true)
   bool no_wait;
+  //! Callback when the operation is complete
+  twi_complete_cb_t complete_cb;
 } twi_package_t;
 
 /**

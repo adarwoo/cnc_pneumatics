@@ -10,8 +10,11 @@
 // Tracing
 #define TRACE_INFO IOPORT_CREATE_PIN(PORTA, 0)
 
+
+#ifdef DEBUG
 // Share the trace pin
 #define ALERT_OUTPUT_PIN LED_FAULT
+#endif
 
 /************************************************************************/
 /* Functional I/Os                                                      */

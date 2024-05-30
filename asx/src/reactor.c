@@ -29,6 +29,10 @@
 #include "debug.h"
 #include "reactor.h"
 
+#include "debug.h"
+
+#include "conf_board.h"
+
 /**
  * @def REACTOR_MAX_HANDLERS
  * Maximum number of handlers for the reactor. This defines defaults
@@ -83,7 +87,9 @@ static uint8_t _next_handle = 0;
 static reactor_item_t _handlers[REACTOR_MAX_HANDLERS] = {0};
 
 /** Lock new registrations */
-bool reactor_lock = false;
+static bool reactor_lock = false;
+
+static volatile uint8_t DEBUG_INDEX;
 
 /** Initialize the reactor API */
 void reactor_init(void)
@@ -124,6 +130,7 @@ void reactor_init(void)
 reactor_handle_t reactor_register( const reactor_handler_t handler, uint8_t priority, uint8_t queue_size )
 {
    alert_and_stop_if(reactor_lock != false);
+   alert_and_stop_if(_next_handle == REACTOR_MAX_HANDLERS);
    
    _handlers[_next_handle].handler = handler;
    _handlers[_next_handle].priority = priority;
@@ -250,7 +257,7 @@ void reactor_run(void)
       {
          // At least 1 flag set
          flags = reactor_notifications;
-         debug_set(REACTOR_BUSY);
+         //debug_set(REACTOR_BUSY);
          sei();
 
          // Handle the flags
@@ -271,8 +278,7 @@ void reactor_run(void)
                /************************************************************************/
 
                item = &(_handlers[_handle_lookup[i]]);
-               alert_and_stop_if(! queue_leftpop(&item->queue, &data));
-
+               alert_and_stop_if( ! queue_leftpop(&item->queue, &data) );
                
                // If the queue is not empty - leave the flag set to go back in it
                // The round-robin will still apply, and the next item in queue is

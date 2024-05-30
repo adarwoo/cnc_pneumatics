@@ -25,7 +25,7 @@
 #define COMMS_TOO_MANY_ERRORS 10
 
 /** Time in seconds when communications faults are tolerated */
-#define COMMS_GRACE_PERIOD_SECONDS 10
+static constexpr auto COMMS_GRACE_PERIOD = TIMER_SECONDS(5);
 
 /************************************************************************/
 /* Local types                                                          */
@@ -83,8 +83,8 @@ timer_instance_t transmit_timer_t;
 /** Timer to report for failure of connection */
 timer_instance_t connection_check_timer_t;
 
-/** Count the number of transmit errors. Remains negative during the grace period */
-int8_t comms_error_count = -1;
+/** Count the number of transmit errors */
+uint8_t comms_error_count = 0;
 
 /** If true, communications error are not fatal */
 bool comms_in_error_grace_period_active = true;
@@ -325,33 +325,33 @@ void on_pneumatic_input_change(void *arg)
  */
 void on_i2c_error(void *arg)
 {
-   // Check if the system hit a no-revery
-   if ( comms_error_count != UINT8_MAX && (! comms_in_error_grace_period_active) )
+   // Check if the system hit a no-recovery
+   if ( ! comms_in_error_grace_period_active )
    {
       // Increment errors at the twice the rate of good packets
       comms_error_count += 2;
+   }      
       
-      if ( comms_error_count >= COMMS_TOO_MANY_ERRORS )
-      {
-         // Turn off the pressure input as a fail safe
-         digitial_output_set(chuck_released_oc, false);
+   if ( comms_error_count >= COMMS_TOO_MANY_ERRORS )
+   {
+      // Turn off the pressure input as a fail safe
+      digitial_output_set(chuck_released_oc, false);
          
-         // Light the comms error LED
-         digitial_output_set(led_fault, true);
+      // Light the communication error LED
+      digitial_output_set(led_fault, true);
 
-         // In release, turn of communication and sound the beeper to signal an error
+      // In release, turn of communication and sound the beeper to signal an error
 #ifdef NDEBUG
-         piezzo_start_tone(PIEZZO_FREQ_TO_PWM(2000), TIMER_SECONDS(5));
+      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(2000), TIMER_SECONDS(5));
 
-         // Flag end of transmit
-         stop_transmit = true;
+      // Flag end of transmit
+      stop_transmit = true;
 #endif
-      }
-      else
-      {
-         // Flash the led once. For repeated errors, it will light
-         digitial_output_start(led_fault, TIMER_MILLISECONDS(50), "+-", false);
-      }
+   }
+   else
+   {
+      // Flash the led once. For repeated errors, it will light
+      digitial_output_start(led_fault, TIMER_MILLISECONDS(50), "+-", false);
    }
 }
 
@@ -368,7 +368,6 @@ void on_i2c_read(void *arg)
    if ( comms_error_count > 0 )
    {
       --comms_error_count;
-      digitial_output_set(led_fault, false);      
    }
 
    // Re-inject the pressure back to Masso
@@ -406,7 +405,7 @@ int main(void)
    // Start a timer to tolerate communications error for the first N seconds
    timer_arm(
 	  react_comms_grace_over, 
-	  timer_get_count_from_now(TIMER_SECONDS(COMMS_GRACE_PERIOD_SECONDS)),
+	  timer_get_count_from_now(COMMS_GRACE_PERIOD),
 	  0, 0
    );
 

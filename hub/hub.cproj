@@ -186,5 +186,10 @@
   <ItemGroup>
     <Folder Include="conf\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile">
+      <SubType>compile</SubType>
+    </None>
+  </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

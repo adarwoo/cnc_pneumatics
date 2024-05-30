@@ -39,6 +39,9 @@
 #include "sysclk.h"
 #include "twim.h"
 
+#include "ioport.h"
+#include "conf_board.h"
+
 
 /** Master Transfer Descriptor */
 static struct
@@ -67,7 +70,6 @@ static struct
 static inline status_code_t twim_acquire(bool no_wait)
 {
 	while (transfer.locked) {
-
 		if (no_wait) { return ERR_BUSY; }
 	}
 
@@ -154,14 +156,22 @@ status_code_t twim_release(void)
 	 * other than a transfer in-progress, then test the bus interface
 	 * for an Idle bus state.
 	 */
-	while (OPERATION_IN_PROGRESS == transfer.status);
+	while (OPERATION_IN_PROGRESS == transfer.status)
+   {
+      continue;
+   }
 
-	while ((! twim_idle(transfer.bus)) && --timeout) { barrier(); }
+	while ((! twim_idle(transfer.bus)) && --timeout)
+   {
+      barrier(); 
+   }
 
 	status_code_t status = transfer.status;
 
-	if(!timeout)
+	if ( ! timeout )
+   {
 		status = ERR_TIMEOUT;
+   }      
 
 	transfer.locked = false;
 
@@ -204,6 +214,11 @@ static inline void twim_write_handler(void)
 		// Send STOP condition to complete the transaction
 		bus->MCTRLB = TWI_MCMD_STOP_gc;
 		transfer.status = STATUS_OK;
+      
+      // Notify the callback
+      if (pkg->complete_cb) {
+         pkg->complete_cb(STATUS_OK);
+      }     
 	}
 }
 
@@ -236,6 +251,11 @@ static inline void twim_read_handler(void)
 
 			bus->MCTRLB = TWI_ACKACT_bm | TWI_MCMD_STOP_gc;
 			transfer.status = STATUS_OK;
+         
+         if (pkg->complete_cb) {
+            pkg->complete_cb(STATUS_OK);
+         }
+         
 		}
 
 	} else {
@@ -244,6 +264,11 @@ static inline void twim_read_handler(void)
 
 		bus->MCTRLB = TWI_MCMD_STOP_gc;
 		transfer.status = ERR_NO_MEMORY;
+      
+      if (pkg->complete_cb) {
+         pkg->complete_cb(ERR_NO_MEMORY);
+      }
+      
 	}
 }
 
@@ -254,22 +279,29 @@ static inline void twim_read_handler(void)
  *
  *  Check current status and calls the appropriate handler.
  */
-void twim_interrupt_handler(void)
+static inline void twim_interrupt_handler(void)
 {
 	uint8_t const master_status = transfer.bus->MSTATUS;
+	twi_package_t * const pkg = transfer.pkg;
 
 	if (master_status & TWI_ARBLOST_bm) {
 
 		transfer.bus->MSTATUS = master_status | TWI_ARBLOST_bm;
 		transfer.bus->MCTRLB  = TWI_MCMD_STOP_gc;
 		transfer.status = ERR_BUSY;
-
+      
+      if (pkg->complete_cb) {
+         pkg->complete_cb(ERR_BUSY);
+      }
 	} else if ((master_status & TWI_BUSERR_bm) ||
 		(master_status & TWI_RXACK_bm)) {
 
 		transfer.bus->MCTRLB = TWI_MCMD_STOP_gc;
 		transfer.status = ERR_IO_ERROR;
 
+      if (pkg->complete_cb) {
+         pkg->complete_cb(ERR_IO_ERROR);
+      }
 	} else if (master_status & TWI_WIF_bm) {
 
 		twim_write_handler();
@@ -281,6 +313,10 @@ void twim_interrupt_handler(void)
 	} else {
 
 		transfer.status = ERR_PROTOCOL;
+
+      if (pkg->complete_cb) {
+         pkg->complete_cb(ERR_PROTOCOL);
+      }
 	}
 }
 
@@ -333,8 +369,6 @@ status_code_t twi_master_transfer(TWI_t *twi,
 		return ERR_INVALID_ARG;
 	}
 
-	/* Initiate a transaction when the bus is ready. */
-
 	status_code_t status = twim_acquire(package->no_wait);
 
 	if (STATUS_OK == status) {
@@ -352,8 +386,15 @@ status_code_t twi_master_transfer(TWI_t *twi,
 			transfer.bus->MADDR = chip | 0x01;
 		}
 
-		status = twim_release();
+      if ( ! package->no_wait )
+		   status = twim_release();
 	}
 
 	return status;
+}
+
+// Interrupt handler
+ISR(TWI0_TWIM_vect)
+{
+   twim_interrupt_handler();
 }
