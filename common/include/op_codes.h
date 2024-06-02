@@ -19,15 +19,15 @@ extern "C" {
  *  using the highest hamming distance
  */
 typedef enum {
-   opcodes_cmd_error = 0,
-   opcodes_cmd_idle = 0b01001111,
-   opcodes_cmd_push_door = 0b01110001,
-   opcodes_cmd_pull_door = 0b00001010,
-   opcodes_cmd_blast_toolsetter = 0b01111010,
-   opcodes_cmd_blast_spindle = 0b100001000,
-   opcodes_cmd_unclamp_chuck = 0b100000110,
-   opcodes_cmd_reserved0 = 0b11001001,
-   opcodes_cmd_reserved1 = 0b10110000,
+   opcodes_cmd_error            = 0,
+   opcodes_cmd_idle             = 0b01001111, // 4f
+   opcodes_cmd_push_door        = 0b01110001, // 71
+   opcodes_cmd_pull_door        = 0b00001010, // 09
+   opcodes_cmd_blast_toolsetter = 0b01111010, // 75
+   opcodes_cmd_blast_spindle    = 0b01001000, // 48
+   opcodes_cmd_unclamp_chuck    = 0b10000110, // 86
+   opcodes_cmd_reserved0        = 0b11001001, // C9
+   opcodes_cmd_reserved1        = 0b10110000, // B0
 } opcodes_cmd_t;
 
 /**

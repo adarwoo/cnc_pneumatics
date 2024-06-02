@@ -13,7 +13,10 @@
 extern "C" {
 #endif
 
-void i2c_slave_init(void);
+#include "reactor.h"
+
+/** @brief Initialise the i2c slave device */
+void i2c_slave_init(reactor_handle_t);
 
 #ifdef __cplusplus
 }

@@ -18,11 +18,15 @@
 #include "ioport.h"
 #include "reactor.h"
 #include "digital_input.h"
+#include "sysclk.h"
 
 #include "conf_board.h"
 
 void board_init(void)
 {
+   // Configure the clock
+   sysclk_init();
+   
    /* This function is meant to contain board-specific initialization code
     * for, e.g., the I/O pins. The initialization can rely on application-
     * specific board configuration, found in conf_board.h.

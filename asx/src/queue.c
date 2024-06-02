@@ -15,6 +15,8 @@
  * will be used for all further queues. That's the price to pay for the
  * speed of static implementations.
  */
+#include <assert.h>
+
 #include "queue.h"
 #include "mem.h"
 
@@ -36,42 +38,64 @@ bool queue_init(queue_t *queue, size_t nelem)
     return true;
 }
 
+queue_t *queue_create(size_t nelem)
+{
+    queue_t * queue = (queue_t*)mem_calloc(nelem, sizeof(queue_t));
+    
+    if ( queue )
+    {
+        queue_init(queue, nelem);
+    }
+
+    return queue;
+}
+
+
 bool queue_is_empty(const queue_t *queue)
 {
-    return queue && queue->length == 0;
+    assert(queue);
+
+    return queue->length == 0;
 }
 
 bool queue_push(queue_t *queue, void *data)
 {
-    if (!queue || queue->length >= queue->nelem)
+    assert(queue);
+
+    if (queue->length >= queue->nelem)
     {
         return false;
     }
 
     queue->buffer[queue->tail] = data;
     queue->tail = (queue->tail + 1) % queue->nelem;
-    queue->length++;
+    ++queue->length;
 
     return true;
 }
 
-bool queue_pop(queue_t *queue, void **data)
+bool queue_pop_front(queue_t *queue, void **data)
 {
-    if (!queue || !data || queue->length <= 0)
+    assert(queue);
+    assert(data);
+
+    if (queue->length <= 0)
     {
         return false;
     }
 
     queue->tail = (queue->tail - 1 + queue->nelem) % queue->nelem;
     *data = queue->buffer[queue->tail];
-    queue->length--;
+    --queue->length;
 
     return true;
 }
 
-bool queue_leftpush(queue_t *queue, void *data)
+bool queue_push_back(queue_t *queue, void *data)
 {
-    if (!queue || queue->length >= queue->nelem)
+    assert(queue);
+
+    if (queue->length >= queue->nelem)
     {
         return false;
     }
@@ -83,9 +107,12 @@ bool queue_leftpush(queue_t *queue, void *data)
     return true;
 }
 
-bool queue_leftpop(queue_t *queue, void **data)
+bool queue_pop(queue_t *queue, void **data)
 {
-    if (!queue || !data || queue->length <= 0)
+    assert(queue);
+    assert(data);
+
+    if ( queue->length <= 0)
     {
         return false;
     }
@@ -97,12 +124,9 @@ bool queue_leftpop(queue_t *queue, void **data)
     return true;
 }
 
-bool queue_ringpush(queue_t *queue, void *data)
+void queue_push_ring(queue_t *queue, void *data)
 {
-    if (!queue)
-    {
-        return false;
-    }
+    assert(queue);
 
     queue->buffer[queue->tail] = data;
     queue->tail = (queue->tail + 1) % queue->nelem;
@@ -115,7 +139,5 @@ bool queue_ringpush(queue_t *queue, void *data)
     {
         queue->head = (queue->head + 1) % queue->nelem;
     }
-
-    return true;
 }
 

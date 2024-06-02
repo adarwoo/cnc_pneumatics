@@ -11,8 +11,11 @@
 
 #include <stdlib.h>
 
+#ifdef _POSIX
+#define mem_calloc calloc
+#else
 /** Same as calloc - but way smaller and simpler. No free possible */
 void *mem_calloc(size_t __nele, size_t __size) __attribute__((__malloc__));
-
+#endif
 
 #endif /* MEM_H_ */

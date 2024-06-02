@@ -50,6 +50,15 @@ typedef struct
 bool queue_init(queue_t *queue, size_t nelem);
 
 /**
+ * @brief Create and initializes the queue properties and
+ * sets the whole array to 0xFF.
+ *
+ * @param nelem Number of elements. If 1, the storage internal
+ * @return A pointer to the dynamically allocated queue object
+ */
+queue_t *queue_create(size_t nelem);
+
+/**
  * @brief Verifies if queue is empty, cpt. Obvious
  *
  * @param queue*
@@ -81,7 +90,7 @@ bool queue_push(queue_t *queue, void *data);
  * @return true when successful, or
  * @return false otherwise
  */
-bool queue_pop(queue_t *queue, void **data);
+bool queue_pop_front(queue_t *queue, void **data);
 
 /**
  * @brief Pushes a single value to the head (left) side of the queue.
@@ -95,7 +104,7 @@ bool queue_pop(queue_t *queue, void **data);
  * @return true
  * @return false
  */
-bool queue_leftpush(queue_t *queue, void *data);
+bool queue_push_back(queue_t *queue, void *data);
 
 /**
  * @brief Pops a single value from the head (left) side of the queue.
@@ -107,7 +116,7 @@ bool queue_leftpush(queue_t *queue, void *data);
  * @return true when successful, or
  * @return false otherwise
  */
-bool queue_leftpop(queue_t *queue, void **data);
+bool queue_pop(queue_t *queue, void **data);
 
 /**
  * @brief Pushes a single value to the tail (right) side of the queue.
@@ -121,7 +130,7 @@ bool queue_leftpop(queue_t *queue, void **data);
  * @return true when successful, or
  * @return false otherwise
  */
-bool queue_ringpush(queue_t *queue, void *data);
+void queue_push_ring(queue_t *queue, void *data);
 
 #ifdef __cplusplus
 }

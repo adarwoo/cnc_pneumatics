@@ -19,7 +19,9 @@ extern "C" {
 #endif
 
 void protocol_init(void);
-bool protocol_process(uint8_t raw_data);
+
+/** @brief Reactor handler */
+void protocol_handle_traffic(void *);
 
 #ifdef __cplusplus
 }

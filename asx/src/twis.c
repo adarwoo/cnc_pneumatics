@@ -7,7 +7,7 @@
  *      This file contains the function implementations the XMEGA TWI slave
  *      driver.
  *
- *      The driver is   t intended for size and/or speed critical code, since
+ *      The driver is intended for size and/or speed critical code, since
  *      most functions are just a few lines of code, and the function call
  *      overhead would decrease code performance. The driver is intended for
  *      rapid prototyping and documentation purposes for getting started with
@@ -71,7 +71,7 @@
 #include "twis.h"
 
 
-/*! \brief Initalizes TWI slave driver structure.
+/*! \brief Initializes TWI slave driver structure.
  *
  *  Initialize the instance of the TWI Slave and set the appropriate values.
  *
@@ -250,7 +250,7 @@ void TWI_SlaveReadHandler(TWI_Slave_t *twi)
 
 		twi->bytesReceived++;
 
-		/* If application signalling need to abort (error occured),
+		/* If application signaling need to abort (error occurred),
 		 * complete transaction and wait for next START. Otherwise
 		 * send ACK and wait for data interrupt.
 		 */
@@ -262,6 +262,7 @@ void TWI_SlaveReadHandler(TWI_Slave_t *twi)
 			twi->interface->SCTRLB = TWI_SCMD_RESPONSE_gc;
 		}
 	}
+   
 	/* If buffer overflow, send NACK and wait for next START. Set
 	 * result buffer overflow.
 	 */

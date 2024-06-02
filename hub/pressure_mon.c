@@ -20,7 +20,7 @@ void pressure_mon_init(void)
    _di = digital_input(
       IOPORT_PRESSURE_READOUT, // IOPort to sample
       REACTOR_NULL_HANDLE,     // No reactor required
-      0,                       // No sensing - sampling
+      IOPORT_SENSE_DISABLE,    // No sensing - sampling
       TIMER_MILLISECONDS(50)   // Sample over 50ms
    );
 }

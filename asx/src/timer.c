@@ -92,10 +92,7 @@ static _timer_future_t _timer_future_sorted_list[TIMER_MAX_CALLBACK] = {0};
 /** Free running counter. */
 static volatile timer_count_t _timer_free_running_ms_counter = 0;
 
-/** 0 based index to the next slot to use by the reactor loop */
-static _timer_slot_t _timer_slot_reactor = TIMER_INVALID_SLOT;
-
-/** 0 based index to the next slot to use upon IT */
+/** 0 based index to the next slot to use */
 static _timer_slot_t _timer_slot_active = 0;
 
 /** 0 based index to the next available slot */
@@ -250,13 +247,10 @@ timer_instance_t timer_arm(
 
 	// Special case where the slots have met up with the active being used
 	// Alert the user and drop the oldest slot
-	if (
-			(insertPoint == _timer_slot_avail) &&
-			(_timer_future_sorted_list[insertPoint].reactor != REACTOR_NULL_HANDLE)
-		)
-	{
-		alert();
-	}
+   alert_and_stop_if(
+		(insertPoint == _timer_slot_avail) &&
+		(_timer_future_sorted_list[insertPoint].reactor != REACTOR_NULL_HANDLE)
+	);
 
 	// Look for the effective insertion position (sorted)
 	while (insertPoint != _timer_slot_avail)
@@ -379,23 +373,21 @@ void timer_dispatch(void *arg)
  */
 bool timer_cancel(timer_instance_t to_cancel)
 {
-	_timer_slot_t insertPoint;
+	_timer_slot_t pointer;
 	_timer_slot_t i;
 
-		// Start from the active position
-	insertPoint = _timer_slot_active;
+	// Start from the active position
+	pointer = _timer_slot_active;
 
 	// At least one pending timer
-	while (insertPoint != _timer_slot_avail)
+	while (pointer != _timer_slot_avail)
 	{
-		_timer_future_t *pFuture = &_timer_future_sorted_list[insertPoint];
+		_timer_future_t *pFuture = &_timer_future_sorted_list[pointer];
 
 		if (pFuture->instance == to_cancel)
 		{
-			pFuture->reactor = REACTOR_NULL_HANDLE;
-
 			// Now shift left all items to reclaim the space
-			for ( i = insertPoint; i != _timer_slot_avail; )
+			for ( i = pointer; i != _timer_slot_avail; )
 			{
 				_timer_slot_t oneRightOf = _timer_right_of(i);
 
@@ -406,11 +398,18 @@ bool timer_cancel(timer_instance_t to_cancel)
 
 				i = oneRightOf;
 			}
-
-			return true;
+         
+         // Shit available left now we've removed 1
+         _timer_slot_avail = _timer_left_of(_timer_slot_avail);
+         
+         // Make the slot as available
+         _timer_future_sorted_list[_timer_slot_avail].reactor = REACTOR_NULL_HANDLE;
+        
+         // Found it, canceled and removed from the list
+         return true;
 		}
       
-      ++insertPoint;
+   	pointer = _timer_right_of(pointer);
 	}
    
    return false;

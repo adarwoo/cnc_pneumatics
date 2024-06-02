@@ -5,13 +5,12 @@
 ifndef NDEBUG
 DEBUG=1
 endif
-
+BUILD_DIR ?= sim
 tc_prefix:=
 CPPFLAGS += -D_POSIX
 LDFLAGS += -pthread
 
 ifdef DEBUG
-  CPPFLAGS += -DDEBUG
   CFLAGS += \
     -fsanitize=address \
     -fsanitize=alignment \

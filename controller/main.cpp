@@ -1,8 +1,8 @@
-/*
- * main.cpp
- *
- * Created: 03/05/2024 10:33:54
- * Author : micro
+/**
+ * @file
+ * Main entry point for the pneumatic controller
+ * Defines all input and output handling objects and most of the reactors
+ * @author gax
  */
 #include <limits.h>
 
@@ -22,7 +22,10 @@
 
 
 /** Number of errors which trigger a shutdown */
-#define COMMS_TOO_MANY_ERRORS 10
+static constexpr auto COMMS_TOO_MANY_ERRORS = 10;
+
+/** Duration of the filter (or no re-trigger period) for digital inputs */
+static constexpr auto DI_FILT4 = TIMER_MILLISECONDS(40);
 
 /** Time in seconds when communications faults are tolerated */
 static constexpr auto COMMS_GRACE_PERIOD = TIMER_SECONDS(5);
@@ -155,18 +158,18 @@ void on_send_i2c_command(void *arg)
  */
 void start_periodic_transmit(bool start)
 {
-   static timer_instance_t transmit_timer_t = TIMER_INVALID_INSTANCE;
+   static timer_instance_t transmit_timer = TIMER_INVALID_INSTANCE;
 
-   if (transmit_timer_t != TIMER_INVALID_INSTANCE)
+   if (transmit_timer != TIMER_INVALID_INSTANCE)
    {
-      timer_cancel(transmit_timer_t);
+      timer_cancel(transmit_timer);
    }
 
    if (start)
    {
       // Start transmit in 1ms (at least). A whole frame take 300us.
       // This way, there cannot be a collision with the on-going frame
-      transmit_timer_t = timer_arm(
+      transmit_timer = timer_arm(
           react_i2c_command,
           timer_get_count_from_now(TIMER_MILLISECONDS(1)),      // First one is in 1ms (allow finishing on-going transmit)
           TIMER_MILLISECONDS(100), // Next one, in 100ms
@@ -254,7 +257,7 @@ void on_beep_input(void *arg)
    // Only play if the door alarm is off
    if ( ! sound_door_alarm )
    {
-      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(1400), TIMER_MILLISECONDS(200));
+      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(2000), TIMER_MILLISECONDS(50));
    }
 }
 
@@ -379,16 +382,14 @@ int main(void)
 {
    board_init();
 
-   digital_input(IN_CHUCK_OPEN,        react_input_change, 0, 4);
-   digital_input(IN_SPINDLE_AIR_BLAST, react_input_change, 0, 4);
-   digital_input(IN_TOOLSET_AIR_BLAST, react_input_change, 0, 4);
-   digital_input(IN_DOOR_OPEN_CLOSE,   react_door_cmd   ,  0, 4);
-   digital_input(IN_DOOR_UP,           react_door_sensor,  0, 4);
-   digital_input(IN_DOOR_DOWN,         react_door_sensor,  0, 4);
-
-   digital_input(IN_SOUNDER,           react_sounder,      0, 4);
-
-   digital_input(IN_BEEP,              react_beep, IOPORT_SENSE_RISING, 10);
+   digital_input(IN_CHUCK_OPEN,            react_input_change, IOPORT_SENSE_DISABLE, DI_FILT4 );
+   digital_input(IN_SPINDLE_AIR_BLAST,     react_input_change, IOPORT_SENSE_DISABLE, DI_FILT4 );
+   digital_input(IN_TOOLSET_AIR_BLAST,     react_input_change, IOPORT_SENSE_DISABLE, DI_FILT4 );
+   digital_input(IN_DOOR_OPEN_CLOSE,       react_door_cmd   ,  IOPORT_SENSE_DISABLE, DI_FILT4 );
+   digital_input(IN_DOOR_UP,               react_door_sensor,  IOPORT_SENSE_DISABLE, DI_FILT4 );
+   digital_input(IN_DOOR_DOWN,             react_door_sensor,  IOPORT_SENSE_DISABLE, DI_FILT4 );
+   digital_input(IN_SOUNDER,               react_sounder,      IOPORT_SENSE_DISABLE, DI_FILT4 );
+   digital_input(IN_BEEP,                  react_beep,         IOPORT_SENSE_RISING,  DI_FILT4 );
 
    // Flash all LEDs for 2 second to start with to check none are defective
    digitial_output_start(led_fault,        1000, "++-", false);

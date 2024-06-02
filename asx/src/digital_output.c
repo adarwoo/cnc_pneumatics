@@ -160,6 +160,11 @@ void _digital_output_reactor_handler(void *arg)
          0,
          output);
    }
+   else
+   {
+      // Mark no timer active
+      output->timer = 0;
+   }
 }
 
 /************************************************************************/
@@ -178,7 +183,7 @@ void _digital_output_reactor_handler(void *arg)
 void digitial_output_set(digital_output_t handle, bool value)
 {
    _digital_output_t *out = (_digital_output_t *)handle;
-   
+
    _cancel_sequence(out->timer);
    ioport_set_pin_level(out->pin, value);
 }

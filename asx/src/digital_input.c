@@ -54,16 +54,22 @@
 /************************************************************************/
 
 /** First structures to receive the di-> Other are chained */
-static digital_input_t *_first = {0};
+static digital_input_t *_first_sampled = {0};
+
+/** First structures to receive the di-> Other are chained */
+static digital_input_t *_first_direct = {0};
 
 /** Reactor for managing the sampling of the inputs */
 static reactor_handle_t _react_sample;
 
 /** Reactor for acknowledging the interrupts */
+static reactor_handle_t _react_direct_handler;
+
+/** Reactor for acknowledging the interrupts */
 static reactor_handle_t _react_ack_it;
 
-/** Mask of bits which have been processed by not acknowledged */
-static volatile uint8_t isr_bit_to_acknowledge_mask[2] = {0,0};
+/** Mask of bits which are being processed by not acknowledged */
+static volatile uint8_t _isr_bit_mask[2] = {0,0};
 
 
 /************************************************************************/
@@ -76,7 +82,7 @@ static volatile uint8_t isr_bit_to_acknowledge_mask[2] = {0,0};
 static void _digital_input_sample(void *arg)
 {
    // Grab first input
-   digital_input_t *di = _first;
+   digital_input_t *di = _first_sampled;
 
    // Iterate over each input
    while ( di )
@@ -123,22 +129,76 @@ static void _digital_input_sample(void *arg)
    };
 }
 
+/** 
+ * Clear an interrupt after it triggered
+ * Can be called from a reactor or directly
+ * @param arg A pin_and_value_t argument. The value is ignored.
+ */
+static void _clear_interrupt(void *arg)
+{
+   digital_input_t *next = (digital_input_t *)arg;
+   
+   // Atomically handle the _isr_bit_mask and the interrupt flags
+
+   /************************************************************************/
+   /* Enter critical section                                               */
+   /************************************************************************/
+   sei();
+   
+   // Reset the bit to allow for processing interrupts again
+   _isr_bit_mask[ioport_pin_to_port_id(next->pin)] &= (~ioport_pin_to_mask(next->pin));
+  
+   // Enable the interrupt again
+   ioport_set_pin_sense_mode(next->pin, next->direct.sense_mode);
+   
+   /************************************************************************/
+   /* Leave critical section                                               */
+   /************************************************************************/
+   cli();
+}
 
 /** 
- * Re-enable the interrupt following a handler
- * Allow the application to filter direct handlers
- * This must be called after the reactor handler or the detection stops.
+ * Called by the reactor to handle a input change triggered by an interrupt
+ * Notify the handler
+ * Clears the interrupt to make way for new ones directly, or by arming a timer.
  */
-static void _digital_input_ack(void *arg)
+static void _digital_input_direct_handler(void *arg)
 {
-   pin_and_value_t pin_and_value = (pin_and_value_t)arg;
-   ioport_pin_t pin = pin_and_value.pin;
+   pin_and_value_t pav = (pin_and_value_t)arg;
    
-   PORT_t *base = ioport_pin_to_base(pin);
-   base->INTFLAGS |= ioport_pin_to_mask(pin);
-
-   // Reset the bit
-   isr_bit_to_acknowledge_mask[ioport_pin_to_port_id(pin)] &= (~ioport_pin_to_mask(pin));
+   // Locate the digital_input responsible
+   digital_input_t *next = _first_direct;
+   
+   while ( next )
+   {
+      if ( next->pin == pav.pin )
+      {
+         // Found the handler responsible
+         if ( next->handler != REACTOR_NULL_HANDLE )
+         {
+            reactor_notify(next->handler, pav.as_arg);
+         }
+         
+         // Acknowledge the ISR
+         if ( next->direct.filter )
+         {
+            timer_arm(
+               _react_ack_it, 
+               timer_get_count_from_now(next->direct.filter),
+               0, 
+               (void *)next);
+         }
+         else
+         {
+            _clear_interrupt( (void *)next);
+         }
+         
+         
+         break;
+      }         
+         
+      next = next->next;
+   }
 }
 
 
@@ -153,46 +213,41 @@ static void _digital_input_ack(void *arg)
 static void _handle_pin_change_isr(
    uint8_t port_id, uint8_t port_value, uint8_t mask)
 {
-   // Grab first input
-   digital_input_t *di = _first;
-
-   // Filter all bit which are yet to be acknowledged (to avoid DoS through noise)
-   mask &= (~isr_bit_to_acknowledge_mask[port_id]);
-
-   while ( di )
+   // Check the bit(s) and notify
+   uint8_t i=0;
+   
+   // Get the current handling status
+   uint8_t handling_mask = _isr_bit_mask[port_id];
+   
+   // Mask bits already being processed
+   mask &= ~handling_mask;
+   
+   // Append new detected bits to avoid re-processing them
+   _isr_bit_mask[port_id] |= mask;
+   
+   while (mask)
    {
-      // Does the interrupt match
-      if ( 
-         (ioport_pin_to_port_id(di->pin) == port_id) &&
-         (ioport_pin_to_mask(di->pin) & mask)
-      ) {
-         pin_and_value_t pav = {
-            .pin = di->pin,
-            .value = ioport_pin_to_mask(di->pin) & port_value
-         };
+      // If the interrupt flag is set but not yet set in the handling mask
+      if ( mask & 1 )
+      {
+         // Notify the reactor to handle the change
+         pin_and_value_t pav;
+         pav.pin = ioport_create_pin(port_id, i);
+         pav.value = port_value;
          
-         if ( di->handler != REACTOR_NULL_HANDLE )
-         {
-            reactor_notify(di->handler, pav.as_arg);
-         }
-      
-         // Is filtering required?
-         if ( di->direct.filter )
-         {
-            isr_bit_to_acknowledge_mask[port_id] &= ioport_pin_to_mask(di->pin);
-
-            timer_arm(_react_ack_it, di->direct.filter, 0, pav.as_arg);
-         }
-         else
-         {
-            // Acknowledge here and now
-            _digital_input_ack(pav.as_arg);
-         }
+         // Turn interrupts off until acknowledge is called
+         ioport_enable_pin(pav.pin);
+         
+         // Handle in the reactor - not in the interrupt
+         reactor_notify( _react_direct_handler, pav.as_arg);
       }
-
-      di = di->next;
+      
+      // Bit shift the mask and increment position
+      mask >>= 1;
+      ++i;
    }
-}   
+}
+
 
 /************************************************************************/
 /* Public API                                                           */
@@ -202,7 +257,7 @@ static void _handle_pin_change_isr(
  * Create a digital input object 
  * @param p The port_io pin to watch
  * @param reactor A reactor handle which process any change. It can be a null handler.
- * @param sense_mode If 0, the input is sampled, otherwise the value determine what
+ * @param sense_mode If IOPORT_SENSE_DISABLE, the input is sampled, otherwise the value determine what
  *         input change cause the handler to respond.
  * @param filter_value Number of count to wait count when filtering, or number of ms to wait
  *         before acknowledging the interrupt. For direct sensing (interrupt mode), a value
@@ -213,6 +268,9 @@ static void _handle_pin_change_isr(
 digital_input_handle_t digital_input(
    ioport_pin_t pin, reactor_handle_t reactor, uint8_t sense_mode, timer_count_t filter_value)
 {
+   // Pointer to the next pointer
+   digital_input_t **next;
+   
    // Allocate a new structure
    digital_input_t *di = mem_calloc(1, sizeof(digital_input_t));
 
@@ -220,27 +278,26 @@ digital_input_handle_t digital_input(
    di->pin = pin;
    di->handler = reactor;
    
-   if ( sense_mode )
+   if ( sense_mode != IOPORT_SENSE_DISABLE )
    {
       // Direct
       di->direct.sense_mode = sense_mode;
       di->direct.filter = filter_value;
 
       // Set the sense detection - enabling the interrupt detection
-      ioport_set_pin_sense_mode(
-         ioport_pin_to_port_id(di->pin), 
-         ioport_pin_to_index(di->pin)
-      );
+      ioport_set_pin_sense_mode(di->pin, sense_mode);
+
+      next = &_first_direct;
    }
    else
    {
       // Regular
       di->sampled.integrator_threshold = filter_value / DIGITAL_INPUT_SAMPLE_PERIOD;
+      
+      next = &_first_sampled;
    }
 
-   // Append to the next
-   digital_input_t **next = &_first;
-   
+   // Chain the structure
    while ( *next != NULL )
    {
       next = &((*next)->next);
@@ -264,8 +321,11 @@ void digital_input_init(void)
    _react_sample = reactor_register(
       _digital_input_sample, DIGITAL_INPUT_PRIO, 1);
 
+   _react_direct_handler = reactor_register(
+      _digital_input_direct_handler, DIGITAL_INPUT_ACK_PRIO, 1);
+
    _react_ack_it = reactor_register(
-      _digital_input_ack, DIGITAL_INPUT_ACK_PRIO, 1);
+      _clear_interrupt, DIGITAL_INPUT_ACK_PRIO, 1);
 
    // Start a repeating timer to sample the inputs at regular interval
    timer_arm(_react_sample, timer_get_count_from_now(0), DIGITAL_INPUT_SAMPLE_PERIOD, NULL);
@@ -285,13 +345,18 @@ bool digital_input_value(digital_input_handle_t di)
 /************************************************************************/
 ISR(PORTA_PORT_vect)
 {
-   // Read the value now
-   _handle_pin_change_isr(0, PORTA.IN, PORTA.INTFLAGS);
+   _handle_pin_change_isr(IOPORT_PORTA, PORTA.IN, PORTA.INTFLAGS);
+
+   // Clear the interrupt
+   PORTA.INTFLAGS |= PORTA.INTFLAGS;
 }   
 
 ISR(PORTB_PORT_vect)
 {
-   _handle_pin_change_isr(1, PORTB.IN, PORTA.INTFLAGS);
+   _handle_pin_change_isr(IOPORT_PORTB, PORTB.IN, PORTB.INTFLAGS);
+
+   // Clear the interrupt
+   PORTB.INTFLAGS |= PORTB.INTFLAGS;
 }
 
 /**@}*/

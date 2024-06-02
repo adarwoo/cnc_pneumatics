@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "utils/interrupt.h"
+
 #include "alert.h"
 #include "debug.h"
 #include "reactor.h"
@@ -140,25 +142,26 @@ reactor_handle_t reactor_register( const reactor_handler_t handler, uint8_t prio
    _handlers[_next_handle].mask = 1 << _next_handle;
    
    // Queue
-   queue_init(&_handlers[_next_handle].queue, queue_size);
+   queue_init(&(_handlers[_next_handle].queue), queue_size);
 
    return _next_handle++;
 }
 
 
 /**
- * Interrupts are disable to avoid the or'ing to endup badly
+ * Interrupts are disabled for atomic operations
+ * This function can be called from within interrupts
  */
 void reactor_notify( reactor_handle_t handle, void *data )
 {
-   cli();
+   irqflags_t flags = cpu_irq_save();
    
    reactor_notifications |= _handlers[handle].mask;
    
    // If the queue is full - drop old data
-   queue_ringpush(&_handlers[handle].queue, data);
+   queue_push_ring(&_handlers[handle].queue, data);
    
-   sei();
+   cpu_irq_restore(flags);
 }
 
 /** Sorting compare function */
@@ -197,9 +200,6 @@ static inline void _reactor_sort_by_priority(void)
    
    qsort(priorities, _next_handle, sizeof(priority_item_t), compare_prio);
       
-   // Do it atomically in case interrupts are already pumping the queues   
-   cli();
-   
    // Iterate over all the reactor and set the mask for each
    for (uint8_t i=0; i<_next_handle; ++i)
    {
@@ -223,8 +223,6 @@ static inline void _reactor_sort_by_priority(void)
    // Do not allow new registration now all is sorted
    reactor_lock = true;
    reactor_notifications = sorted_notifications;
-   
-   sei();
 }
 
 
@@ -278,7 +276,7 @@ void reactor_run(void)
                /************************************************************************/
 
                item = &(_handlers[_handle_lookup[i]]);
-               alert_and_stop_if( ! queue_leftpop(&item->queue, &data) );
+               alert_and_stop_if( ! queue_pop(&item->queue, &data) );
                
                // If the queue is not empty - leave the flag set to go back in it
                // The round-robin will still apply, and the next item in queue is

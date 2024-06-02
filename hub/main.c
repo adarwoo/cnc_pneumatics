@@ -10,7 +10,6 @@
 #include "protocol.h"
 #include "i2c_slave.h"
 
-
 int main(void)
 {
    // Initialize the board hardware (clocks, IOs, buses etc.)
@@ -23,7 +22,13 @@ int main(void)
    protocol_init();
    
    // Turn on this board as an i2c slave
-   i2c_slave_init();
+   i2c_slave_init(
+      reactor_register(
+         protocol_handle_traffic,
+         reactor_prio_realtime,
+         1 // Queue of 1 as realtime
+      )
+   );
    
    // Off we go!
    reactor_run();
