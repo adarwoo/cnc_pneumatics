@@ -2,6 +2,9 @@
 **/Debug
 **/Release
 **/*.map
+**/*.hex
+**/*.lss
+**/*.elf
 
 controller/controller.map
 hub/hub.map
