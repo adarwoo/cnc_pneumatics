@@ -5,6 +5,7 @@
 **/*.hex
 **/*.lss
 **/*.elf
+**/*.eep
 
 controller/controller.map
 hub/hub.map
