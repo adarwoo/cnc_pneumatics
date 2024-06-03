@@ -31,16 +31,16 @@ static inline void _i2c_on_complete(status_code_t status)
       // Check no transmit error
       opcodes_reply_t reply = opcodes_decode_reply(last_sent, buffer);
 
-      if ( reply != opcodes_reply_error )
-      {
-         bool value = opcodes_reply_on ? true : false;
-
-         reactor_notify(on_data_received, (void*)value);
-      }
-      else
+      if ( reply == opcodes_reply_error )
       {
          status = ERR_BAD_DATA;
          reactor_notify(on_error, (void *)status);
+      }
+      else
+      {
+         uint16_t value = opcodes_reply_on ? 1 : 0;
+
+         reactor_notify(on_data_received, (void*)value);
       }
    }
    else

@@ -22,6 +22,7 @@
 #include "board.h"
 
 
+
 /************************************************************************/
 /* Local macros                                                         */
 /************************************************************************/
@@ -150,9 +151,10 @@ timer_count_t timer_get_count(void)
 
 	// Stop a race between this accessor and the interrupt
 	// Especially true for 32 bits counters which takes many assembly instructions
-	sei();
+   // Save the I register to allow calling from interrupt
+	uint8_t flag = cpu_irq_save();
 	retval = _timer_free_running_ms_counter;
-	cli();
+	cpu_irq_restore(flag);
 	
 	return retval;
 }

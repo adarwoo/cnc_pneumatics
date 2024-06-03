@@ -52,6 +52,8 @@ typedef uint_fast32_t timer_count_t;
  * Unique timer handle
  * Its size makes it unique. Even at 1ms interval (insane), it would take
  *  2^32 / 1000 seconds = 49 days to roll over.
+ * The repeating timers are created from the top and keep their instance
+ *  number throughout.
  */
 typedef uint32_t timer_instance_t;
 

@@ -30,6 +30,10 @@ static constexpr auto DI_FILT4 = TIMER_MILLISECONDS(40);
 /** Time in seconds when communications faults are tolerated */
 static constexpr auto COMMS_GRACE_PERIOD = TIMER_SECONDS(5);
 
+/** Time between i2c send */
+static constexpr auto I2C_DELAY_BETWEEN_TRANSMIT = TIMER_MILLISECONDS(100);
+
+
 /************************************************************************/
 /* Local types                                                          */
 /************************************************************************/
@@ -98,6 +102,10 @@ bool sound_door_alarm = false;
 /** Flag set to end sending following too many errors */
 bool stop_transmit = false;
 
+/** Timer used to transmit over the i2c */
+static timer_instance_t transmit_timer = TIMER_INVALID_INSTANCE;
+
+
 /*
  * Outputs                                                              
  */
@@ -148,6 +156,9 @@ void on_send_i2c_command(void *arg)
       {
          i2c_master_send(current_command);
       }
+      
+      transmit_timer = timer_arm(
+         react_i2c_command, timer_get_count_from_now(I2C_DELAY_BETWEEN_TRANSMIT), 0, 0);
    }
 }   
 
@@ -156,26 +167,17 @@ void on_send_i2c_command(void *arg)
  * Re-initiate the periodic transmit.
  * Cancel any on-going wait, and transmit right away.
  */
-void start_periodic_transmit(bool start)
+void trigger_next_transmit(void)
 {
-   static timer_instance_t transmit_timer = TIMER_INVALID_INSTANCE;
-
    if (transmit_timer != TIMER_INVALID_INSTANCE)
    {
       timer_cancel(transmit_timer);
    }
 
-   if (start)
-   {
-      // Start transmit in 1ms (at least). A whole frame take 300us.
-      // This way, there cannot be a collision with the on-going frame
-      transmit_timer = timer_arm(
-          react_i2c_command,
-          timer_get_count_from_now(TIMER_MILLISECONDS(1)),      // First one is in 1ms (allow finishing on-going transmit)
-          TIMER_MILLISECONDS(100), // Next one, in 100ms
-          (void *)current_command
-	  );
-   }
+   // Start transmit in 1ms (at least). A whole frame take 300us.
+   // This way, there cannot be a collision with the on-going frame
+   transmit_timer = timer_arm(
+      react_i2c_command, timer_get_count_from_now(TIMER_MILLISECONDS(1)), 0, 0);
 }
 
 /** Check the pneumatic inputs, and let the hub know */
@@ -200,7 +202,7 @@ void refresh_opcode(void)
       current_command = new_cmd;
 
       // Cancel the TWI timer to transmit here and now
-      start_periodic_transmit(true);
+      trigger_next_transmit();
    }
 }
 
@@ -401,7 +403,7 @@ int main(void)
    i2c_init(react_i2c_read, react_i2c_error);
 
    // Start sending to the i2c periodically
-   start_periodic_transmit(true);
+   trigger_next_transmit();
    
    // Start a timer to tolerate communications error for the first N seconds
    timer_arm(

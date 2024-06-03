@@ -42,7 +42,7 @@
  *  required.
  */
 #ifndef REACTOR_MAX_HANDLERS
-   #define REACTOR_MAX_HANDLERS 16
+   #define REACTOR_MAX_HANDLERS 32
 #endif
 
 
