@@ -19,10 +19,11 @@
 /************************************************************************/
 /* Functional I/Os                                                      */
 /************************************************************************/
+#define OC_CHUCK_RELEASED IOPORT_CREATE_PIN(PORTA, 1)
 #define OC_DOOR_CLOSED IOPORT_CREATE_PIN(PORTA, 2)
-#define OC_CHUCH_RELEASED IOPORT_CREATE_PIN(PORTA, 1)
 
-#define PIEZZO_DRIVE_PIN IOPORT_CREATE_PIN(PORTA, 3)
+// Piezzo drive is driven by the OC
+#define PIEZZO_DRIVE_PIN IOPORT_CREATE_PIN(PORTB, 2)
 
 #define IN_CHUCK_OPEN IOPORT_CREATE_PIN(PORTA, 4)
 #define IN_SPINDLE_AIR_BLAST IOPORT_CREATE_PIN(PORTA, 5)
@@ -31,7 +32,7 @@
 #define IN_BEEP IOPORT_CREATE_PIN(PORTB, 4)
 #define IN_DOOR_OPEN_CLOSE IOPORT_CREATE_PIN(PORTB, 5)
 
-#define IN_DOOR_UP IOPORT_CREATE_PIN(PORTB, 2)
+#define IN_DOOR_UP IOPORT_CREATE_PIN(PORTA, 3)
 #define IN_DOOR_DOWN IOPORT_CREATE_PIN(PORTB, 3)
 
 #define LED_CHUCK IOPORT_CREATE_PIN(PORTC, 0)

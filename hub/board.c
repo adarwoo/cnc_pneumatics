@@ -52,7 +52,8 @@ void board_init(void)
    ioport_set_pin_level(IOPORT_DOOR_PULL, false);
    ioport_set_pin_dir(IOPORT_DOOR_PULL, IOPORT_DIR_OUTPUT);
 
-   // Activate pull-ups on the input pin
+   // Since the input is active when the switch closes, invert
+   ioport_set_pin_mode(IOPORT_PRESSURE_READOUT, PORT_INVEN_bm);
    ioport_set_pin_dir(IOPORT_PRESSURE_READOUT, IOPORT_DIR_INPUT);
 
    // Activate trace pins for debug

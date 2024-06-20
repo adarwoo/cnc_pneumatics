@@ -49,15 +49,7 @@
 #define PIEZZO_PRIO reactor_prio_realtime
 #endif
 
-#if PIEZZO_TCB_NUMBER == 0
-#define PIEZZO_TCB TCB0
-#define PIEZZO_TCB_INT_VECTOR TCB0_INT_vect
-#define PIEZZO_TCB_INT_VECTOR_NUM TCB0_INT_vect_num
-#else
-#define PIEZZO_TCB TCB1
-#define PIEZZO_TCBB_INT_VECTOR TCB1_INT_vect
-#define PIEZZO_TCB_INT_VECTOR_NUM TCB1_INT_vect_num
-#endif
+#define PIEZZO_TCB TCA0
 
 /** Duration of a full note at 1 beat per minutes in ms (4(full) * 60(seconds) * 1000(ms)) */
 #define TEMPO_FULL_NOTE_PERIOD 240000UL
@@ -94,8 +86,8 @@ struct piezzo_s
    /** Store the slur for the next note */
    bool slur_next;
 
-   /** Calculated value to load in the PWM to hit the right note */
-   uint16_t pwm_compare_value;
+   /** Calculated period for the note at the lowest octave */
+   uint16_t ref_duration;
 
    /** Duration in timer count of the note or the rest */
    timer_count_t duration;
@@ -105,7 +97,7 @@ struct piezzo_s
 } piezzo;
 
 /**
- * Lookup table to convert a note to the pwm value.
+ * Lookup table to convert a note to the PWM value.
  * The rows corresponds to flats, regular and sharps
  * The columns to C, D, E, F, G, A, B
  */
@@ -135,21 +127,24 @@ uint16_t playing_tone_recovery_value = 0;
 /* Local methods                                                             */
 /*****************************************************************************/
 
-static inline void _set_timer_period(uint16_t new_tc_value)
+/** Helper to return the TC compare value */
+static inline uint16_t _get_cmp_value(void)
 {
-   PIEZZO_TCB.CNT = 0;
-   PIEZZO_TCB.CCMP = new_tc_value;
+   return piezzo.ref_duration >> piezzo.octave_shift;
+}
 
-   // Enable the clock
-   PIEZZO_TCB.CTRLA |= TCB_ENABLE_bm;
+static inline void _set_timer_compare_period(uint16_t new_tc_value)
+{
+   PIEZZO_TCB.SINGLE.CNT = 0;
+   PIEZZO_TCB.SINGLE.CMP0 = new_tc_value;
+
+   // Enable the compare
+   PIEZZO_TCB.SINGLE.CTRLB |= TCA_SINGLE_CMP2EN_bm;
 }
 
 static inline void _stop_timer_compare(void)
 {
-   // Drop the piezzo voltage too
-   ioport_set_pin_level(PIEZZO_DRIVE_PIN, false);
-
-   PIEZZO_TCB.CTRLA &= ~TCB_ENABLE_bm;
+   PIEZZO_TCB.SINGLE.CTRLB &= ~TCA_SINGLE_CMP2EN_bm;
 }
 
 /** Internal parse a single note and change all global variables */
@@ -178,7 +173,7 @@ static inline void _parse_next_note()
          }
          else if (c == 'R')
          {
-            piezzo.pwm_compare_value = 0;
+            piezzo.ref_duration = 0;
             state = state_duration;
          }
          break;
@@ -215,7 +210,7 @@ static inline void _parse_next_note()
          {
             --piezzo.next_note;
 
-            piezzo.pwm_compare_value = _note_to_pwm[alt_index][note_index];
+            piezzo.ref_duration = _note_to_pwm[alt_index][note_index];
             state = state_duration;
          }
          break;
@@ -257,29 +252,22 @@ void _play_next_note(void *arg)
 
       _parse_next_note();
 
-      new_tc_value = piezzo.pwm_compare_value >> piezzo.octave_shift;
+      new_tc_value = _get_cmp_value();
+      playing_tone_recovery_value = new_tc_value;
 
       if (last_tc_value != new_tc_value || piezzo.slur == false)
       {
-         if ( playing_tone )
+         if (!playing_tone)
          {
-            if (piezzo.pwm_compare_value)
+            if (new_tc_value)
             {
-               playing_tone_recovery_value = new_tc_value;
+               _set_timer_compare_period(new_tc_value);
             }
             else
             {
-               playing_tone_recovery_value = 0;
+               _stop_timer_compare();
             }
-         }
-         else if (piezzo.pwm_compare_value)
-         {
-            _set_timer_period(new_tc_value);
-         }
-         else
-         {
-            _stop_timer_compare();
-         }
+         }            
       }
 
       last_tc_value = new_tc_value;
@@ -290,30 +278,27 @@ void _play_next_note(void *arg)
    }
    else
    {
-      // End of play - Disable the timer
-      PIEZZO_TCB.CTRLA &= ~TCB_ENABLE_bm;
-
-      // Drop the piezzo voltage too
-      ioport_set_pin_level(PIEZZO_DRIVE_PIN, false);
+      playing_tone_recovery_value = 0;
+      
+      if (!playing_tone)
+      {
+         _stop_timer_compare();
+      }            
    }
 }
 
 /** Called to stop a single tone*/
-void _stop_tone(void *arg)
+static void _stop_tone(void *arg)
 {
    playing_tone = false;
 
    if ( playing_tone_recovery_value )
    {
-      _set_timer_period(playing_tone_recovery_value);
+      _set_timer_compare_period(playing_tone_recovery_value);
    }
    else
    {
       _stop_timer_compare();
-      PIEZZO_TCB.CTRLA &= ~TCB_ENABLE_bm;
-      
-      // Drop the piezzo voltage too
-      ioport_set_pin_level(PIEZZO_DRIVE_PIN, false);
    }
 
    playing_tone_recovery_value = 0;
@@ -328,11 +313,12 @@ void piezzo_init(void)
 {
    // Ready the PWM
 #ifndef _WIN32
-   // Use the Timer type B 1 to drive the piezzo transistor
-   PIEZZO_TCB.CNT = 0;                    // Reset the timer
-   PIEZZO_TCB.CTRLA = TCB_CLKSEL_DIV1_gc; // 10Mhz
-   PIEZZO_TCB.CTRLB = TCB_CNTMODE_INT_gc; // Periodic interrupt mode
-   PIEZZO_TCB.INTCTRL = TCB_CAPT_bm;      // Turn on 'capture' interrupt
+   // Use the Timer type A to drive the piezzo transistor directly
+   PIEZZO_TCB.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc | TCA_SINGLE_ENABLE_bm;
+   PIEZZO_TCB.SINGLE.CTRLB = TCA_SINGLE_WGMODE_FRQ_gc;
+   
+   // The channel 0 controls the period. Simply keep the compare for channel 2 at 0
+   PIEZZO_TCB.SINGLE.CMP2 = 0;
 #endif
    // This timer does not have a PWM output when using all 16bits.
 
@@ -384,8 +370,7 @@ void piezzo_stop(void)
       timer_cancel(timer_instance);
    }
 
-   // Drop the piezzo voltage too
-   ioport_set_pin_level(PIEZZO_DRIVE_PIN, false);
+   _stop_timer_compare();
 }
 
 /**
@@ -395,14 +380,8 @@ void piezzo_stop(void)
  */
 void piezzo_start_tone(uint16_t pwm_value, timer_count_t duration)
 {
-   // Push the current playing tone
-   playing_tone_recovery_value = piezzo.pwm_compare_value;
-
    // Restart the timer with the new value
-   PIEZZO_TCB.CNT = 0;
-   PIEZZO_TCB.CCMP = pwm_value;
-   PIEZZO_TCB.CTRLA |= TCB_ENABLE_bm;
-
+   _set_timer_compare_period(pwm_value);
 
    // If a duration is given, start a timer
    if ( duration )
@@ -416,24 +395,9 @@ void piezzo_start_tone(uint16_t pwm_value, timer_count_t duration)
 /** Stop playing the tone */
 void piezzo_stop_tone(void)
 {
-   _stop_tone(0);
+   _stop_tone(NULL);
 }
 
-
-/************************************************************************/
-/* ISR                                                                  */
-/************************************************************************/
-
-/**
- * Drive the piezzo by toggling the output
- */
-ISR(PIEZZO_TCB_INT_VECTOR)
-{
-   // Clear the flag
-   PIEZZO_TCB.INTFLAGS |= TCB_OVF_bm;
-
-   ioport_toggle_pin_level(PIEZZO_DRIVE_PIN);
-}
 
 /**@}*/
 /**@}*/

@@ -88,7 +88,7 @@ static void _digital_input_sample(void *arg)
    while ( di )
    {
       bool level = ioport_get_pin_level(di->pin);
-      bool previous_input = di->sampled.input;
+      di_input_state_t previous_input = di->sampled.input;
       
       if ( level )
       {
@@ -98,7 +98,7 @@ static void _digital_input_sample(void *arg)
             
             if ( di->sampled.integrator == di->sampled.integrator_threshold )
             {
-               di->sampled.input = true;
+               di->sampled.input = di_on_e;
             }
          }
       }
@@ -110,7 +110,7 @@ static void _digital_input_sample(void *arg)
 
             if ( di->sampled.integrator == 0 )
             {
-               di->sampled.input = false;
+               di->sampled.input = di_off_e;
             }
          }
       }
@@ -119,7 +119,7 @@ static void _digital_input_sample(void *arg)
       if ( di->sampled.input != previous_input && di->handler != REACTOR_NULL_HANDLE )
       {
          pin_and_value_t pav = {.pin=di->pin};
-         pav.value = di->sampled.input;
+         pav.value = di->sampled.input == di_on_e ? true : false;
          
          reactor_notify(di->handler, pav.as_arg);
       }
@@ -292,6 +292,7 @@ digital_input_handle_t digital_input(
    else
    {
       // Regular
+      di->sampled.input = di_unknown_e;
       di->sampled.integrator_threshold = filter_value / DIGITAL_INPUT_SAMPLE_PERIOD;
       
       next = &_first_sampled;
@@ -337,7 +338,7 @@ void digital_input_init(void)
  */
 bool digital_input_value(digital_input_handle_t di)
 {
-   return di->sampled.input;
+   return di->sampled.input == di_on_e ? true : false;
 }
 
 /************************************************************************/

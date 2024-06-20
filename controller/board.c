@@ -37,13 +37,20 @@ void board_init(void)
    * specific board configuration, found in conf_board.h.
    */
 
-   // Force a zero on output the set as output
+   /*
+    * OC pins drive a PNP. Invert the pin, so the application logic is normal
+    */
+   ioport_set_pin_mode(OC_DOOR_CLOSED, PORT_INVEN_bm);
    ioport_set_pin_level(OC_DOOR_CLOSED, false);
    ioport_set_pin_dir(OC_DOOR_CLOSED, IOPORT_DIR_OUTPUT);
+   
+   ioport_set_pin_mode(OC_CHUCK_RELEASED, PORT_INVEN_bm);
+   ioport_set_pin_level(OC_CHUCK_RELEASED, false);
+   ioport_set_pin_dir(OC_CHUCK_RELEASED, IOPORT_DIR_OUTPUT);
 
-   ioport_set_pin_level(OC_CHUCH_RELEASED, false);
-   ioport_set_pin_dir(OC_CHUCH_RELEASED, IOPORT_DIR_OUTPUT);
-
+   /*
+    * Inputs
+    */
    ioport_set_pin_dir(IN_CHUCK_OPEN, IOPORT_DIR_INPUT);
    ioport_set_pin_dir(IN_SPINDLE_AIR_BLAST, IOPORT_DIR_INPUT);
    ioport_set_pin_dir(IN_TOOLSET_AIR_BLAST, IOPORT_DIR_INPUT);
@@ -51,6 +58,9 @@ void board_init(void)
    ioport_set_pin_dir(IN_BEEP, IOPORT_DIR_INPUT);
    ioport_set_pin_dir(IN_DOOR_OPEN_CLOSE, IOPORT_DIR_INPUT);
 
+   /*
+    * Outputs
+    */
    ioport_set_pin_level(LED_CHUCK, false);
    ioport_set_pin_dir(LED_CHUCK, IOPORT_DIR_OUTPUT);
 
@@ -63,10 +73,14 @@ void board_init(void)
    ioport_set_pin_level(LED_FAULT, false);
    ioport_set_pin_dir(LED_FAULT, IOPORT_DIR_OUTPUT);
    
+   // Driven by the OC WO2 (TCA0) - Default (no need for the TCAROUTEA mux register)
    ioport_set_pin_level(PIEZZO_DRIVE_PIN, false);
    ioport_set_pin_dir(PIEZZO_DRIVE_PIN, IOPORT_DIR_OUTPUT);
    
-   // Init all services
+   
+   /*
+    * Init all services
+    */
    reactor_init();
    timer_init();
    digital_output_init();

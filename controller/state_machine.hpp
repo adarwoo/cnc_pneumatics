@@ -6,52 +6,71 @@
 namespace sml = boost::sml;
 
 // Create those simple events
-struct on_open {};
-struct on_close {};
-struct door_is_up {};
-struct door_is_down {};
-struct timeout {};
-struct comms_established {};
-struct comms_error {};
+struct event_open {};
+struct event_close {};
+struct event_door_is_up {};
+struct event_door_is_down {};
+struct event_door_moving_up {};
+struct event_door_moving_down {};
+struct event_timeout {};
    
 extern void on_pneumatic_input_change(void *);
 
 namespace valve
 {
-   static constexpr auto push_on  = [] { 
-      pin_and_value_t pav{.pin=IN_DOOR_UP}; pav.value=true;
-      on_pneumatic_input_change( pav.as_arg ); 
+   // Constants
+   constexpr auto moving_timeout = TIMER_SECONDS(3);
+   constexpr auto complete_timeout = TIMER_SECONDS(8);
+
+   // Locals
+   timer_instance_t timer = TIMER_INVALID_INSTANCE;
+   
+   // Helpers as lambdas
+   auto arm_timer = [](timer_count_t c) {
+      timer = timer_arm(react_cmd_timeout, timer_get_count_from_now(c), 0, 0);
+   };
+   
+   /************************************************************************/
+   /* Transition lambdas                                                   */
+   /************************************************************************/
+   
+   auto push_on  = [] { 
+      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_UP, true) );
       digitial_output_start(led_door_opening, TIMER_SECONDS(1), "+1-", true);
+      arm_timer(moving_timeout);
    };
    
-   static constexpr auto push_off = [] { 
-      pin_and_value_t pav{.pin=IN_DOOR_UP}; pav.value=false;
-      on_pneumatic_input_change( pav.as_arg );
+   auto push_off = [] { 
+      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_UP, false) );
       digitial_output_set(led_door_opening, false);
+      timer_cancel(timer);
    };
 
-   static constexpr auto push_timeout = [] {
-      pin_and_value_t pav{.pin=IN_DOOR_UP}; pav.value=false;
-      on_pneumatic_input_change( pav.as_arg );
-      digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+3-", true);
+   auto push_timeout = [] {
+      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_UP, false) );
+      digitial_output_start(led_door_opening, TIMER_SECONDS(1), "+4-", true);
    };
    
-   static constexpr auto pull_on  = [] {
-      pin_and_value_t pav{.pin=IN_DOOR_DOWN}; pav.value=true;
-      on_pneumatic_input_change( pav.as_arg );
+   auto pull_on = [] {
+      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, true) );
       digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+1-", true);
+      arm_timer(moving_timeout);
    };
    
-   static constexpr auto pull_off = [] {
-      pin_and_value_t pav{.pin=IN_DOOR_DOWN}; pav.value=false;
-      on_pneumatic_input_change( pav.as_arg );
+   auto pull_off = [] {
+      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, false) );
       digitial_output_set(led_door_closing, false);
+      timer_cancel(timer);
    };
 
-   static constexpr auto pull_timeout = [] {
-      pin_and_value_t pav{.pin=IN_DOOR_DOWN}; pav.value=false;
-      on_pneumatic_input_change( pav.as_arg );
-      digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+3-", true);
+   auto pull_timeout = [] {
+      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, false) );
+      digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+4-", true);
+   };
+   
+   auto door_moving = [] {
+      timer_cancel(timer);
+      arm_timer(complete_timeout);
    };
 };
 
@@ -63,14 +82,16 @@ struct door_sm
       using namespace sml;
 
       return make_transition_table(
-         *"unknown"_s + event<door_is_up>                          = "opened"_s,
-          "unknown"_s + event<door_is_down>                        = "closed"_s,
-          "closed"_s  + event<on_open>      / valve::push_on       = "opening"_s,
-          "opened"_s  + event<on_close>     / valve::pull_on       = "closing"_s,
-          "opening"_s + event<timeout>      / valve::push_timeout  = "unknown"_s,
-          "opening"_s + event<door_is_up>   / valve::push_off      = "opened"_s,
-          "closing"_s + event<timeout>      / valve::pull_timeout  = "unknown"_s,
-          "closing"_s + event<door_is_down> / valve::pull_off      = "closed"_s
+         *"unknown"_s + event<event_door_is_up>                              = "opened"_s,
+          "unknown"_s + event<event_door_is_down>                            = "closed"_s,
+          "closed"_s  + event<event_open>             / valve::push_on       = "opening"_s,
+          "opened"_s  + event<event_close>            / valve::pull_on       = "closing"_s,
+          "opening"_s + event<event_door_moving_up>   / valve::door_moving   = "opening"_s,
+          "opening"_s + event<event_timeout>          / valve::push_timeout  = "unknown"_s,
+          "opening"_s + event<event_door_is_up>       / valve::push_off      = "opened"_s,
+          "closing"_s + event<event_door_moving_down> / valve::door_moving   = "closing"_s,
+          "closing"_s + event<event_timeout>          / valve::pull_timeout  = "unknown"_s,
+          "closing"_s + event<event_door_is_down>     / valve::pull_off      = "closed"_s
       );
    }
 };

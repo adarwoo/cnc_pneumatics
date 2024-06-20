@@ -46,6 +46,32 @@ typedef union
    };
 } pin_and_value_t;
 
+/** 
+ * State of the input. Make tristate to detect the unknown state
+ */
+typedef enum
+{
+   di_off_e,
+   di_on_e,
+   di_unknown_e
+} di_input_state_t;
+
+/** Helper to create a pin_and_value_t from a pin and a value */
+static inline pin_and_value_t pin_and_value(ioport_pin_t pin, bool value)
+{
+   pin_and_value_t retval;
+   retval.pin = pin;
+   retval.value = value;
+
+   return retval;   
+}
+
+/** Create a arg like value from the pin and value */
+static inline void *pin_and_value_as_arg(ioport_pin_t pin, bool value)
+{
+   return pin_and_value(pin, value).as_arg;
+}
+
 /** Hold digital input persistent information */
 typedef struct _digital_input_s
 {
@@ -60,7 +86,7 @@ typedef struct _digital_input_s
       struct
       {
          /** Last known status of the filtered input */
-         bool input;
+         di_input_state_t input;
          /** Internal value of the integrator */
          uint8_t integrator_threshold;
          /** Threshold value of the integrator */

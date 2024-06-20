@@ -38,7 +38,7 @@ static inline void _i2c_on_complete(status_code_t status)
       }
       else
       {
-         uint16_t value = opcodes_reply_on ? 1 : 0;
+         uint16_t value = (reply == opcodes_reply_on) ? 1 : 0;
 
          reactor_notify(on_data_received, (void*)value);
       }

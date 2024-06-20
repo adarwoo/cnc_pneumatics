@@ -57,6 +57,7 @@ static void on_i2c_read(void *);
 static void on_comms_grace_over(void *);
 static void on_door_sensor_change(void *);
 static void on_door_cmd(void *);
+static void on_cmd_timeout(void *);
 
 
 /************************************************************************/
@@ -71,6 +72,7 @@ reactor_handle_t react_i2c_read =         reactor_register(on_i2c_read,         
 reactor_handle_t react_comms_grace_over = reactor_register(on_comms_grace_over,       reactor_prio_low,            1);
 reactor_handle_t react_door_sensor =      reactor_register(on_door_sensor_change,     reactor_prio_medium_minus,   1);
 reactor_handle_t react_door_cmd =         reactor_register(on_door_cmd,               reactor_prio_low_plus,       1);
+reactor_handle_t react_cmd_timeout =      reactor_register(on_cmd_timeout,            reactor_prio_low_plus,       1);
 
 /** Command to send via i2c */
 opcodes_cmd_t current_command = opcodes_cmd_idle;
@@ -80,8 +82,8 @@ output_status_t output_statuses[] = {
     {IN_CHUCK_OPEN, opcodes_cmd_unclamp_chuck, false},
     {IN_SPINDLE_AIR_BLAST, opcodes_cmd_blast_spindle, false},
     {IN_TOOLSET_AIR_BLAST, opcodes_cmd_blast_toolsetter, false},
-    {IN_DOOR_UP, opcodes_cmd_pull_door, false},   // Borrow the sensor input
-    {IN_DOOR_DOWN, opcodes_cmd_push_door, false}, // Borrow the sensor input
+    {IN_DOOR_UP, opcodes_cmd_pull_door, false},   // Fake input - pretend IN_DOOR_UP is used
+    {IN_DOOR_DOWN, opcodes_cmd_push_door, false}, // Same, borrow the sensor input
 };
 
 /** Keep a handle for the TWI timer */
@@ -95,9 +97,6 @@ uint8_t comms_error_count = 0;
 
 /** If true, communications error are not fatal */
 bool comms_in_error_grace_period_active = true;
-
-/** Sounding door alarm */
-bool sound_door_alarm = false;
 
 /** Flag set to end sending following too many errors */
 bool stop_transmit = false;
@@ -115,7 +114,7 @@ digital_output_t led_door_opening = digital_output(LED_DOOR_OPENING);
 digital_output_t led_door_closing = digital_output(LED_DOOR_CLOSING);
 
 // Pressure value from the chuck
-digital_output_t chuck_released_oc = digital_output(OC_CHUCH_RELEASED);
+digital_output_t chuck_released_oc = digital_output(OC_CHUCK_RELEASED);
 
 /*
  * State machine - include like a .inc
@@ -123,22 +122,21 @@ digital_output_t chuck_released_oc = digital_output(OC_CHUCH_RELEASED);
 #include "state_machine.hpp"
 
 /** Create the state machine */
-boost::sml::sm<door_sm> sm;
+boost::sml::sm<door_sm> door_sm;
 
 
 /************************************************************************/
 /* Local functions                                                      */
 /************************************************************************/
 
-
 /** Now lack of connection and transmit errors are accounted for */
-void on_comms_grace_over(void *)
+static void on_comms_grace_over(void *)
 {
    comms_in_error_grace_period_active = false;
 }
 
 /** Send an i2c command to the hub */
-void on_send_i2c_command(void *arg)
+static void on_send_i2c_command(void *arg)
 {
    // If the error count is too high - stop sending
 #ifdef NDEBUG
@@ -167,7 +165,7 @@ void on_send_i2c_command(void *arg)
  * Re-initiate the periodic transmit.
  * Cancel any on-going wait, and transmit right away.
  */
-void trigger_next_transmit(void)
+static void trigger_next_transmit(void)
 {
    if (transmit_timer != TIMER_INVALID_INSTANCE)
    {
@@ -181,7 +179,7 @@ void trigger_next_transmit(void)
 }
 
 /** Check the pneumatic inputs, and let the hub know */
-void refresh_opcode(void)
+static void refresh_opcode(void)
 {
    // If we get to the end of the iteration and none are on, state is idle
    opcodes_cmd_t new_cmd = opcodes_cmd_idle;
@@ -206,31 +204,35 @@ void refresh_opcode(void)
    }
 }
 
+/** Called when a timeout is occuring during a door open/close */
+static void on_cmd_timeout(void *arg)
+{
+   door_sm.process_event(event_timeout{});
+}
+
 /**
  * Called with the input changes (high to low or low to high)
  * Pass to the state machine to handle the request
  */
-void on_door_cmd(void *arg)
+static void on_door_cmd(void *arg)
 {
-   pin_and_value_t pin_and_value;
-   pin_and_value.as_arg = arg;
+   pin_and_value_t pin_and_value { .as_arg = arg };
    
    // Pump the status into the state machine
    if ( pin_and_value.value )
    {
-      sm.process_event(on_open{});
+      door_sm.process_event(event_open{});
    }         
    else
    {
-      sm.process_event(on_close{});
+      door_sm.process_event(event_close{});
    }         
 }
 
 /** Pass the information down when the change input */
-void on_door_sensor_change(void *arg)
+static void on_door_sensor_change(void *arg)
 {
-   pin_and_value_t pin_and_value;
-   pin_and_value.as_arg = arg;
+   pin_and_value_t pin_and_value { .as_arg = arg };
    
    if ( pin_and_value.pin == IN_DOOR_DOWN )
    {
@@ -240,7 +242,11 @@ void on_door_sensor_change(void *arg)
       if ( pin_and_value.value )      
       {
          // Let the state machine know
-         sm.process_event(door_is_down{});
+         door_sm.process_event(event_door_is_down{});
+      }
+      else
+      {
+         door_sm.process_event(event_door_moving_up{});
       }
    }
    else if ( pin_and_value.pin == IN_DOOR_UP )
@@ -248,26 +254,26 @@ void on_door_sensor_change(void *arg)
       if ( pin_and_value.value )
       {
          // Let the state machine know
-         sm.process_event(door_is_up{});
+         door_sm.process_event(event_door_is_up{});
+      }
+      else
+      {
+         door_sm.process_event(event_door_moving_down{});
       }
    }
 }
 
 /** A key was pushed - sound it */
-void on_beep_input(void *arg)
+static void on_beep_input(void *arg)
 {
-   // Only play if the door alarm is off
-   if ( ! sound_door_alarm )
-   {
-      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(2000), TIMER_MILLISECONDS(50));
-   }
+   piezzo_play(150, "B4");
 }
 
 /**
  * The sounder is beeping to warn the door is opening or closing
  * Note: This takes over every other sounds.
  */
-void on_sounder(void *arg)
+static void on_sounder(void *arg)
 {
    pin_and_value_t pin_and_value;
    pin_and_value.as_arg = arg;
@@ -275,15 +281,11 @@ void on_sounder(void *arg)
    if (pin_and_value.value)
    {
       // Play long continuous tone
-      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(800), 0);
-      
-      sound_door_alarm = true;
+      piezzo_start_tone(PIEZZO_FREQ_TO_PWM(1400), 0);
    }
    else
    {
       piezzo_stop_tone();
-
-      sound_door_alarm = false;
    }
 }
 
@@ -294,7 +296,7 @@ void on_sounder(void *arg)
  * Note : Only 1 output is allowed 'on' at a time. The table output_statuses
  * list them in priority order - so, only 1 value control is passed out.
  */
-void on_pneumatic_input_change(void *arg)
+static void on_pneumatic_input_change(void *arg)
 {
    // Grab the pin that changed
    pin_and_value_t pav;
@@ -328,7 +330,7 @@ void on_pneumatic_input_change(void *arg)
  *  a good communication is detected.
  * Sound the alert, and go into failsafe mode.
  */
-void on_i2c_error(void *arg)
+static void on_i2c_error(void *arg)
 {
    // Check if the system hit a no-recovery
    if ( ! comms_in_error_grace_period_active )
@@ -364,7 +366,7 @@ void on_i2c_error(void *arg)
  * Handle a successful read from the i2c slave
  * The returned value was also checked for errors
  */
-void on_i2c_read(void *arg)
+static void on_i2c_read(void *arg)
 {
    bool status = (bool)arg;
 
@@ -383,15 +385,19 @@ void on_i2c_read(void *arg)
 int main(void)
 {
    board_init();
+   
+   constexpr auto input = [](ioport_pin_t p, reactor_handle_t h) {
+      return digital_input(p, h, IOPORT_SENSE_DISABLE, DI_FILT4 );
+   };
 
-   digital_input(IN_CHUCK_OPEN,            react_input_change, IOPORT_SENSE_DISABLE, DI_FILT4 );
-   digital_input(IN_SPINDLE_AIR_BLAST,     react_input_change, IOPORT_SENSE_DISABLE, DI_FILT4 );
-   digital_input(IN_TOOLSET_AIR_BLAST,     react_input_change, IOPORT_SENSE_DISABLE, DI_FILT4 );
-   digital_input(IN_DOOR_OPEN_CLOSE,       react_door_cmd   ,  IOPORT_SENSE_DISABLE, DI_FILT4 );
-   digital_input(IN_DOOR_UP,               react_door_sensor,  IOPORT_SENSE_DISABLE, DI_FILT4 );
-   digital_input(IN_DOOR_DOWN,             react_door_sensor,  IOPORT_SENSE_DISABLE, DI_FILT4 );
-   digital_input(IN_SOUNDER,               react_sounder,      IOPORT_SENSE_DISABLE, DI_FILT4 );
-   digital_input(IN_BEEP,                  react_beep,         IOPORT_SENSE_RISING,  DI_FILT4 );
+   input(IN_DOOR_UP,           react_door_sensor );
+   input(IN_DOOR_DOWN,         react_door_sensor );
+   input(IN_CHUCK_OPEN,        react_input_change);
+   input(IN_SPINDLE_AIR_BLAST, react_input_change);
+   input(IN_TOOLSET_AIR_BLAST, react_input_change);
+   input(IN_DOOR_OPEN_CLOSE,   react_door_cmd    );
+   input(IN_SOUNDER,           react_sounder     );
+   input(IN_BEEP,              react_beep        );
 
    // Flash all LEDs for 2 second to start with to check none are defective
    digitial_output_start(led_fault,        1000, "++-", false);
@@ -413,8 +419,10 @@ int main(void)
    );
 
    // Play moon_cresta tune
-#ifdef NDEBUG
+   #ifndef DEBUG
    piezzo_play(190, "C,3 R C E G E G E D R D F A2~A3 B G E B G E B G E C' R B, C'~C1");
-#endif
+   #endif
+   
+   // Run the reactor
    reactor_run();
 }

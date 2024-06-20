@@ -298,7 +298,8 @@ timer_instance_t timer_arm(
 	// Move next available slot
 	_timer_slot_avail = _timer_right_of(_timer_slot_avail);
 
-	return _timer_current_instance;
+	// Do not return a valid instance for the repeating timer as it will keep on changing
+	return repeat ? TIMER_INVALID_INSTANCE : _timer_current_instance;
 }
 
 
