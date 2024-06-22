@@ -1,5 +1,9 @@
 # cnc_pneumatic
-A simple pneumatic door controller
+HUB for Masso based CNC to control the pneumatics of the CNC with 1 controller which implements the logic controller, and 1 hub, which handled all the pneumatic valves.
+
+![Alt text](pics/both.jpg?raw=true "Assembled circuits")
+
+The PCB is double sided with a ATMEL attiny1626 microcontroller in the controller and a 824 in the hub.
 
 This simple project is for my CNC which now has a pneumatic door (operated by pneumatic cylinders) and a pneumatic valve.
 The valve is a 5/3 solenoid with an exhaust center.
@@ -13,9 +17,11 @@ A pair of microswitch/proximity sensor detect when the door is fully opened and 
 
 The intention is to use an ATTiny microcontroller.
 
-The firwmware will be using a simple reactor (no RTOS) and a C++ template based state machine.
+The firwmware is using a priority based round-robin reactor and a C++ template based state machine - the boost SML.
 
 It will be coded in C++2017 using the avr-gcc compiler.
+
+## The project can compile in AVR Studio, but also on a Linux box, or Windows PC.
 
 ## Draft notes:
 
@@ -57,16 +63,18 @@ The state machine should have the following states:
 
 ```mermaid
 ---
-title: Simple sample
+title: Door control
 ---
 stateDiagram-v2
-    [*] --> Unknown
-    Unknown --> Opened : DoorIsOpened
-    Unknown --> Closed : DoorIsClosed
-    Opened --> Closing : OnClosing
-    Closing --> Unknown : OnTimeout
-    Closing --> Closed : DoorIsClosed
-    Closed --> Opening : OnOpening
-    Opening --> Unknown : OnTimeout
-    Opening --> Opened : DoorIsOpened
+
+   unknown --> opened  : door_is_up
+   unknown --> closed  : door_is_down
+   closed  --> opening : open / push_on
+   opened  --> closing : close
+   opening --> opening : door_moving_up
+   opening --> unknown : timeout
+   opening --> opened  : door_is_up
+   closing --> closing : door_moving_down
+   closing --> unknown : timeout
+   closing --> closed  : door_is_down
 ```
