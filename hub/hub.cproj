@@ -96,8 +96,8 @@
     </ToolchainSettings>
     <UsesExternalMakeFile>True</UsesExternalMakeFile>
     <OutputDirectory />
-    <BuildTarget>all</BuildTarget>
-    <CleanTarget>clean</CleanTarget>
+    <BuildTarget>NDEBUG=1 all</BuildTarget>
+    <CleanTarget>NDEBUG=1 clean</CleanTarget>
     <ExternalMakeFilePath>Makefile</ExternalMakeFilePath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -141,8 +141,8 @@
     </ToolchainSettings>
     <UsesExternalMakeFile>True</UsesExternalMakeFile>
     <OutputDirectory />
-    <BuildTarget>DEBUG=1 all</BuildTarget>
-    <CleanTarget>DEBUG=1 clean</CleanTarget>
+    <BuildTarget>VERBOSE=1 all</BuildTarget>
+    <CleanTarget>VERBOSE=1 clean</CleanTarget>
     <ExternalMakeFilePath>Makefile</ExternalMakeFilePath>
   </PropertyGroup>
   <ItemGroup>

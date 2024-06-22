@@ -12,17 +12,28 @@ include $(TOP)/make/$(target).mak
 build_type ?= $(if $(NDEBUG),Release,Debug)
 MUTE  ?= $(if $(VERBOSE),@set -x;,@)
 
+# Default tools
 CC    ?= gcc
 CXX   ?= g++
 RC    ?= make/rc.py
 SIZE  ?= size
 ECHO  ?= echo
-MKDIR ?=	mkdir -p 
+MKDIR ?=	mkdir -p
+SREC_CAT ?= srec_cat
 
 BUILD_DIR       ?= $(build_type)
 
-# Pre-processor flags
-CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p)) -D$(if $(NDEBUG),NDEBUG,DEBUG)=1
+# Work out the size of the flash using make functions only
+FLASH_END := \
+	$(if $(findstring attiny32,$(ARCH)),0x7FFE, \
+		$(if $(findstring attiny16,$(ARCH)),0x3FFE, \
+			$(if $(findstring attiny8,$(ARCH)),0x1FFE, \
+				$(if $(findstring attiny4,$(ARCH)),0x0FFE, \
+					$(if $(findstring attiny2,$(ARCH)),0x07FE, \
+						$(error Unknown arch $(ARCH)))))))
+
+# Pre-processor flags for C, C++ and assembly
+CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p)) -D$(if $(NDEBUG),NDEBUG,DEBUG)=1 -DCRC_AT=$(strip $(FLASH_END))
 
 # Flags for the compilation of C files
 CFLAGS          += -ggdb3 -Wall
@@ -30,6 +41,7 @@ CFLAGS          += -ggdb3 -Wall
 # Flags for the compilation of C++ files
 CXXFLAGS        += $(CFLAGS) -std=c++17 -fno-exceptions
 
+# Assembler flags
 ASFLAGS         += -Wa,-gdwarf2 -x assembler-with-cpp -Wa,-g
 
 # Flag for the linker
@@ -95,6 +107,9 @@ $(BUILD_DIR)/%.rcd : %.json
 	@echo Generating the resources from $<
 	$(MUTE)[ -d $(@D) ] || mkdir -p $(@D)
 	$(MUTE)$(COMPILE.rc) $@ $<
+
+# Add the CRC of the code to enable integrity check of the code
+# $(BUILD_DIR)/$(BIN)_crc$(BIN_EXT) : $(BUILD_DIR)/$(BIN)$(BIN_EXT)
 
 #-----------------------------------------------------------------------------
 # Create directory $$dir if it doesn't already exist.

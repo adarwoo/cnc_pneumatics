@@ -1,3 +1,7 @@
+##
+## Make rules for a Linux/Docker/WSL build
+##
+
 # Change the compiler
 CXX := avr-g++
 CC := avr-gcc
@@ -21,7 +25,7 @@ CXXFLAGS += $(CFLAGS) -fno-threadsafe-statics -fno-exceptions
 LDFLAGS += $(ARCHFLAGS) -Wl,-Map="$(BIN).map" -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mmcu=$(ARCH) -Wl,--demangle -Wl,-flto
 
 define DIAG
-$(MUTE)$(SIZE) $@ | awk 'NR!=1 {print "Flash: [" $$1 "]" " - RAM: [" $$2 "+" $$3 "]" }'
+$(MUTE)$(SIZE) -G $@
 
 endef
 
@@ -30,4 +34,5 @@ define POST_LINK
 	$(MUTE)avr-objcopy -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "$@" "${@:.elf=.eep}" || exit 0
 	$(MUTE)avr-objdump -h -S "$@" > "${@:.elf=.lss}"
 	$(MUTE)avr-objcopy -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "$@" "${@:.elf=.lss}"
+	$(MUTE)$(SREC_CAT) $(@:.elf=.hex) -intel -crop 0 $(FLASH_END) -fill 0xFF 0 $(FLASH_END) -CRC16_Big_Endian $(FLASH_END) -broken -o $(@:.elf=_crc.hex) -intel -line-length=44
 endef

@@ -10,7 +10,10 @@
  */
 #include <avr/wdt.h>
 #include <assert.h>
+#include <ioport.h>
 
+// Need to include the configuration to determine the alert pin
+#include "conf_board.h"
 #include "alert.h"
 
 #ifdef ALERT_RECORD

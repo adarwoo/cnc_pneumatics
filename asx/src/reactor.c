@@ -129,7 +129,7 @@ void reactor_init(void)
  *
  */
 
-reactor_handle_t reactor_register( const reactor_handler_t handler, uint8_t priority, uint8_t queue_size )
+reactor_handle_t reactor_register( const reactor_handler_t handler, reactor_priorities_t priority, uint8_t queue_size )
 {
    alert_and_stop_if(reactor_lock != false);
    alert_and_stop_if(_next_handle == REACTOR_MAX_HANDLERS);
@@ -190,7 +190,7 @@ static int compare_prio(const void *e1, const void *e2)
 static inline void _reactor_sort_by_priority(void)
 {
    priority_item_t priorities[_next_handle];
-   uint32_t sorted_notifications = 0;
+   reactor_mask_t sorted_notifications = 0;
  
    for (int i=0; i<_next_handle; ++i)
    {
@@ -204,19 +204,15 @@ static inline void _reactor_sort_by_priority(void)
    for (uint8_t i=0; i<_next_handle; ++i)
    {
       uint8_t sorted_index = priorities[i].index;
-      uint32_t mask = (1 << i);
+      reactor_mask_t mask = (1l << i);
       
       _handle_lookup[i] = sorted_index;
       _handlers[sorted_index].mask = mask;
       
       // Any pending notifications are shuffled to account for new ordering
-      if ( reactor_notifications & (1 << sorted_index) )
+      if ( reactor_notifications & (1l << sorted_index) )
       {
          sorted_notifications |= mask;
-      }
-      else
-      {
-         sorted_notifications &= (~mask);
       }
    }
    

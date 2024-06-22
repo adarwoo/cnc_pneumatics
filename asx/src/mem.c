@@ -53,6 +53,7 @@ static void
    __attribute__ ((section (".init5"), naked, used))
    _mem_stack_init(void)
 {
+   // Fill the heap with 0xaa
    memset(&__heap_start, 0xaa, HEAP_SIZE);
 }
 

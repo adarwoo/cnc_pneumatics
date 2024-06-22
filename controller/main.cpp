@@ -15,6 +15,7 @@
 #include "digital_input.h"
 #include "digital_output.h"
 #include "piezzo.h"
+#include "alert.h"
 #include "board.h"
 
 #include "op_codes.h"
@@ -37,7 +38,7 @@ static void on_cmd_timeout(void *);
 namespace
 {
    /** Number of errors which trigger a shutdown */
-   constexpr auto COMMS_TOO_MANY_ERRORS = 10;
+   constexpr auto COMMS_TOO_MANY_ERRORS = 100;
 
    /** Duration of the filter (or no re-trigger period) for digital inputs */
    constexpr auto DI_FILT4 = TIMER_MILLISECONDS(40);
@@ -78,13 +79,16 @@ namespace
    /** Command to send via i2c */
    opcodes_cmd_t current_command = opcodes_cmd_idle;
 
-   /** Keep track of all the outputs ordered by priority */
+   /**
+    * Keep track of all the outputs ordered by priority.
+    * Only 1 pneumatic valve is activated at once to preserve the compressor
+    */
    output_status_t output_statuses[] = {
-       {IN_CHUCK_OPEN, opcodes_cmd_unclamp_chuck, false},
-       {IN_SPINDLE_AIR_BLAST, opcodes_cmd_blast_spindle, false},
+       {IN_CHUCK_OPEN,        opcodes_cmd_unclamp_chuck,    false},
+       {IN_SPINDLE_AIR_BLAST, opcodes_cmd_blast_spindle,    false},
        {IN_TOOLSET_AIR_BLAST, opcodes_cmd_blast_toolsetter, false},
-       {IN_DOOR_UP, opcodes_cmd_pull_door, false},   // Fake input - pretend IN_DOOR_UP is used
-       {IN_DOOR_DOWN, opcodes_cmd_push_door, false}, // Same, borrow the sensor input
+       {IN_DOOR_UP,           opcodes_cmd_pull_door,        false}, // Fake input
+       {IN_DOOR_DOWN,         opcodes_cmd_push_door,        false}, // Fake input
    };
 
    /** Count the number of transmit errors */
@@ -134,9 +138,7 @@ static void on_comms_grace_over(void *)
 static void on_send_i2c_command(void *arg)
 {
    // If the error count is too high - stop sending
-#ifdef NDEBUG
    if ( ! stop_transmit )
-#endif
    {   
       // Send an i2c command
       // The i2c should never be busy since we delay the transmit by 5 times a single transmit
@@ -328,10 +330,12 @@ static void on_i2c_error(void *arg)
    // Check if the system hit a no-recovery
    if ( ! comms_in_error_grace_period_active )
    {
+#ifdef NDEBUG
       // Increment errors at the twice the rate of good packets
       comms_error_count += 2;
+#endif
    }      
-      
+
    if ( comms_error_count >= COMMS_TOO_MANY_ERRORS )
    {
       // Turn off the pressure input as a fail safe
@@ -341,16 +345,14 @@ static void on_i2c_error(void *arg)
       digitial_output_set(led_fault, true);
 
       // In release, turn of communication and sound the beeper to signal an error
-#ifdef NDEBUG
       piezzo_start_tone(PIEZZO_FREQ_TO_PWM(2000), TIMER_SECONDS(5));
-#endif
 
       // Flag end of transmit
       stop_transmit = true;
    }
    else
    {
-      // Flash the led once. For repeated errors, it will light
+      // Flash the led once. For repeated errors, it will light on
       digitial_output_start(led_fault, TIMER_MILLISECONDS(50), "+-", false);
    }
 }

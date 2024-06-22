@@ -1,20 +1,18 @@
+#ifndef BOARD_H_
+#define BOARD_H_
 /*
  * board.h
  *
  * Created: 07/05/2024 11:20:17
  *  Author: micro
  */ 
-#ifndef BOARD_H_
-#define BOARD_H_
 
 // Tracing
 #define TRACE_INFO IOPORT_CREATE_PIN(PORTA, 0)
 
-
-#ifdef DEBUG
 // Share the trace pin
 #define ALERT_OUTPUT_PIN LED_FAULT
-#endif
+
 
 /************************************************************************/
 /* Functional I/Os                                                      */
