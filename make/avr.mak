@@ -21,13 +21,13 @@ CXXFLAGS += $(CFLAGS) -fno-threadsafe-statics -fno-exceptions
 LDFLAGS += $(ARCHFLAGS) -Wl,-Map="$(BIN).map" -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mmcu=$(ARCH) -Wl,--demangle -Wl,-flto
 
 define DIAG
-$(mute)$(SIZE) $@ | awk 'NR!=1 {print "Flash: [" $$1 "]" " - RAM: [" $$2 "+" $$3 "]" }'
+$(MUTE)$(SIZE) $@ | awk 'NR!=1 {print "Flash: [" $$1 "]" " - RAM: [" $$2 "+" $$3 "]" }'
 
 endef
 
 define POST_LINK
-	$(mute)avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures  "$@" "${@:.elf=.hex}"
-	$(mute)avr-objcopy -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "$@" "${@:.elf=.eep}" || exit 0
-	$(mute)avr-objdump -h -S "$@" > "${@:.elf=.lss}"
-	$(mute)avr-objcopy -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "$@" "${@:.elf=.lss}"
+	$(MUTE)avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures  "$@" "${@:.elf=.hex}"
+	$(MUTE)avr-objcopy -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "$@" "${@:.elf=.eep}" || exit 0
+	$(MUTE)avr-objdump -h -S "$@" > "${@:.elf=.lss}"
+	$(MUTE)avr-objcopy -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "$@" "${@:.elf=.lss}"
 endef

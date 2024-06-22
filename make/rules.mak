@@ -1,3 +1,5 @@
+.PHONY: clean all
+
 # By default, build for the AVR target. Export sim to build a simulator
 ifdef ToolchainDir
 target := studio
@@ -20,7 +22,7 @@ MKDIR ?=	mkdir -p
 BUILD_DIR       ?= $(build_type)
 
 # Pre-processor flags
-CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p)) -D$(if $(NDEBUG),NDEBUG,DEBUG)
+CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p)) -D$(if $(NDEBUG),NDEBUG,DEBUG)=1
 
 # Flags for the compilation of C files
 CFLAGS          += -ggdb3 -Wall
@@ -110,12 +112,10 @@ $(BUILDDIRS) :
 	$(MKDIR) "$@"
 
 # Include the .d if they exists
--include $(addsuffix .d, $(basename $(SRCS)))
+-include $(DEP_FILES)
 
 #-----------------------------------------------------------------------------
 # Clean rules
 #
-.PHONY: clean
-
 clean:
 	rm -rf $(BUILD_DIR)
