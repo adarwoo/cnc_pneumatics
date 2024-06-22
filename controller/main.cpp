@@ -20,35 +20,10 @@
 #include "op_codes.h"
 #include "i2c.h"
 
-
-/** Number of errors which trigger a shutdown */
-static constexpr auto COMMS_TOO_MANY_ERRORS = 10;
-
-/** Duration of the filter (or no re-trigger period) for digital inputs */
-static constexpr auto DI_FILT4 = TIMER_MILLISECONDS(40);
-
-/** Time in seconds when communications faults are tolerated */
-static constexpr auto COMMS_GRACE_PERIOD = TIMER_SECONDS(5);
-
-/** Time between i2c send */
-static constexpr auto I2C_DELAY_BETWEEN_TRANSMIT = TIMER_MILLISECONDS(100);
-
-
-/************************************************************************/
-/* Local types                                                          */
-/************************************************************************/
-typedef struct
-{
-   ioport_pin_t pin;     ///< Input pin
-   opcodes_cmd_t opcode; ///< Matching opcode
-   bool state;           ///< Last seen state of this output
-} output_status_t;
-
-
 /************************************************************************/
 /* Forward declarations and event Handlers                              */
 /************************************************************************/
-static void on_pneumatic_input_change(void *arg);
+static void on_input_change(void *arg);
 static void on_beep_input(void *arg);
 static void on_sounder(void *arg);
 static void on_send_i2c_command(void *arg);
@@ -59,62 +34,82 @@ static void on_door_sensor_change(void *);
 static void on_door_cmd(void *);
 static void on_cmd_timeout(void *);
 
+namespace
+{
+   /** Number of errors which trigger a shutdown */
+   constexpr auto COMMS_TOO_MANY_ERRORS = 10;
 
-/************************************************************************/
-/* Local variables                                                      */
-/************************************************************************/
-reactor_handle_t react_input_change =     reactor_register(on_pneumatic_input_change, reactor_prio_medium,         1);
-reactor_handle_t react_beep =             reactor_register(on_beep_input,             reactor_prio_high,           1);
-reactor_handle_t react_sounder =          reactor_register(on_sounder,                reactor_prio_medium_plus,    1);
-reactor_handle_t react_i2c_command =      reactor_register(on_send_i2c_command,       reactor_prio_very_high_plus, 2);
-reactor_handle_t react_i2c_error =        reactor_register(on_i2c_error,              reactor_prio_medium_plus,    1);
-reactor_handle_t react_i2c_read =         reactor_register(on_i2c_read,               reactor_prio_medium_minus,   1);
-reactor_handle_t react_comms_grace_over = reactor_register(on_comms_grace_over,       reactor_prio_low,            1);
-reactor_handle_t react_door_sensor =      reactor_register(on_door_sensor_change,     reactor_prio_medium_minus,   1);
-reactor_handle_t react_door_cmd =         reactor_register(on_door_cmd,               reactor_prio_low_plus,       1);
-reactor_handle_t react_cmd_timeout =      reactor_register(on_cmd_timeout,            reactor_prio_low_plus,       1);
+   /** Duration of the filter (or no re-trigger period) for digital inputs */
+   constexpr auto DI_FILT4 = TIMER_MILLISECONDS(40);
 
-/** Command to send via i2c */
-opcodes_cmd_t current_command = opcodes_cmd_idle;
+   /** Time in seconds when communications faults are tolerated */
+   constexpr auto COMMS_GRACE_PERIOD = TIMER_SECONDS(5);
 
-/** Keep track of all the outputs ordered by priority */
-output_status_t output_statuses[] = {
-    {IN_CHUCK_OPEN, opcodes_cmd_unclamp_chuck, false},
-    {IN_SPINDLE_AIR_BLAST, opcodes_cmd_blast_spindle, false},
-    {IN_TOOLSET_AIR_BLAST, opcodes_cmd_blast_toolsetter, false},
-    {IN_DOOR_UP, opcodes_cmd_pull_door, false},   // Fake input - pretend IN_DOOR_UP is used
-    {IN_DOOR_DOWN, opcodes_cmd_push_door, false}, // Same, borrow the sensor input
-};
+   /** Time between i2c send */
+   constexpr auto I2C_DELAY_BETWEEN_TRANSMIT = TIMER_MILLISECONDS(100);
+   
+   /** Arcade tune */
+   constexpr auto arcade_tune = "C,3 R C E G E G E D R D F A2~A3 B G E B G E B G E C' R B, C'~C1";
 
-/** Keep a handle for the TWI timer */
-timer_instance_t transmit_timer_t;
+   /************************************************************************/
+   /* Local types                                                          */
+   /************************************************************************/
+   typedef struct
+   {
+      ioport_pin_t pin;     ///< Input pin
+      opcodes_cmd_t opcode; ///< Matching opcode
+      bool state;           ///< Last seen state of this output
+   } output_status_t;
 
-/** Timer to report for failure of connection */
-timer_instance_t connection_check_timer_t;
+   /************************************************************************/
+   /* Local variables                                                      */
+   /************************************************************************/
+   reactor_handle_t react_beep =             reactor_register(on_beep_input,         reactor_prio_very_high, 1);
+   reactor_handle_t react_i2c_command =      reactor_register(on_send_i2c_command,   reactor_prio_high,      2);
+   reactor_handle_t react_i2c_read =         reactor_register(on_i2c_read,           reactor_prio_high,      1);
+   reactor_handle_t react_sounder =          reactor_register(on_sounder,            reactor_prio_medium,    1);
+   reactor_handle_t react_i2c_error =        reactor_register(on_i2c_error,          reactor_prio_medium,    1);
+   reactor_handle_t react_input_change =     reactor_register(on_input_change,       reactor_prio_medium,    1);
+   reactor_handle_t react_door_sensor =      reactor_register(on_door_sensor_change, reactor_prio_medium,    1);
+   reactor_handle_t react_door_cmd =         reactor_register(on_door_cmd,           reactor_prio_medium,    1);
+   reactor_handle_t react_cmd_timeout =      reactor_register(on_cmd_timeout,        reactor_prio_low,       1);
+   reactor_handle_t react_comms_grace_over = reactor_register(on_comms_grace_over,   reactor_prio_low,       1);
 
-/** Count the number of transmit errors */
-uint8_t comms_error_count = 0;
+   /** Command to send via i2c */
+   opcodes_cmd_t current_command = opcodes_cmd_idle;
 
-/** If true, communications error are not fatal */
-bool comms_in_error_grace_period_active = true;
+   /** Keep track of all the outputs ordered by priority */
+   output_status_t output_statuses[] = {
+       {IN_CHUCK_OPEN, opcodes_cmd_unclamp_chuck, false},
+       {IN_SPINDLE_AIR_BLAST, opcodes_cmd_blast_spindle, false},
+       {IN_TOOLSET_AIR_BLAST, opcodes_cmd_blast_toolsetter, false},
+       {IN_DOOR_UP, opcodes_cmd_pull_door, false},   // Fake input - pretend IN_DOOR_UP is used
+       {IN_DOOR_DOWN, opcodes_cmd_push_door, false}, // Same, borrow the sensor input
+   };
 
-/** Flag set to end sending following too many errors */
-bool stop_transmit = false;
+   /** Count the number of transmit errors */
+   uint8_t comms_error_count = 0;
 
-/** Timer used to transmit over the i2c */
-static timer_instance_t transmit_timer = TIMER_INVALID_INSTANCE;
+   /** If true, communications error are not fatal */
+   bool comms_in_error_grace_period_active = true;
 
+   /** Flag set to end sending following too many errors */
+   bool stop_transmit = false;
 
-/*
- * Outputs                                                              
- */
-digital_output_t led_fault = digital_output(LED_FAULT);
-digital_output_t led_chuck = digital_output(LED_CHUCK);
-digital_output_t led_door_opening = digital_output(LED_DOOR_OPENING);
-digital_output_t led_door_closing = digital_output(LED_DOOR_CLOSING);
+   /** Timer used to transmit over the i2c */
+   timer_instance_t transmit_timer = TIMER_INVALID_INSTANCE;
 
-// Pressure value from the chuck
-digital_output_t chuck_released_oc = digital_output(OC_CHUCK_RELEASED);
+   /*
+    * Outputs                                                              
+    */
+   digital_output_t led_fault         = digital_output(LED_FAULT);
+   digital_output_t led_chuck         = digital_output(LED_CHUCK);
+   digital_output_t led_door_opening  = digital_output(LED_DOOR_OPENING);
+   digital_output_t led_door_closing  = digital_output(LED_DOOR_CLOSING);
+
+   // Pressure value from the chuck
+   digital_output_t chuck_released_oc = digital_output(OC_CHUCK_RELEASED);
+}
 
 /*
  * State machine - include like a .inc
@@ -232,7 +227,7 @@ static void on_door_cmd(void *arg)
 /** Pass the information down when the change input */
 static void on_door_sensor_change(void *arg)
 {
-   pin_and_value_t pin_and_value { .as_arg = arg };
+   pin_and_value_t pin_and_value {.as_arg = arg};
    
    if ( pin_and_value.pin == IN_DOOR_DOWN )
    {
@@ -275,8 +270,7 @@ static void on_beep_input(void *arg)
  */
 static void on_sounder(void *arg)
 {
-   pin_and_value_t pin_and_value;
-   pin_and_value.as_arg = arg;
+   pin_and_value_t pin_and_value {.as_arg = arg};
 
    if (pin_and_value.value)
    {
@@ -296,11 +290,10 @@ static void on_sounder(void *arg)
  * Note : Only 1 output is allowed 'on' at a time. The table output_statuses
  * list them in priority order - so, only 1 value control is passed out.
  */
-static void on_pneumatic_input_change(void *arg)
+static void on_input_change(void *arg)
 {
    // Grab the pin that changed
-   pin_and_value_t pav;
-   pav.as_arg = arg;
+   pin_and_value_t pav {.as_arg = arg};
 
    // Iterate
    for (uint8_t i = 0; i < COUNTOF(output_statuses); ++i)
@@ -350,10 +343,10 @@ static void on_i2c_error(void *arg)
       // In release, turn of communication and sound the beeper to signal an error
 #ifdef NDEBUG
       piezzo_start_tone(PIEZZO_FREQ_TO_PWM(2000), TIMER_SECONDS(5));
+#endif
 
       // Flag end of transmit
       stop_transmit = true;
-#endif
    }
    else
    {
@@ -386,7 +379,7 @@ int main(void)
 {
    board_init();
    
-   constexpr auto input = [](ioport_pin_t p, reactor_handle_t h) {
+   auto input = [](ioport_pin_t p, reactor_handle_t h) {
       return digital_input(p, h, IOPORT_SENSE_DISABLE, DI_FILT4 );
    };
 
@@ -418,10 +411,10 @@ int main(void)
 	  0, 0
    );
 
-   // Play moon_cresta tune
-   #ifndef DEBUG
-   piezzo_play(190, "C,3 R C E G E G E D R D F A2~A3 B G E B G E B G E C' R B, C'~C1");
-   #endif
+#ifdef NDEBUG
+   // Play some arcade tune from memory
+   piezzo_play(190, arcade_tune);
+#endif
    
    // Run the reactor
    reactor_run();

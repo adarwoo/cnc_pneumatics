@@ -13,8 +13,7 @@ struct event_door_is_down {};
 struct event_door_moving_up {};
 struct event_door_moving_down {};
 struct event_timeout {};
-   
-extern void on_pneumatic_input_change(void *);
+
 
 namespace valve
 {
@@ -35,36 +34,36 @@ namespace valve
    /************************************************************************/
    
    auto push_on  = [] { 
-      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_UP, true) );
+      on_input_change( pin_and_value_as_arg(IN_DOOR_UP, true) );
       digitial_output_start(led_door_opening, TIMER_SECONDS(1), "+1-", true);
       arm_timer(moving_timeout);
    };
    
    auto push_off = [] { 
-      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_UP, false) );
+      on_input_change( pin_and_value_as_arg(IN_DOOR_UP, false) );
       digitial_output_set(led_door_opening, false);
       timer_cancel(timer);
    };
 
    auto push_timeout = [] {
-      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_UP, false) );
+      on_input_change( pin_and_value_as_arg(IN_DOOR_UP, false) );
       digitial_output_start(led_door_opening, TIMER_SECONDS(1), "+4-", true);
    };
    
    auto pull_on = [] {
-      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, true) );
+      on_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, true) );
       digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+1-", true);
       arm_timer(moving_timeout);
    };
    
    auto pull_off = [] {
-      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, false) );
+      on_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, false) );
       digitial_output_set(led_door_closing, false);
       timer_cancel(timer);
    };
 
    auto pull_timeout = [] {
-      on_pneumatic_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, false) );
+      on_input_change( pin_and_value_as_arg(IN_DOOR_DOWN, false) );
       digitial_output_start(led_door_closing, TIMER_SECONDS(1), "+4-", true);
    };
    
@@ -75,6 +74,9 @@ namespace valve
 };
 
 
+/************************************************************************/
+/* State machine table                                                  */
+/************************************************************************/
 struct door_sm
 {
    auto operator()() const noexcept

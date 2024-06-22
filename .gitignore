@@ -6,14 +6,3 @@
 **/*.lss
 **/*.elf
 **/*.eep
-
-controller/controller.map
-hub/hub.map
-controller/controller.eep
-controller/controller.elf
-controller/controller.hex
-controller/controller.lss
-hub/hub.elf
-hub/hub.hex
-hub/hub.lss
-hub/hub.map
