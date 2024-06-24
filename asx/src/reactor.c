@@ -204,13 +204,13 @@ static inline void _reactor_sort_by_priority(void)
    for (uint8_t i=0; i<_next_handle; ++i)
    {
       uint8_t sorted_index = priorities[i].index;
-      reactor_mask_t mask = (1l << i);
+      reactor_mask_t mask = ((reactor_mask_t)1 << i);
       
       _handle_lookup[i] = sorted_index;
       _handlers[sorted_index].mask = mask;
       
       // Any pending notifications are shuffled to account for new ordering
-      if ( reactor_notifications & (1l << sorted_index) )
+      if ( reactor_notifications & ((reactor_mask_t)1 << sorted_index) )
       {
          sorted_notifications |= mask;
       }
