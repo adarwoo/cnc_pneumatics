@@ -25,7 +25,7 @@ CXXFLAGS += $(CFLAGS) -fno-threadsafe-statics -fno-exceptions
 LDFLAGS += $(ARCHFLAGS) -Wl,-Map="$(BIN).map" -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mmcu=$(ARCH) -Wl,--demangle -Wl,-flto
 
 define DIAG
-$(MUTE)$(SIZE) -G $@
+$(MUTE)$(SIZE) $@
 endef
 
 define POST_LINK
