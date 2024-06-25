@@ -21,9 +21,9 @@ RUN set -xe \
   && apt-get -y install --no-install-recommends \
     apt-utils make bash quilt rsync tree vim less \
     python3 python3-pip git binutils build-essential gdb \
-    sed gawk wget bc coreutils chrpath libx11-dev \
+    sed gawk wget bc coreutils chrpath \
     ca-certificates locales file iproute2 inetutils-ping \
-    python3-pil srecord \
+    python3-pil srecord unzip \
   && sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
   && locale-gen en_US.UTF-8 \
   && ${PKG_CLEANUP}
@@ -37,6 +37,13 @@ RUN set -xe \
   && cd /opt \
   && ln -s /opt/avr-gcc-* /opt/avr-gcc \
   && echo 'PATH=$PATH:/opt/avr-gcc/bin' >> /etc/bash.bashrc
+
+# Install the DFP pack for the tiny arch
+RUN set -xe \
+  && wget https://packs.download.microchip.com/Microchip.ATtiny_DFP.3.1.260.atpack -O /tmp/dfp.zip \
+  && mkdir -p /opt/ATtiny_DFP.2.0.368 \
+  && cd /opt/ATtiny_DFP.2.0.368 \
+  && unzip /tmp/dfp.zip
 
 # Add the path for all processes
 ENV PATH='PATH=/usr/sbin:/usr/bin:/sbin:/bin:/opt/avr-gcc/bin'

@@ -50,7 +50,9 @@
  * @def reactor_mask_t
  * Event a bits in a mask. The type is large enough to support the maximum number of reactors
  */
-#if REACTOR_MAX_HANDLERS <= 16
+#if REACTOR_MAX_HANDLERS <= 8
+typedef uint8_t reactor_mask_t;
+#elif REACTOR_MAX_HANDLERS <= 16
 typedef uint16_t reactor_mask_t;
 #else
 typedef uint32_t reactor_mask_t;

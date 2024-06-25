@@ -26,13 +26,14 @@ LDFLAGS += $(ARCHFLAGS) -Wl,-Map="$(BIN).map" -Wl,--start-group -Wl,-lm  -Wl,--e
 
 define DIAG
 $(MUTE)$(SIZE) -G $@
-
 endef
 
 define POST_LINK
+	@echo "Creating memory maps"
 	$(MUTE)avr-objcopy -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures  "$@" "${@:.elf=.hex}"
 	$(MUTE)avr-objcopy -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "$@" "${@:.elf=.eep}" || exit 0
 	$(MUTE)avr-objdump -h -S "$@" > "${@:.elf=.lss}"
 	$(MUTE)avr-objcopy -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "$@" "${@:.elf=.lss}"
+	@echo "Creating $(@:.elf=_crc.hex) which includes the flash CRC"
 	$(MUTE)$(SREC_CAT) $(@:.elf=.hex) -intel -crop 0 $(FLASH_END) -fill 0xFF 0 $(FLASH_END) -CRC16_Big_Endian $(FLASH_END) -broken -o $(@:.elf=_crc.hex) -intel -line-length=44
 endef

@@ -14,7 +14,7 @@ fi
 
 # If the docker image does not yet exists, build it
 if (($(docker images -q $image | wc -l) == 0)); then
-   docker build -t $image docker || { echo "Failed to build the docker image"; exit; }
+   docker build -t $image . || { echo "Failed to build the docker image"; exit; }
 fi
 
 # Variables
