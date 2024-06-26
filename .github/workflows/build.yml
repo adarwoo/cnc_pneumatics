@@ -1,9 +1,9 @@
-name: "Upload SARIF"
+name: Build
 
 # Run workflow each time code is pushed to your repository and on a schedule.
 # The scheduled workflow runs every Thursday at 15:45 UTC.
 on:
-  push:
+  [push]
 
 jobs:
   build:
@@ -15,14 +15,13 @@ jobs:
       actions: read
       contents: read
     steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."      
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"      
       # This step checks out a copy of your repository.
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          # Path to SARIF file relative to the root of the repository
-          sarif_file: cnc_pneumatics.sarif
-          # Optional category for the results
-          # Used to differentiate multiple results for one commit
-          category: my-analysis-tool
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Build the docker image and run the build
+        run: |
+          ./build.bash
+          ls ${{ github.workspace }}
