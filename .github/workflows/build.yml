@@ -22,10 +22,10 @@ jobs:
         run: |
           bash build.bash NDEBUG=1 VERBOSE=1
           ls ${{ github.workspace }}
-      - name: Upload the artifacts
-        uses: skx/github-action-publish-binaries@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
         with:
-          releaseId: main
-          args: 'hub/Release/*_crc.hex'
+          name: dist-without-markdown
+          path: |
+            **/*_crc.hex
