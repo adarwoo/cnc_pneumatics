@@ -27,4 +27,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: '**/*_crc.hex'
+          args: 'hub/Release/*_crc.hex'
