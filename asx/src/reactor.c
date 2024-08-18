@@ -129,7 +129,10 @@ void reactor_init(void)
  *
  */
 
-reactor_handle_t reactor_register( const reactor_handler_t handler, reactor_priorities_t priority, uint8_t queue_size )
+reactor_handle_t reactor_register( 
+   const reactor_handler_t handler, 
+   reactor_priorities_t priority, 
+   uint8_t queue_size )
 {
    alert_and_stop_if(reactor_lock != false);
    alert_and_stop_if(_next_handle == REACTOR_MAX_HANDLERS);
@@ -150,7 +153,7 @@ reactor_handle_t reactor_register( const reactor_handler_t handler, reactor_prio
 
 /**
  * Interrupts are disabled for atomic operations
- * This function can be called from within interrupts
+ * This function can be called from within interrupts and can use full size queues
  */
 void reactor_notify( reactor_handle_t handle, void *data )
 {
@@ -163,6 +166,26 @@ void reactor_notify( reactor_handle_t handle, void *data )
    
    cpu_irq_restore(flags);
 }
+
+/**
+ * Notify a reactor with a queue depth of 1 from within an ISR
+ * 60 cycles in debug / 40 in release.
+ */
+void reactor_notify_from_isr( reactor_handle_t handle, void *data )
+{
+   reactor_notifications |= _handlers[handle].mask;
+   
+   // If the queue is full - drop old data
+ 
+
+/** Fasted reactor notification from ISR */
+void reactor_null_notify_from_isr(reactor_handle_t handle)
+{
+   reactor_notifications |= _handlers[handle].mask;
+
+  queue_null_store(&_handlers[handle].queue);
+}
+
 
 /** Sorting compare function */
 static int compare_prio(const void *e1, const void *e2)

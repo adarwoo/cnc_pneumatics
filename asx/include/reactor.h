@@ -85,7 +85,8 @@ typedef void (*reactor_handler_t)(void *);
 void reactor_init(void);
 
 /** Add a new reactor process */
-reactor_handle_t reactor_register( const reactor_handler_t, reactor_priorities_t, uint8_t queue_size );
+reactor_handle_t reactor_register( 
+   const reactor_handler_t, reactor_priorities_t, uint8_t queue_size );
 
 /**
  * Notify a handler should be invoke next time the loop is processed
@@ -97,6 +98,12 @@ void reactor_notify( reactor_handle_t handle, void * );
 
 /** Process the reactor loop */
 void reactor_run(void);
+
+/** 
+ * ISR version where no data is passed - the fastest notification in 6 cycles
+ * Make sure to activate -flto to inline this function
+ */
+void reactor_null_notify_from_isr(reactor_handle_t handle);
 
 #ifdef __cplusplus
 }

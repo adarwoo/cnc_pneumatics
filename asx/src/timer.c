@@ -306,6 +306,7 @@ timer_instance_t timer_arm(
  * Called by the timer ISR every 1ms
  * Only increment the timer if the dispatch has been called.
  * This guarantees, all handlers are called in time.
+ * Takes around 70 CPU cycles
  */
 ISR(TIMER_TCB_INT_VECTOR)
 {
@@ -315,7 +316,7 @@ ISR(TIMER_TCB_INT_VECTOR)
 	++_timer_free_running_ms_counter;
 
 	// Tell the reactor to process the tick
-	reactor_notify(_timer_reactor_handle, NULL);
+	reactor_null_notify_from_isr(_timer_reactor_handle);
 }
 
 /**
