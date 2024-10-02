@@ -14,6 +14,7 @@ THIS_DIR       := .
 COMMON_DIR     := common
 BOOST_DIR      := boost
 ASX_DIR        := asx
+ETL_DIR        := etl
 
 # -I throughout (C and C++)
 INCLUDE_DIRS = \
@@ -25,6 +26,7 @@ INCLUDE_DIRS = \
    ../${ASX_DIR}/include \
    ../${ASX_DIR}/include/utils \
    ../${ASX_DIR}/include/utils/preprocessor \
+   ../${ETL_DIR}/include \
 
 # Mixed library and common files
 SRCS := \
@@ -41,6 +43,7 @@ SRCS := \
    $(ASX_DIR)/src/sysclk.c \
    $(ASX_DIR)/src/timer.c \
    $(ASX_DIR)/src/twim.c \
+   $(ASX_DIR)/src/pca9555.cpp \
 
 # Project own files
 SRCS += \

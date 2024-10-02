@@ -71,7 +71,7 @@ typedef volatile int_fast8_t _timer_slot_t;
 #  define TIMER_TCB_INT_VECTOR TCB1_INT_vect
 #endif
 
-/** 
+/**
  * @def TIMER_PRIO
  * Assign a priority to the digital input reactor handler
  * Defaults to reactor_prio_very_high_plus
@@ -154,7 +154,7 @@ timer_count_t timer_get_count(void)
 	uint8_t flag = cpu_irq_save();
 	retval = _timer_free_running_ms_counter;
 	cpu_irq_restore(flag);
-	
+
 	return retval;
 }
 
@@ -186,7 +186,7 @@ void timer_init(void)
    }
 
 	// Register with the reactor
-	_timer_reactor_handle = reactor_register(&timer_dispatch, TIMER_PRIO, 1);
+	_timer_reactor_handle = reactor_register(&timer_dispatch, TIMER_PRIO);
 }
 
 /**
@@ -401,20 +401,20 @@ bool timer_cancel(timer_instance_t to_cancel)
 
 				i = oneRightOf;
 			}
-         
+
          // Shit available left now we've removed 1
          _timer_slot_avail = _timer_left_of(_timer_slot_avail);
-         
+
          // Make the slot as available
          _timer_future_sorted_list[_timer_slot_avail].reactor = REACTOR_NULL_HANDLE;
-        
+
          // Found it, canceled and removed from the list
          return true;
 		}
-      
+
    	pointer = _timer_right_of(pointer);
 	}
-   
+
    return false;
 }
 

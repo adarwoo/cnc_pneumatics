@@ -23,9 +23,9 @@
 #include "digital_input.h"
 #include "digital_output.h"
 #include "piezzo.h"
+#include "twim.h"
 
 #include "conf_board.h"
-
 
 void board_init(void)
 {
@@ -36,56 +36,33 @@ void board_init(void)
    * for, e.g., the I/O pins. The initialization can rely on application-
    * specific board configuration, found in conf_board.h.
    */
+   ioport_set_pin_level(RS485_XDIR_PIN, false);
+   ioport_set_pin_dir(RS485_XDIR_PIN, true);
 
-   /*
-    * OC pins drive a PNP. Invert the pin, so the application logic is normal
-    */
-   ioport_set_pin_mode(OC_DOOR_CLOSED, PORT_INVEN_bm);
-   ioport_set_pin_level(OC_DOOR_CLOSED, false);
-   ioport_set_pin_dir(OC_DOOR_CLOSED, IOPORT_DIR_OUTPUT);
-   
-   ioport_set_pin_mode(OC_CHUCK_RELEASED, PORT_INVEN_bm);
-   ioport_set_pin_level(OC_CHUCK_RELEASED, false);
-   ioport_set_pin_dir(OC_CHUCK_RELEASED, IOPORT_DIR_OUTPUT);
-
-   /*
-    * Inputs
-    */
-   ioport_set_pin_dir(IN_CHUCK_OPEN, IOPORT_DIR_INPUT);
-   ioport_set_pin_dir(IN_SPINDLE_AIR_BLAST, IOPORT_DIR_INPUT);
-   ioport_set_pin_dir(IN_TOOLSET_AIR_BLAST, IOPORT_DIR_INPUT);
-   ioport_set_pin_dir(IN_SOUNDER, IOPORT_DIR_INPUT);
-   ioport_set_pin_dir(IN_BEEP, IOPORT_DIR_INPUT);
-   ioport_set_pin_dir(IN_DOOR_OPEN_CLOSE, IOPORT_DIR_INPUT);
-
-   /*
-    * Outputs
-    */
-   ioport_set_pin_level(LED_CHUCK, false);
-   ioport_set_pin_dir(LED_CHUCK, IOPORT_DIR_OUTPUT);
-
-   ioport_set_pin_level(LED_DOOR_CLOSING, false);
-   ioport_set_pin_dir(LED_DOOR_CLOSING, IOPORT_DIR_OUTPUT);
-
-   ioport_set_pin_level(LED_DOOR_OPENING, false);
-   ioport_set_pin_dir(LED_DOOR_OPENING, IOPORT_DIR_OUTPUT);
-
-   ioport_set_pin_level(LED_FAULT, false);
-   ioport_set_pin_dir(LED_FAULT, IOPORT_DIR_OUTPUT);
-   
-   // Driven by the OC WO2 (TCA0) - Default (no need for the TCAROUTEA mux register)
-   ioport_set_pin_level(PIEZZO_DRIVE_PIN, false);
-   ioport_set_pin_dir(PIEZZO_DRIVE_PIN, IOPORT_DIR_OUTPUT);
-   
+   // Masso input pins need the pull-up to avoid excess noise if not connected
+   ioport_set_pin_mode(IN_MASSO0, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO1, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO2, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO3, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO4, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO5, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO6, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO7, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO8, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO9, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO10, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO11, PORT_PULLUPEN_bm);
+   ioport_set_pin_mode(IN_MASSO12, PORT_PULLUPEN_bm);
    
    /*
     * Init all services
     */
    reactor_init();
    timer_init();
-   digital_output_init();
-   digital_input_init();
-   piezzo_init();
+   
+   // Initialize the ASF TWI
+   twi_master_init(&TWI0);
+   twi_master_enable(&TWI0);
 
    // Promote the i2c interrupt
    CPUINT.LVL1VEC = TWI0_TWIM_vect_num;

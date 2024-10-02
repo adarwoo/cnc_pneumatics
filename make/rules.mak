@@ -39,7 +39,7 @@ CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p)) -D$(if $(NDEBUG),NDEBUG
 CFLAGS          += -ggdb3 -Wall
 
 # Flags for the compilation of C++ files
-CXXFLAGS        += $(CFLAGS) -std=c++17 -fno-exceptions
+CXXFLAGS        += $(CFLAGS) -std=c++20 -fno-exceptions -fno-rtti
 
 # Assembler flags
 ASFLAGS         += -Wa,-gdwarf2 -x assembler-with-cpp -Wa,-g

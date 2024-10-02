@@ -84,7 +84,7 @@ static inline bool _parse_next(_digital_output_t *out)
 {
    const char *pNext = out->next;
    _parsing_state_t state = state_initial;
-   
+
    while ( state != state_done )
    {
       char c = *pNext;
@@ -102,7 +102,7 @@ static inline bool _parse_next(_digital_output_t *out)
          {
             break;
          }
-         
+
          if (c == '+')
          {
             ioport_set_pin_level(out->pin, true);
@@ -115,7 +115,7 @@ static inline bool _parse_next(_digital_output_t *out)
          {
             --pNext;
          }
-         
+
          state = state_duration;
          break;
       case state_duration:
@@ -127,17 +127,17 @@ static inline bool _parse_next(_digital_output_t *out)
          {
             --pNext;
          }
-         
+
          state = state_done;
          break;
       default:
          break;
       }
-      
+
       // Advance to the next char in every case (including to skip the space or slur)
       ++pNext;
    }
-   
+
    out->next = pNext;
    return true;
 }
@@ -151,7 +151,7 @@ static inline bool _parse_next(_digital_output_t *out)
 void _digital_output_reactor_handler(void *arg)
 {
    _digital_output_t *output = (_digital_output_t*)arg;
-   
+
    if ( _parse_next(output) || output->repeat )
    {
       output->timer = timer_arm(
@@ -202,7 +202,7 @@ void digitial_output_toggle(digital_output_t handle)
  * If a sequence is already running, the new sequence takes over immediately
  *
  * @param handle The handle to driver
- * @param reference_time The reference time from which the fractions are determined. 
+ * @param reference_time The reference time from which the fractions are determined.
  *                       Make it the duration of the longest item in the sequence for maximum accuracy
  * @param repeat If true, the sequence self repeats
  */
@@ -223,7 +223,7 @@ void digitial_output_start(digital_output_t handle, timer_count_t reference_time
  */
 void digital_output_init(void)
 {
-   _reactor = reactor_register(_digital_output_reactor_handler, DIGITAL_OUTPUT_PRIO, DIGITAL_OUTPUT_MAX_CONCURRENT_SEQUENCE);
+   _reactor = reactor_register(_digital_output_reactor_handler, DIGITAL_OUTPUT_PRIO);
 }
 
 
@@ -235,14 +235,14 @@ digital_output_t digital_output(ioport_pin_t pin)
 {
    // Allocate some storage for this output
    _digital_output_t *output = (_digital_output_t *)mem_calloc(1, sizeof(_digital_output_t));
-   
+
    // Initialize the output
    output->pin = pin;
    output->repeat=false;
 
    // We need to count in order to create a reactor with a queue big enough for all output at once
    ++_number_of_outputs;
-   
+
    return (digital_output_t)output;
 }
 

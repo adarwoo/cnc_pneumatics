@@ -50,7 +50,9 @@
  * @def reactor_mask_t
  * Event a bits in a mask. The type is large enough to support the maximum number of reactors
  */
-#if REACTOR_MAX_HANDLERS <= 16
+#if REACTOR_MAX_HANDLERS <= 8
+typedef uint8_t reactor_mask_t;
+#elif REACTOR_MAX_HANDLERS <= 16
 typedef uint16_t reactor_mask_t;
 #else
 typedef uint32_t reactor_mask_t;
@@ -63,7 +65,7 @@ typedef struct
    reactor_handler_t handler;
    uint8_t priority;
    reactor_mask_t mask;
-   queue_t queue;
+   void *arg;
 } reactor_item_t;
 
 /** Temporary structure to sort items by priority */
@@ -99,7 +101,7 @@ void reactor_init(void)
    // Use a debug pin if available
    debug_init(REACTOR_IDLE);
    debug_init(REACTOR_BUSY);
-   
+
    // Fill the look-up with linear values so that the reactor can be used prior to run
    for (int i=0; i<_next_handle; ++i)
    {
@@ -120,32 +122,25 @@ void reactor_init(void)
  *  eventually be called.
  * However, low priority handler will suffer from more potential delay and
  *  jitter.
- * A queue can be associated with a handler for cases where multiple
- *  notification can occur at the same time.
- * 
+ *
  * @param handler Function to call when an event is ready for processing
  * @param priority Priority of the handler during round-robin scheduling
                    High priority handlers are handled first
  *
  */
 
-reactor_handle_t reactor_register( 
-   const reactor_handler_t handler, 
-   reactor_priorities_t priority, 
-   uint8_t queue_size )
+reactor_handle_t reactor_register( const reactor_handler_t handler, reactor_priority_t priority )
 {
    alert_and_stop_if(reactor_lock != false);
    alert_and_stop_if(_next_handle == REACTOR_MAX_HANDLERS);
-   
+
    _handlers[_next_handle].handler = handler;
    _handlers[_next_handle].priority = priority;
-   
+
    // Create a temporary mask so that notification are possible before run
    // This mask will be updated once the reactor run starts
    _handlers[_next_handle].mask = 1 << _next_handle;
-   
-   // Queue
-   queue_init(&(_handlers[_next_handle].queue), queue_size);
+   _handlers[_next_handle].arg = NULL;
 
    return _next_handle++;
 }
@@ -153,37 +148,25 @@ reactor_handle_t reactor_register(
 
 /**
  * Interrupts are disabled for atomic operations
- * This function can be called from within interrupts and can use full size queues
+ * This function can be called from within interrupts
  */
 void reactor_notify( reactor_handle_t handle, void *data )
 {
    irqflags_t flags = cpu_irq_save();
-   
+
+   _handlers[handle].arg = data;
    reactor_notifications |= _handlers[handle].mask;
-   
-   // If the queue is full - drop old data
-   queue_push_ring(&_handlers[handle].queue, data);
-   
+
    cpu_irq_restore(flags);
 }
 
 /**
- * Notify a reactor with a queue depth of 1 from within an ISR
- * 60 cycles in debug / 40 in release.
+ * Interrupts are disabled for atomic operations
+ * This function can be called from within interrupts
  */
-void reactor_notify_from_isr( reactor_handle_t handle, void *data )
+inline void reactor_null_notify_from_isr( reactor_handle_t handle )
 {
    reactor_notifications |= _handlers[handle].mask;
-   
-   // If the queue is full - drop old data
- 
-
-/** Fasted reactor notification from ISR */
-void reactor_null_notify_from_isr(reactor_handle_t handle)
-{
-   reactor_notifications |= _handlers[handle].mask;
-
-  queue_null_store(&_handlers[handle].queue);
 }
 
 
@@ -192,17 +175,17 @@ static int compare_prio(const void *e1, const void *e2)
 {
    uint8_t p1 = ((priority_item_t *)e1)->priority;
    uint8_t p2 = ((priority_item_t *)e2)->priority;
- 
+
    if ( p1 < p2 )
    {
       return 1;
    }
- 
+
    if ( p1 > p2 )
    {
       return -1;
    }
- 
+
    return  0;
 }
 
@@ -214,31 +197,31 @@ static inline void _reactor_sort_by_priority(void)
 {
    priority_item_t priorities[_next_handle];
    reactor_mask_t sorted_notifications = 0;
- 
+
    for (int i=0; i<_next_handle; ++i)
    {
       priorities[i].index = i;
       priorities[i].priority = _handlers[i].priority;
    }
-   
+
    qsort(priorities, _next_handle, sizeof(priority_item_t), compare_prio);
-      
+
    // Iterate over all the reactor and set the mask for each
    for (uint8_t i=0; i<_next_handle; ++i)
    {
       uint8_t sorted_index = priorities[i].index;
-      reactor_mask_t mask = (1l << i);
-      
+      reactor_mask_t mask = ((reactor_mask_t)1 << i);
+
       _handle_lookup[i] = sorted_index;
       _handlers[sorted_index].mask = mask;
-      
+
       // Any pending notifications are shuffled to account for new ordering
-      if ( reactor_notifications & (1l << sorted_index) )
+      if ( reactor_notifications & ((reactor_mask_t)1 << sorted_index) )
       {
          sorted_notifications |= mask;
       }
    }
-   
+
    // Do not allow new registration now all is sorted
    reactor_lock = true;
    reactor_notifications = sorted_notifications;
@@ -253,7 +236,7 @@ void reactor_run(void)
 
    // Sort all items by priority
    _reactor_sort_by_priority();
-   
+
    // Set the watchdog which is reset by the reactor
    // If the timer is uses, the watchdog would be refreshed every 1ms, but otherwise, we don't know
    // There is no need for too aggressive timings
@@ -288,7 +271,6 @@ void reactor_run(void)
             if ( flags & 1 )
             {
                reactor_item_t *item;
-               void *data;
 
                // Keep the system alive for as long as the reactor is calling handlers
                // We assume that if no handlers are called, the system is dead.
@@ -300,17 +282,11 @@ void reactor_run(void)
                /************************************************************************/
 
                item = &(_handlers[_handle_lookup[i]]);
-               alert_and_stop_if( ! queue_pop(&item->queue, &data) );
-               
-               // If the queue is not empty - leave the flag set to go back in it
-               // The round-robin will still apply, and the next item in queue is
-               // not necessarily the next
-               if ( queue_is_empty(&item->queue) )
-               {
-                  // Reset the flag
-                  reactor_notifications &= (~item->mask);
-               }
-               
+               void *data = item->arg;
+
+               // Reset the flag
+               reactor_notifications &= (~item->mask);
+
                /************************************************************************/
                /* End of critical section                                              */
                /************************************************************************/
@@ -318,7 +294,7 @@ void reactor_run(void)
 
                // Call the handler
                item->handler(data);
-               
+
                // Apply round-robin strategy
                break;
             }

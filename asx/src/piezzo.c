@@ -267,7 +267,7 @@ void _play_next_note(void *arg)
             {
                _stop_timer_compare();
             }
-         }            
+         }
       }
 
       last_tc_value = new_tc_value;
@@ -279,11 +279,11 @@ void _play_next_note(void *arg)
    else
    {
       playing_tone_recovery_value = 0;
-      
+
       if (!playing_tone)
       {
          _stop_timer_compare();
-      }            
+      }
    }
 }
 
@@ -316,16 +316,16 @@ void piezzo_init(void)
    // Use the Timer type A to drive the piezzo transistor directly
    PIEZZO_TCB.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc | TCA_SINGLE_ENABLE_bm;
    PIEZZO_TCB.SINGLE.CTRLB = TCA_SINGLE_WGMODE_FRQ_gc;
-   
+
    // The channel 0 controls the period. Simply keep the compare for channel 2 at 0
    PIEZZO_TCB.SINGLE.CMP2 = 0;
 #endif
    // This timer does not have a PWM output when using all 16bits.
 
    // Create the reactor handler
-   react_piezzo = reactor_register(_play_next_note, PIEZZO_PRIO, 1);
+   react_piezzo = reactor_register(_play_next_note, PIEZZO_PRIO);
 
-   react_tone_stop = reactor_register(_stop_tone, PIEZZO_PRIO, 1);
+   react_tone_stop = reactor_register(_stop_tone, PIEZZO_PRIO);
 }
 
 /**
@@ -374,7 +374,7 @@ void piezzo_stop(void)
 }
 
 /**
- * Play a single tone on top of whatever is playing right now 
+ * Play a single tone on top of whatever is playing right now
  * This tone takes over for the given duration.
  * If the duration is 0, plays for ever/
  */

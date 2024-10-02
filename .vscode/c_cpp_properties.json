@@ -3,19 +3,30 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "e:/gax/dev/cnc_pneumatics/**"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
-            ]
+            ],
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "e:/gax/dev/cnc_pneumatics/**",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "cppStandard": "c++17",
+            "cStandard": "c17"
         },
         {
             "name": "avr",
             "includePath": [
                 "${workspaceFolder}/asx/include",
                 "${workspaceFolder}/common",
+                "${workspaceFolder}/etl/include",
                 "${workspaceFolder}/controller/include",
                 "${workspaceFolder}/hub/include",
                 "${workspaceFolder}/hub/conf",
