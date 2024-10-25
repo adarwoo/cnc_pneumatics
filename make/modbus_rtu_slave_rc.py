@@ -29,6 +29,7 @@ The tuple is made of:
      A single value
      A range (2 values, from inclusive, to exclusive)
      A list (possible values)
+     None - to allow any value
 
    Warning: As the tree is constructed, each command must have a unique path. Overlapping path will
     generate a compile error.
@@ -59,6 +60,11 @@ namespace modbus {
             reply, // Reply is ready to send
         };
 
+        enum class callback_outcomme_t : uint8_t {
+            reply_ready,  // A reply is read to send
+            unsupported_operation, // Operation is not supported
+            invalid_value, // Value is out-of-range or not valid
+        };
 @PROTOTYPES@
         enum class state_t : uint8_t {
 @ENUMS@
@@ -114,6 +120,18 @@ namespace modbus {
 
                 return process_outcomme_t::expecting_more;
             }
+
+            /** Called when a T3.5 has been detected, in a good sequence */
+            auto process() -> process_outcome_t {
+                switch(state) {
+@CALLBACKS@
+                default:
+                    break;
+                }
+
+                // This is un-reachable!
+                return process_outcomme_t::expecting_more;
+            }
         }; // struct Processor
 
     } // namespace slave
@@ -154,7 +172,9 @@ class Matcher:
     """Base Matcher class for different integral types."""
 
     def __init__(self, *args, **kwargs):
-        if len(args) == 1:
+        if len(args) == 0 or (len(args) == 1 and args[0] is None):
+            self.value = None
+        elif len(args) == 1:
             value = args[0]
 
             if isinstance(value, list):
@@ -215,9 +235,11 @@ class Matcher:
             return f"c >= {self.value._from} and c < {self.value._to}"
         elif isinstance(self.value, list):
             return " || ".join(f"c == {value}" for value in self.value)
+        elif self.value == None:
+            "true"
         else:
             return f"c == {self.value}"
-
+        
 class Range:
     """Simple Range class to hold value ranges."""
     def __init__(self, from_value, to_value):
@@ -260,6 +282,8 @@ class s32(SignedMatcher, _32bits): pass
 class f32(Matcher, _32bits):
     def check(self, value):
         return isinstance(value, float)
+class Crc(UnsignedMatcher, _16bits):
+    _bits = -16 # Negative for little endian
 
 READ_COILS                    = u8(0x01, alias="READ_COILS")
 READ_DISCRETE_INPUTS          = u8(0x02, alias="READ_DISCRETE_INPUTS")
@@ -287,8 +311,11 @@ class Transition:
 
     def to_code(self, indent):
         tab = INDENT * indent
-        close = f"\n{tab}}}"
-        openning = f"if ( {self.matcher.to_code()} ) {{\n{tab}"
+        openning = close = ""
+
+        if self.matcher.value is not None:
+            openning += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
+            close = f"\n{tab}}}"
 
         if self.next:
             return f"{openning}{INDENT}state = state_t::{self.next.name};{close}"
@@ -382,6 +409,20 @@ class Operation:
                 values_str.insert(0, f"{param.ctype}{{buffer[{offset}]<<8 || buffer[{offset+1}]}}")
             elif param_size == 4:
                 values_str.insert(0, f"{param.ctype}{{buffer[{offset}]<<24 || buffer[{offset+1}]<<16 || buffer[{offset+2}]<<8 || buffer[{offset+3}]}}")
+            elif param_size == -2: # CRC
+                values_str.insert(0, f"{param.ctype}{{buffer[{offset+1}]<<8 || buffer[{offset}]}}")
+
+        # Add the params (the list is ordered)
+        return f"{self.name}({', '.join(values_str)});"
+
+
+def TransitionOperation(Operation):
+    def to_code(self):
+        # Check the prototype to see if we need to pass the buffer data
+        # Create from the end
+        values_str = []
+        chain = [] + self.chain # Force a deep copy
+        nargs = len(self.prototype)
 
         # Add the params (the list is ordered)
         return f"{self.name}({', '.join(values_str)});"
@@ -482,6 +523,7 @@ class CodeGenerator:
             "BUFSIZE" : str(self.max_buf_size),
             "ENUMS" : self.get_enums_text(3),
             "CASES" : self.get_cases_text(3),
+            "CALLBACKS" : self.get_callbacks_text(3),
             "PROTOTYPES" : self.get_prototypes(2),
         }
 
@@ -506,6 +548,9 @@ class CodeGenerator:
             state_code += state.to_code(indent+1)
 
         return state_code
+    
+    def get_callbacks_text(self, indent):
+        return "TODO"
 
     def get_prototypes(self, indent):
         tab = INDENT * indent
@@ -574,12 +619,23 @@ class CodeGenerator:
             if state.has(matcher):
                 state = state.get_next_state_of(matcher)
             else:
-                if isinstance(cmd[index+1], str):
-                    # Concert the command into one of the
-                    command_name = cmd[-1]
+                if isinstance(cmd[index+1], str): # Command to follow?
+                    command_name = cmd[-1] # Grab the command name
+
+                    if command_name not in self.callbacks:
+                        raise ParsingException(f"Cmd {command_name} does not have a prototype")
+                    
+                    # Add the CRC calculation
+                    crc_matcher = u16(None)
+                    next_state = self.new_state(state.next(command_name.upper() + "_CRC"), state.pos + crc_matcher.size)
+                    state.add(Transition(crc_matcher, next_state))
+                    state = next_state
+
+                    # Add the final transition before making the call to the callback
+
 
                     op = Operation(command_name, self.callbacks[command_name], [address_matcher] + list(cmd[:-1]))
-                    state.add(Transition(matcher, op))
+                    state.add(Transition(crc_matcher, op))
                     break
                 else:
                     next_state = self.new_state(state.next(matcher.alias), state.pos + matcher.size)
