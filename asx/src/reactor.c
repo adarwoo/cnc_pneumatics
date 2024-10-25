@@ -211,7 +211,7 @@ static inline void _reactor_sort_by_priority(void)
    {
       uint8_t sorted_index = priorities[i].index;
       reactor_mask_t mask = ((reactor_mask_t)1 << i);
-
+     
       _handle_lookup[i] = sorted_index;
       _handlers[sorted_index].mask = mask;
 

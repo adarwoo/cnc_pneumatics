@@ -3,6 +3,9 @@
 readonly image=cnc_pneumatics:latest
 readonly hostname_=cnc_pneumatics
 
+# Running in a TTY?
+test -t 1 && USE_TTY="-it"
+
 # Exit with error on interrupt, or failure
 set -e
 
@@ -14,7 +17,7 @@ fi
 
 # If the docker image does not yet exists, build it
 if (($(docker images -q $image | wc -l) == 0)); then
-   docker build -t $image docker || { echo "Failed to build the docker image"; exit; }
+   docker build -t $image . || { echo "Failed to build the docker image"; exit; }
 fi
 
 # Variables
@@ -35,7 +38,7 @@ fi
 # Run make or start a shell
 if [[ "$1" == "shell" ]]; then
    shift
-   docker run -ti --rm --init --name $container_name $xoptions -h $hostname_ $base_opts -w $workdir $image $@
+   docker run ${USE_TTY} --rm --init --name $container_name $xoptions -h $hostname_ $base_opts -w $workdir $image $@
 else
-   docker run -ti --rm --init --name $container_name -h $hostname_ $base_opts -w $workdir $image make -j$core_count $@
+   docker run ${USE_TTY} --rm --init --name $container_name -h $hostname_ $base_opts -w $workdir $image make -j$core_count $@
 fi
