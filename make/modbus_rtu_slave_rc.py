@@ -284,6 +284,8 @@ class f32(Matcher, _32bits):
         return isinstance(value, float)
 class Crc(UnsignedMatcher, _16bits):
     _bits = -16 # Negative for little endian
+    def to_code(self):
+        return "crc == c"
 
 READ_COILS                    = u8(0x01, alias="READ_COILS")
 READ_DISCRETE_INPUTS          = u8(0x02, alias="READ_DISCRETE_INPUTS")
@@ -313,9 +315,8 @@ class Transition:
         tab = INDENT * indent
         openning = close = ""
 
-        if self.matcher.value is not None:
-            openning += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
-            close = f"\n{tab}}}"
+        openning += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
+        close = f"\n{tab}}}"
 
         if self.next:
             return f"{openning}{INDENT}state = state_t::{self.next.name};{close}"
@@ -626,16 +627,15 @@ class CodeGenerator:
                         raise ParsingException(f"Cmd {command_name} does not have a prototype")
                     
                     # Add the CRC calculation
-                    crc_matcher = u16(None)
+                    crc_matcher = Crc(None)
                     next_state = self.new_state(state.next(command_name.upper() + "_CRC"), state.pos + crc_matcher.size)
                     state.add(Transition(crc_matcher, next_state))
-                    state = next_state
 
                     # Add the final transition before making the call to the callback
-
+                    next_state = self.new_state("RDY_TO_CALL_" + command_name.upper(), 0)
+                    state.add(Transition(crc_matcher, next_state))
 
                     op = Operation(command_name, self.callbacks[command_name], [address_matcher] + list(cmd[:-1]))
-                    state.add(Transition(crc_matcher, op))
                     break
                 else:
                     next_state = self.new_state(state.next(matcher.alias), state.pos + matcher.size)
