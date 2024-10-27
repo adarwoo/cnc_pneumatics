@@ -76,9 +76,7 @@ typedef volatile int_fast8_t _timer_slot_t;
  * Assign a priority to the digital input reactor handler
  * Defaults to reactor_prio_very_high_plus
  */
-#ifndef TIMER_PRIO
-#  define TIMER_PRIO reactor_prio_very_high_plus
-#endif
+#define TIMER_PRIO reactor_prio_high
 
 
 /**

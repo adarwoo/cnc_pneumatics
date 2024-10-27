@@ -108,6 +108,11 @@ $(BUILD_DIR)/%.rcd : %.json
 	$(MUTE)[ -d $(@D) ] || mkdir -p $(@D)
 	$(MUTE)$(COMPILE.rc) $@ $<
 
+%.hpp : %.conf.py
+	@echo Generating $@ interface header code from $<
+	$(MUTE)[ -d $(@D) ] || mkdir -p $(@D)
+	$(MUTE)PYTHONPATH=$(TOP)/make $< -o$@
+
 # Add the CRC of the code to enable integrity check of the code
 # $(BUILD_DIR)/$(BIN)_crc$(BIN_EXT) : $(BUILD_DIR)/$(BIN)$(BIN_EXT)
 
