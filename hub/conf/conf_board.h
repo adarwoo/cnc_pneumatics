@@ -7,6 +7,9 @@
 #ifndef BOARD_H_
 #define BOARD_H_
 
+// Override reactor default to use only 8 reactor handle
+#define REACTOR_MAX_HANDLERS 8
+
 // Tracing
 #define TRACE_INFO IOPORT_CREATE_PIN(PORTA, 1)
 #define TRACE_WARN IOPORT_CREATE_PIN(PORTA, 2)
