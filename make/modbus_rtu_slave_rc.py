@@ -239,7 +239,7 @@ class Matcher:
             "true"
         else:
             return f"c == {self.value}"
-        
+
 class Range:
     """Simple Range class to hold value ranges."""
     def __init__(self, from_value, to_value):
@@ -300,16 +300,12 @@ READ_WRITE_MULTIPLE_REGISTERS = u8(0x17, alias="READ_WRITE_MULTIPLE_REGISTERS")
 
 class Transition:
     """ Represents a test which triggers a callback or a transition """
-    def __init__(self, matcher, ops_or_next):
+    def __init__(self, matcher, next_state):
         self.matcher = matcher
-        self.next = None
-        self.ops = None
+        self.next = next_state
 
-        if isinstance(ops_or_next, State):
-            self.next = ops_or_next
-        else:
-            assert(isinstance(ops_or_next, Operation))
-            self.ops = ops_or_next
+    def is_crc(self):
+        return self.next is not None and isinstance(self.next.ops, Operation)
 
     def to_code(self, indent):
         tab = INDENT * indent
@@ -318,10 +314,8 @@ class Transition:
         openning += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
         close = f"\n{tab}}}"
 
-        if self.next:
-            return f"{openning}{INDENT}state = state_t::{self.next.name};{close}"
+        return f"{openning}{INDENT}state = state_t::{self.next.name};{close}"
 
-        return f"{openning}{INDENT}return {self.ops.to_code()}{close}"
 
 class TransitionGroup:
     """ Holds a group of matchers of the same type """
@@ -393,7 +387,6 @@ class Operation:
 
             chain_item = chain.pop() # Pop the last element (and remove from length computation)
             offset = sum(item.size for item in chain if isinstance(item, Integral))
-            ctype = chain_item.ctype
 
             param_size = param(0).size
 
@@ -412,18 +405,6 @@ class Operation:
                 values_str.insert(0, f"{param.ctype}{{buffer[{offset}]<<24 || buffer[{offset+1}]<<16 || buffer[{offset+2}]<<8 || buffer[{offset+3}]}}")
             elif param_size == -2: # CRC
                 values_str.insert(0, f"{param.ctype}{{buffer[{offset+1}]<<8 || buffer[{offset}]}}")
-
-        # Add the params (the list is ordered)
-        return f"{self.name}({', '.join(values_str)});"
-
-
-def TransitionOperation(Operation):
-    def to_code(self):
-        # Check the prototype to see if we need to pass the buffer data
-        # Create from the end
-        values_str = []
-        chain = [] + self.chain # Force a deep copy
-        nargs = len(self.prototype)
 
         # Add the params (the list is ordered)
         return f"{self.name}({', '.join(values_str)});"
@@ -448,6 +429,9 @@ class State:
     def __add__(self, suffix):
         return State(self.name + "_" + suffix, self.pos+1)
 
+    def is_final(self):
+        return len(self.transition) and isinstance(Operation, self.transition[0])
+
     def has(self, matcher):
         for transition in self.transition:
             if transition.matcher == matcher:
@@ -461,12 +445,15 @@ class State:
                 return transition.next
         assert(False)
 
+    def to_code_case(self, indent):
+        tab = INDENT * indent
+        return f"{tab}case state_t::{self.name}:\n"
+
     def to_code(self, indent):
         # Group the transitions into groups by type
         transition_groups = {}
-
         tab = INDENT * indent
-        retval = f"{tab}case state_t::{self.name}:\n"
+        retval = str()
 
         for transition in self.transition:
             group = transition_groups.setdefault(
@@ -479,11 +466,23 @@ class State:
         for tg in transition_groups.values():
             retval += tg.to_code(indent+1)
 
-        return retval + f";\n{tab}{INDENT}}}\n{tab}{INDENT}break;\n"
+        return retval + f";\n{tab}}}\n{tab}{INDENT}break;\n"
+
+
+class OperationState(State):
+    def __init__(self, op, name, pos=0):
+        super().__init__(name, pos)
+        self.op = op
+
+    """ A state which leads to an operation """
+    def to_code(self, indent):
+        tab = INDENT * indent
+        return f"{tab}case state_t::{self.name}:\n{INDENT}return {self.op.to_code()};\n{INDENT}break;"
 
 
 class ParsingException(Exception):
     pass
+
 
 class CodeGenerator:
     """ Creates the C++ code to parse the modbus data """
@@ -546,12 +545,31 @@ class CodeGenerator:
         state_code = str()
 
         for state in self.states:
-            state_code += state.to_code(indent+1)
+            if isinstance(state, OperationState):
+                continue
+            state_code += state.to_code_case(indent+1)
+            state_code += state.to_code(indent+2)
+
+        # Create the default cases
+        for state in self.states:
+            if isinstance(state, OperationState):
+                state_code += state.to_code_case(indent+1)
 
         return state_code
-    
+
     def get_callbacks_text(self, indent):
-        return "TODO"
+        state_code = str()
+
+        for state in self.states:
+            if isinstance(state, OperationState):
+                state_code += state.to_code_case(indent+1)
+                state_code += state.to_code(indent+2)
+
+        for state in self.states:
+            if not isinstance(state, OperationState):
+                state_code += state.to_code_case(indent+1)
+
+        return state_code
 
     def get_prototypes(self, indent):
         tab = INDENT * indent
@@ -625,17 +643,17 @@ class CodeGenerator:
 
                     if command_name not in self.callbacks:
                         raise ParsingException(f"Cmd {command_name} does not have a prototype")
-                    
+
                     # Add the CRC calculation
                     crc_matcher = Crc(None)
                     next_state = self.new_state(state.next(command_name.upper() + "_CRC"), state.pos + crc_matcher.size)
                     state.add(Transition(crc_matcher, next_state))
 
                     # Add the final transition before making the call to the callback
-                    next_state = self.new_state("RDY_TO_CALL_" + command_name.upper(), 0)
-                    state.add(Transition(crc_matcher, next_state))
-
                     op = Operation(command_name, self.callbacks[command_name], [address_matcher] + list(cmd[:-1]))
+                    next_state = OperationState(op, "RDY_TO_CALL_" + command_name.upper(), 0)
+                    self.states.append(next_state)
+                    state.add(Transition(crc_matcher, next_state))
                     break
                 else:
                     next_state = self.new_state(state.next(matcher.alias), state.pos + matcher.size)
