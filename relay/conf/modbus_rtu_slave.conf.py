@@ -16,13 +16,13 @@ Modbus({
     },
 
     "device@44": [
-        (READ_COILS,            u16(0, 3, alias="device_index"),
+        (READ_COILS,            u16(0, 3, alias="ID"),
                                 "on_get_single"),
-        (WRITE_SINGLE_COIL,     u16(0, 3, alias="device_index"),
-                                u16([0xFF, 0, 0x55], alias="operation"),
+        (WRITE_SINGLE_COIL,     u16(0, 3, alias="ID"),
+                                u16([0xFF, 0, 0x55], alias="OP"),
                                 "on_set_single"),
-        (WRITE_SINGLE_COIL,     u16(0xFF, alias="device_index"),
-                                u16([0xFF, 0, 0x55], alias="operation"), 
+        (WRITE_SINGLE_COIL,     u16(0xFF, alias="ID"),
+                                u16([0xFF, 0, 0x55], alias="OP"), 
                                 "on_write_all"),
         (READ_HOLDING_REGISTERS, u16(1), "on_read_version"),
         (READ_INPUT_REGISTERS,   u16(1), "on_read_baud_rate"),

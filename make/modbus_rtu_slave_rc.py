@@ -50,13 +50,14 @@ TEMPLATE_CODE="""/**
 
 namespace modbus {
     namespace slave {
-        enum class process_outcomme_t : uint8_t {
+        enum class process_outcome_t : uint8_t {
             ignore,             // Wait for the stream to stop (3.5T) as it is not for us
             expecting_more,     // Char was processed, another is expected
             invalid_value,      // Value is out-of-range or not valid
+            unsupported_operation
         };
 
-        enum class callback_outcomme_t : uint8_t {
+        enum class callback_outcome_t : uint8_t {
             reply_ready,            // A reply is ready to send
             unsupported_operation,  // Operation is not supported
             invalid_value,          // Value is out-of-range or not valid
@@ -74,6 +75,7 @@ namespace modbus {
             state_t state;
             uint8_t idx;
             uint16_t crc;
+            bool expecting_crc;
 
             uint8_t buffer[@BUFSIZE@];
 
@@ -81,13 +83,14 @@ namespace modbus {
                 state = state_t::DEVICE_ADDRESS;
                 idx = 0;
                 crc = 0xffff;
+                expecting_crc = false;
             }
 
             Processor() {
                 reset();
             }
 
-            inline void update_crc16(uint8_t *byte) {
+            inline void update_crc(uint8_t byte) {
                 crc = crc ^ byte;
 
                 for (unsigned char j = 1; j <= 8; ++j)
@@ -106,7 +109,7 @@ namespace modbus {
             auto process(const uint8_t c) -> process_outcome_t {
                 buffer[idx++] = c; // Store the data
 
-                if ( state != process_outcomme_t::expecting_crc ) {
+                if ( not expecting_crc ) {
                     update_crc(c); // Update the CRC as we go
                 }
 
@@ -116,11 +119,11 @@ namespace modbus {
                     break;
                 }
 
-                return process_outcomme_t::invalid_value;
+                return process_outcome_t::invalid_value;
             }
 
             /** Called when a T3.5 has been detected, in a good sequence */
-            auto process_end_of_frame() -> callback_outcomme_t {
+            auto process_end_of_frame() -> callback_outcome_t {
                 switch(state) {
                 @CALLBACKS@
                 default:
@@ -128,7 +131,7 @@ namespace modbus {
                 }
 
                 // This is un-reachable!
-                return callback_outcomme_t::unsupported_operation;
+                return callback_outcome_t::unsupported_operation;
             }
         }; // struct Processor
 
@@ -257,7 +260,6 @@ class UnsignedMatcher(Matcher):
     def min(self):
         return 0
 
-
 class SignedMatcher(Matcher):
     """Matcher for signed integral types."""
     def check(self, value):
@@ -268,7 +270,6 @@ class SignedMatcher(Matcher):
     @property
     def min(self):
         return -(1 << (self.bits - 1))
-
 
 # Concrete Matcher classes for various types
 class u8(UnsignedMatcher, _8bits): pass
@@ -301,19 +302,23 @@ class Transition:
     def __init__(self, matcher, next_state):
         self.matcher = matcher
         self.next = next_state
+        self.set_crc = False
 
     def is_crc(self):
         return self.next is not None and isinstance(self.next.ops, Operation)
 
     def to_code(self, indent):
         tab = INDENT * indent
-        openning = close = ""
+        opening = close = ""
 
-        openning += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
+        opening += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
+        
+        if self.set_crc:
+            opening += f"{INDENT}expecting_crc = true;\n{tab}"
+        
         close = f"\n{tab}}}"
 
-        return f"{openning}{INDENT}state = state_t::{self.next.name};{close}"
-
+        return f"{opening}{INDENT}state = state_t::{self.next.name};{close}"
 
 class TransitionGroup:
     """ Holds a group of matchers of the same type """
@@ -356,17 +361,16 @@ class TransitionGroup:
         retval += f" else {{\n{tab}{extra}{INDENT}return "
 
         if self.pos == 0:
-            retval += "process_outcomme_t::ignore"
+            retval += "process_outcome_t::ignore"
         elif self.pos == 1:
-            retval += "process_outcomme_t::unsupported_operation"
+            retval += "process_outcome_t::unsupported_operation"
         else:
-            retval += "process_outcomme_t::invalid_value"
+            retval += "process_outcome_t::invalid_value"
 
         if size == 1:
             return retval
 
         return f"{tab}if ( idx == {self.pos+size} ) {{\n{retval};\n{INDENT}{tab}}}"
-
 
 class Operation:
     def __init__(self, name, prototype, chain):
@@ -412,7 +416,6 @@ class Operation:
 
         # Add the params (the list is ordered)
         return f"{self.name}({', '.join(values_str)});"
-
 
 class State:
     """ State in the processing of incomming bytes """
@@ -471,7 +474,6 @@ class State:
 
         return retval + f";\n{tab}{INDENT}}}\n{tab}{INDENT}break;\n"
 
-
 class OperationState(State):
     def __init__(self, op, name, pos=0):
         super().__init__(name, pos)
@@ -482,10 +484,8 @@ class OperationState(State):
         tab = INDENT * indent
         return f"{tab}return {self.op.to_code()};\n{tab}break;\n"
 
-
 class ParsingException(Exception):
     pass
-
 
 class CodeGenerator:
     """ Creates the C++ code to parse the modbus data """
@@ -517,7 +517,16 @@ class CodeGenerator:
 
     def new_state(self, new_state_name, pos):
         """ Add a new state transition """
-        new_state = State(new_state_name, pos)
+        # Make sure the name is unique
+        names = {state.name for state in self.states if state.name.startswith(new_state_name)}
+
+        count = 1
+        alt_name = new_state_name
+        while alt_name in names:
+            alt_name = new_state_name + "_" + str(count)
+            count+=1
+
+        new_state = State(alt_name, pos)
         self.states.append(new_state)
         return new_state
 
@@ -580,7 +589,7 @@ class CodeGenerator:
         retval = str()
 
         for name, proto in self.callbacks.items():
-            retval += f"{tab}callback_outcomme_t {name}("
+            retval += f"{tab}callback_outcome_t {name}("
 
             for idx, param in enumerate(proto):
                 if isinstance(param, tuple):
@@ -654,7 +663,9 @@ class CodeGenerator:
 
                     # Add the CRC calculation
                     next_state = self.new_state(state.next("_" + command_name.upper() + "__CRC"), state.pos + matcher.size)
-                    state.add(Transition(matcher, next_state))
+                    to_crc_transition = Transition(matcher, next_state)
+                    to_crc_transition.set_crc = True
+                    state.add(to_crc_transition)
                     state = next_state
 
                     # Add the final transition before making the call to the callback
