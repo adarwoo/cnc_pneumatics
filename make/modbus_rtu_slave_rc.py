@@ -51,23 +51,23 @@ TEMPLATE_CODE="""/**
 namespace modbus {
     namespace slave {
         enum class process_outcomme_t : uint8_t {
-            ignore, // Wait for the stream to stop (3.5T) as it is not for us
-            expecting_more, // Char was processed, another is expected
-            expecting_crc, // Message is complete, CRC is required
-            unsupported_operation, // Operation is not supported
-            invalid_value, // Value is out-of-range or not valid
-            bad_crc, // Message is invalid
-            reply, // Reply is ready to send
+            ignore,             // Wait for the stream to stop (3.5T) as it is not for us
+            expecting_more,     // Char was processed, another is expected
+            invalid_value,      // Value is out-of-range or not valid
         };
 
         enum class callback_outcomme_t : uint8_t {
-            reply_ready,  // A reply is read to send
-            unsupported_operation, // Operation is not supported
-            invalid_value, // Value is out-of-range or not valid
+            reply_ready,            // A reply is ready to send
+            unsupported_operation,  // Operation is not supported
+            invalid_value,          // Value is out-of-range or not valid
         };
-@PROTOTYPES@
+
+        // All callbacks registered
+        @PROTOTYPES@
+        
+        // All states to consider
         enum class state_t : uint8_t {
-@ENUMS@
+            @ENUMS@
         };
 
         struct Processor {
@@ -87,9 +87,7 @@ namespace modbus {
                 reset();
             }
 
-
-            inline void update_crc16(uint8_t *byte)
-            {
+            inline void update_crc16(uint8_t *byte) {
                 crc = crc ^ byte;
 
                 for (unsigned char j = 1; j <= 8; ++j)
@@ -105,7 +103,7 @@ namespace modbus {
                 }
             }
 
-            auto process(const uint8_t c) -> process_outcomme_t {
+            auto process(const uint8_t c) -> process_outcome_t {
                 buffer[idx++] = c; // Store the data
 
                 if ( state != process_outcomme_t::expecting_crc ) {
@@ -113,24 +111,24 @@ namespace modbus {
                 }
 
                 switch(state) {
-@CASES@
+                @CASES@
                 default:
                     break;
                 }
 
-                return process_outcomme_t::expecting_more;
+                return process_outcomme_t::invalid_value;
             }
 
             /** Called when a T3.5 has been detected, in a good sequence */
-            auto process() -> process_outcome_t {
+            auto process_end_of_frame() -> callback_outcomme_t {
                 switch(state) {
-@CALLBACKS@
+                @CALLBACKS@
                 default:
                     break;
                 }
 
                 // This is un-reachable!
-                return process_outcomme_t::expecting_more;
+                return callback_outcomme_t::unsupported_operation;
             }
         }; // struct Processor
 
@@ -144,7 +142,7 @@ DEVICE_ADDR_RE = re.compile(r'device@(?:0x)?([0-9a-fA-F]+)')
 VALID_C_FUNCTION_NAME = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
 
 # Indent by
-INDENT = "    "
+INDENT = " " * 4
 
 class Integral:
     """Base class for integral types."""
@@ -332,13 +330,19 @@ class TransitionGroup:
         extra_indent = 1 if size > 1 else 0
         extra = INDENT * extra_indent
 
+        crc = isinstance(self.integral, Crc)
+
         # Redefine c
         if size == 2:
-            retval += f"{tab}{extra}uint8_t *data = &buffer[idx-2];\n"
-            retval += f"{tab}{extra}{self.integral.ctype} c = (data[0] << 8) | data[1];\n"
+            if crc:
+                retval += f"{tab}{extra}uint8_t *data = &buffer[idx-2];\n"
+                retval += f"{tab}{extra}{self.integral.ctype} c = (data[1] << 8) | data[0];\n\n"
+            else:
+                retval += f"{tab}{extra}uint8_t *data = &buffer[idx-2];\n"
+                retval += f"{tab}{extra}{self.integral.ctype} c = (data[0] << 8) | data[1];\n\n"
         elif size == 4:
             retval += f"{tab}{extra}uint8_t *data = &buffer[idx-4];\n"
-            retval += f"{tab}{extra}{self.integral.ctype} c = data[0] << 24 | data[0] << 16 | data[0] << 8 | data[1];\n"
+            retval += f"{tab}{extra}{self.integral.ctype} c = data[0] << 24 | data[0] << 16 | data[0] << 8 | data[1];\n\n"
 
         for matcher in self.transitions:
             if next_flag:
@@ -446,8 +450,7 @@ class State:
         assert(False)
 
     def to_code_case(self, indent):
-        tab = INDENT * indent
-        return f"{tab}case state_t::{self.name}:\n"
+        return f"{INDENT * indent}case state_t::{self.name}:\n"
 
     def to_code(self, indent):
         # Group the transitions into groups by type
@@ -466,7 +469,7 @@ class State:
         for tg in transition_groups.values():
             retval += tg.to_code(indent+1)
 
-        return retval + f";\n{tab}}}\n{tab}{INDENT}break;\n"
+        return retval + f";\n{tab}{INDENT}}}\n{tab}{INDENT}break;\n"
 
 
 class OperationState(State):
@@ -477,7 +480,7 @@ class OperationState(State):
     """ A state which leads to an operation """
     def to_code(self, indent):
         tab = INDENT * indent
-        return f"{tab}case state_t::{self.name}:\n{INDENT}return {self.op.to_code()};\n{INDENT}break;"
+        return f"{tab}return {self.op.to_code()};\n{tab}break;\n"
 
 
 class ParsingException(Exception):
@@ -522,7 +525,7 @@ class CodeGenerator:
         placeholders = {
             "BUFSIZE" : str(self.max_buf_size),
             "ENUMS" : self.get_enums_text(3),
-            "CASES" : self.get_cases_text(3),
+            "CASES" : self.get_cases_text(4),
             "CALLBACKS" : self.get_callbacks_text(3),
             "PROTOTYPES" : self.get_prototypes(2),
         }
@@ -530,11 +533,12 @@ class CodeGenerator:
         # Function to replace each placeholder
         def replace_placeholder(match):
             placeholder = match.group(1)
+            endl = match.group(2) or ""
 
             # Call the corresponding method based on the placeholder name
-            return placeholders[placeholder]
+            return endl + placeholders[placeholder]
 
-        return re.sub(r"@(.*?)@", replace_placeholder, TEMPLATE_CODE)
+        return re.sub(r"\s*@(.*?)@(\n?)", replace_placeholder, TEMPLATE_CODE)
 
     def get_enums_text(self, indent):
         tab = INDENT * indent
@@ -547,13 +551,13 @@ class CodeGenerator:
         for state in self.states:
             if isinstance(state, OperationState):
                 continue
-            state_code += state.to_code_case(indent+1)
-            state_code += state.to_code(indent+2)
+            state_code += state.to_code_case(indent)
+            state_code += state.to_code(indent)
 
         # Create the default cases
         for state in self.states:
             if isinstance(state, OperationState):
-                state_code += state.to_code_case(indent+1)
+                state_code += state.to_code_case(indent)
 
         return state_code
 
@@ -576,7 +580,7 @@ class CodeGenerator:
         retval = str()
 
         for name, proto in self.callbacks.items():
-            retval += f"{tab}process_outcomme_t {name}("
+            retval += f"{tab}callback_outcomme_t {name}("
 
             for idx, param in enumerate(proto):
                 if isinstance(param, tuple):
@@ -639,20 +643,25 @@ class CodeGenerator:
                 state = state.get_next_state_of(matcher)
             else:
                 if isinstance(cmd[index+1], str): # Command to follow?
+                    next_state = self.new_state(state.next(matcher.alias), state.pos + matcher.size)
+                    state.add(Transition(matcher, next_state))
+                    state = next_state
+
                     command_name = cmd[-1] # Grab the command name
 
                     if command_name not in self.callbacks:
                         raise ParsingException(f"Cmd {command_name} does not have a prototype")
 
                     # Add the CRC calculation
-                    crc_matcher = Crc(None)
-                    next_state = self.new_state(state.next(command_name.upper() + "_CRC"), state.pos + crc_matcher.size)
-                    state.add(Transition(crc_matcher, next_state))
+                    next_state = self.new_state(state.next("_" + command_name.upper() + "__CRC"), state.pos + matcher.size)
+                    state.add(Transition(matcher, next_state))
+                    state = next_state
 
                     # Add the final transition before making the call to the callback
                     op = Operation(command_name, self.callbacks[command_name], [address_matcher] + list(cmd[:-1]))
-                    next_state = OperationState(op, "RDY_TO_CALL_" + command_name.upper(), 0)
+                    next_state = OperationState(op, "RDY_TO_CALL__" + command_name.upper(), 0)
                     self.states.append(next_state)
+                    crc_matcher = Crc(None)
                     state.add(Transition(crc_matcher, next_state))
                     break
                 else:
