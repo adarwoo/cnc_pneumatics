@@ -65,7 +65,7 @@ namespace modbus {
 
         // All callbacks registered
         @PROTOTYPES@
-        
+
         // All states to consider
         enum class state_t : uint8_t {
             @ENUMS@
@@ -312,10 +312,10 @@ class Transition:
         opening = close = ""
 
         opening += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
-        
+
         if self.set_crc:
             opening += f"{INDENT}expecting_crc = true;\n{tab}"
-        
+
         close = f"\n{tab}}}"
 
         return f"{opening}{INDENT}state = state_t::{self.next.name};{close}"
@@ -541,13 +541,13 @@ class CodeGenerator:
 
         # Function to replace each placeholder
         def replace_placeholder(match):
-            placeholder = match.group(1)
-            endl = match.group(2) or ""
+            placeholder = match.group(2)
+            endl = match.group(3) or ""
 
             # Call the corresponding method based on the placeholder name
-            return endl + placeholders[placeholder]
+            return placeholders[placeholder].strip() + endl
 
-        return re.sub(r"\s*@(.*?)@(\n?)", replace_placeholder, TEMPLATE_CODE)
+        return re.sub(r"(\s*)@(.*?)@(\n?)", replace_placeholder, TEMPLATE_CODE)
 
     def get_enums_text(self, indent):
         tab = INDENT * indent
