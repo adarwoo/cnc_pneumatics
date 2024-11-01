@@ -52,6 +52,9 @@ namespace modbus {
     namespace slave {
         enum class process_outcome_t : uint8_t {
             ignore,             // Wait for the stream to stop (3.5T) as it is not for us
+            illegal_function_code = 0x01, // Nodbus standard for illegal function code
+            illegal_data_address = 0x02,
+            illegal_data_value = 0x03,
             expecting_more,     // Char was processed, another is expected
             invalid_value,      // Value is out-of-range or not valid
             unsupported_operation
@@ -74,8 +77,9 @@ namespace modbus {
         struct Processor {
             state_t state;
             uint8_t idx;
-            uint16_t crc;
-            bool expecting_crc;
+            uint16_t crc; // The CRC for the currently received frame
+            uint16_t n_minus_1_crc; // Copy of the CRC at n-1
+            uint16_t n_minus_2_crc; // Copy of the CRC at n-2
 
             uint8_t buffer[@BUFSIZE@];
 
@@ -83,7 +87,7 @@ namespace modbus {
                 state = state_t::DEVICE_ADDRESS;
                 idx = 0;
                 crc = 0xffff;
-                expecting_crc = false;
+                bad_crc = false;
             }
 
             Processor() {
@@ -91,6 +95,8 @@ namespace modbus {
             }
 
             inline void update_crc(uint8_t byte) {
+                n_minus_2_crc = n_minus_1_crc;
+                n_minus_1_crc = crc;
                 crc = crc ^ byte;
 
                 for (unsigned char j = 1; j <= 8; ++j)
@@ -108,10 +114,7 @@ namespace modbus {
 
             auto process(const uint8_t c) -> process_outcome_t {
                 buffer[idx++] = c; // Store the data
-
-                if ( not expecting_crc ) {
-                    update_crc(c); // Update the CRC as we go
-                }
+                update_crc(c);
 
                 switch(state) {
                 @CASES@
@@ -284,7 +287,7 @@ class f32(Matcher, _32bits):
 class Crc(UnsignedMatcher, _16bits):
     _bits = -16 # Negative for little endian
     def to_code(self):
-        return "crc == c"
+        return "packet_crc == c"
 
 READ_COILS                    = u8(0x01, alias="READ_COILS")
 READ_DISCRETE_INPUTS          = u8(0x02, alias="READ_DISCRETE_INPUTS")
@@ -314,7 +317,7 @@ class Transition:
         opening += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
         
         if self.set_crc:
-            opening += f"{INDENT}expecting_crc = true;\n{tab}"
+            opening += f"{INDENT}crc_should_be_next();\n{tab}"
         
         close = f"\n{tab}}}"
 
@@ -363,9 +366,9 @@ class TransitionGroup:
         if self.pos == 0:
             retval += "process_outcome_t::ignore"
         elif self.pos == 1:
-            retval += "process_outcome_t::unsupported_operation"
+            retval += "process_outcome_t::illegal_function_code"
         else:
-            retval += "process_outcome_t::invalid_value"
+            retval += "process_outcome_t::illegal_data_value"
 
         if size == 1:
             return retval
@@ -652,9 +655,9 @@ class CodeGenerator:
                 state = state.get_next_state_of(matcher)
             else:
                 if isinstance(cmd[index+1], str): # Command to follow?
-                    next_state = self.new_state(state.next(matcher.alias), state.pos + matcher.size)
-                    state.add(Transition(matcher, next_state))
-                    state = next_state
+#                    next_state = self.new_state(state.next(matcher.alias), state.pos + matcher.size)
+#                    state.add(Transition(matcher, next_state))
+#                    state = next_state
 
                     command_name = cmd[-1] # Grab the command name
 
