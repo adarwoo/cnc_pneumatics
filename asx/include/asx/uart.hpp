@@ -2,20 +2,28 @@
 
 #include <cstdint>
 #include <type_traits>
-#include <avr/io.h>
-
-#include "sysclk.h"
+#include <string_view>
 #include <asx/reactor.hpp>
 #include <asx/utils.hpp>
 
+#include <avr/io.h>
+
+#include "sysclk.h"
+
+
+
 namespace asx {
-   namespace usart {
-      extern reactor::handle on_usart_rx_complete;
-      extern reactor::handle on_usart_tx_complete;
-      extern reactor::handle on_usart_data_ready;
+   namespace uart {
+      extern reactor::handle on_usart0_tx_complete;
+      extern reactor::handle on_usart1_tx_complete;
+
+      using dre_callback = void(*)();
+
+      extern dre_callback dre_callback_uart0;
+      extern dre_callback dre_callback_uart1;
 
       enum class width { _5, _6, _7, _8, _9 };
-      enum class partity { odd, even, none };
+      enum class parity { odd, even, none };
       enum class stop { _1, _2 };
 
       // Options
@@ -25,16 +33,19 @@ namespace asx {
       constexpr auto disable_rx = 1<<4;
       constexpr auto disable_tx = 1<<5;
 
-      template<int N, long BAUD, width W, partity P, stop S, int OPTIONS=0>
+      template<int N, long BAUD, width W, parity P, stop S, int OPTIONS=0>
       class Uart {
+         ///< Contains a view to transmit
+         static std::string_view to_send;
+
          static_assert(N < 2, "Invalid USART number");
 
-         static constexpr USART_t * const get_usart() {
+         static constexpr USART_t & get() {
             if constexpr (N == 0) {
-               return &USART0;
+               return *(&USART0);
             }
 
-            return &USART1;
+            return *(&USART1);
          }
 
          static constexpr uint16_t get_baud() {
@@ -90,9 +101,9 @@ namespace asx {
                retval |= USART_CHSIZE_9BITH_gc;
             }
 
-            if (P == partity::odd) {
+            if (P == parity::odd) {
                retval |= USART_PMODE_ODD_gc;
-            } else if (P == partity::even) {
+            } else if (P == parity::even) {
                retval |= USART_PMODE_EVEN_gc;
             }
 
@@ -107,11 +118,11 @@ namespace asx {
 
       public:
          static void init() {
-            if (OPTIKONS & map_to_alt_position) {
+            if (OPTIONS & map_to_alt_position) {
                if (N == 0) {
                   PORTMUX_USARTROUTEA |= PORTMUX_USART0_ALT1_gc;
 
-                  if (is_onewire()) {
+                  if (OPTIONS & onewire) {
                      PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
                   } else {
                      VPORTA_DIR |= _BV(1);
@@ -119,7 +130,7 @@ namespace asx {
                } else {
                   PORTMUX_USARTROUTEA |= 4; // Bug in AVR defs
 
-                  if (is_onewire()) {
+                  if (OPTIONS & onewire) {
                      PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
                   } else {
                      VPORTC_DIR |= _BV(2);
@@ -127,14 +138,14 @@ namespace asx {
                }
             } else {
                if (N == 0) {
-                  if (is_onewire()) {
+                  if (OPTIONS & onewire) {
                      PORTB.PIN2CTRL |= PORT_PULLUPEN_bm;
                   } else {
                      VPORTB_DIR |= _BV(2);
                   }
 
                } else {
-                  if (is_onewire()) {
+                  if (OPTIONS & onewire) {
                      PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
                   } else {
                      VPORTA_DIR |= _BV(1);
@@ -142,41 +153,55 @@ namespace asx {
                }
             }
 
-            get_usart()->CTRLA = get_ctrl_a();
-            get_usart()->CTRLB = get_ctrl_b();
-            get_usart()->CTRLC = get_ctrl_c();
-            get_usart()->BAUD = get_baud();
+            get().CTRLA = get_ctrl_a();
+            get().CTRLB = get_ctrl_b();
+            get().CTRLC = get_ctrl_c();
+            get().BAUD = get_baud();
+
+            // Register a reactor for filling the buffer
+            if ( N == 0 ) {
+               dre_callback_uart0 = &on_dre;
+            } else {
+               dre_callback_uart1 = &on_dre;
+            }
          }
 
-        static void write(uint8_t c) {
-            get_usart()->TXDATAL = c;
-        };
+         static void write(const std::string_view &view_to_send) {
+            // Store the view to transmit
+            to_send = view_to_send;
 
+            // Enable the DRE and TXCIE interrupts
+            get().CTRLA |= USART_DREIE_bm | USART_TXCIE_bm;;
 
-		 static void react_on_rx_complete_interrupt( reactor_handle_t reactor ) {
-			on_usart_rx_complete = reactor;
+            // Need to kick-start the process
+            on_dre();
+         }
 
-			// Enable the interrupt
-			get_usart()->CTRLA |= USART_RXCIE_bm;
-		 }
+         // Called from the DRE interrupt to indicate there is space in the Tx buffer
+         static void on_dre()
+         {
+            if ( not to_send.empty() ) {
+               get().TXDATAL = to_send.front();
+               to_send.remove_prefix(1);
+            } else {
+               // Disable the DRE interrupt
+               get().CTRLA &= ~USART_DREIE_bm;
+            }
+         }
 
-		 static void react_on_tx_complete_interrupt( reactor_handle_t reactor ) {
-			on_usart_tx_complete = reactor;
-
-			// Enable the interrupt
-			get_usart()->CTRLA |= USART_TXCIE_bm;
-		 }
-
-		 static void react_on_data_ready( reactor_handle_t reactor ) {
-			on_usart_data_ready = reactor;
-
-			// Enable the interrupt
-			get_usart()->CTRLA |= USART_DREIE_bm;
-		 }
-
+		   static void react_on_send_complete( reactor_handle_t reactor ) {
+            // Register a reactor for filling the buffer
+            if ( N == 0 ) {
+               on_usart0_tx_complete = reactor;
+            } else {
+               on_usart1_tx_complete = reactor;
+            }
+		   }
       };
-   } // end of namespace usart
+   } // end of namespace uart
 } // end of namespace asx
 
+// Define the static member
+template<int N, long BAUD, asx::uart::width W, asx::uart::parity P, asx::uart::stop S, int OPTIONS>
+std::string_view asx::uart::Uart<N, BAUD, W, P, S, OPTIONS>::to_send;
 
-// How to hook interrupts ?

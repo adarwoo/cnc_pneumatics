@@ -80,6 +80,7 @@ void reactor_run(void);
  */
 void reactor_null_notify_from_isr(reactor_handle_t handle);
 
+
 #ifdef __cplusplus
 }
 #endif

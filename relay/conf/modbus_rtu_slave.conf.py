@@ -5,7 +5,7 @@ Modbus({
     "callbacks": {
         "on_get_single":                [],
         "on_set_single":                [(u8, "relay_index"), (u8, "operation")],
-        "on_write_all":                 [u8],
+        "on_write_all":                 [(u8, "operation")],
         "on_read_version":              [],
         "on_read_baud_rate":            [],
         "on_read_stop_and_data_bits":   [],

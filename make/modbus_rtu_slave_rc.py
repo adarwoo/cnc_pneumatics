@@ -39,7 +39,6 @@ The tuple is made of:
    The size is checked during cast. A range 0-0x200 cannot be cast to an 8-bit.
 """
 import re
-import textwrap
 
 TEMPLATE_CODE="""/**
  * This file was generated to create a state machine for processing
@@ -52,7 +51,11 @@ namespace modbus {
     namespace slave {
         enum class process_outcome_t : uint8_t {
             ignore,             // Wait for the stream to stop (3.5T) as it is not for us
+            illegal_function_code = 0x01, // Nodbus standard for illegal function code
+            illegal_data_address = 0x02,
+            illegal_data_value = 0x03,
             expecting_more,     // Char was processed, another is expected
+            expecting_no_more,  // No more expected
             invalid_value,      // Value is out-of-range or not valid
             unsupported_operation
         };
@@ -63,34 +66,100 @@ namespace modbus {
             invalid_value,          // Value is out-of-range or not valid
         };
 
+        namespace event {
+            struct char_received;
+            struct timeout_t15;
+            struct timeout_t35;
+            struct error_detected;
+        }
+
         // All callbacks registered
         @PROTOTYPES@
 
         // All states to consider
-        enum class state_t : uint8_t {
+        enum class dg_state_t : uint8_t {
             @ENUMS@
         };
 
-        struct Processor {
-            state_t state;
-            uint8_t idx;
-            uint16_t crc;
-            bool expecting_crc;
+        enum class slave_state_t : uint8_t {
+            idle,
+            in_frame,
+            ignore_frame,
+            bad_frame,
+        };
 
-            uint8_t buffer[@BUFSIZE@];
+        template <class UART, class TIMER>
+        class Processor {
+            ///< State of datagram processing
+            inline static state_t dg_state;
+            ///< Outer state for the slave
+            inline static slave_state_t slave_state;
+            ///< Number of characters in the buffer
+            inline static uint8_t cnt;
+            ///< The CRC for the currently received frame
+            inline static uint16_t crc;
+            ///< The CRC 1 char ago. Temporary storage
+            inline static uint16_t n_minus_1_crc;
+            ///< The CRC 2 characters ago. That's the one to use when the end of frame is detected
+            inline static uint16_t n_minus_2_crc; // Copy of the CRC at n-2
+            ///< The receiving buffer which holds the maximum possible number of characters + 2 for the CRC
+            inline static uint8_t buffer[@BUFSIZE@ + 2];
+            ///< Timer counter for race detection
+            uint8_t timer_counter;
 
-            void reset() {
-                state = state_t::DEVICE_ADDRESS;
-                idx = 0;
-                crc = 0xffff;
-                expecting_crc = false;
+            /**
+             * Constructor
+             *
+            Processor() :
+                slave_state{slave_state_t::ignore_frame},
+                timer_counter{0} {
+                clock::perclk_duration d = 1_s / UART.get_baud();
+                TIMER.set_prescaler(d);
+                reset();
+
+                // Install the reactor handler
+                UART.react_on_data_ready
             }
 
-            Processor() {
-                reset();
+            static void rearm_t35() {
+                clock::perclk_duration d = 1_s / UART.get_baud();
+                TIMER::count_t
+
+                TIMER.start();
+            }
+
+            // Calculate tick count for UART byte duration at a given baud rate
+            static constexpr cpu_tick calculate_uart_duration(int baud_rate, double bit_multiplier) {
+                using namespace std::chrono;
+                auto byte_duration = duration_cast<cpu_tick>(duration<double>(bit_multiplier / baud_rate));
+                return byte_duration;
+            }
+
+
+            static void on_rx_char() {
+
+            }
+
+            static void on_timeout_t15() {
+
+            }
+
+            static void on_timeout_t35() {
+
+            }
+
+
+            void reset() {
+                dg_state = state_t::DEVICE_ADDRESS;
+                cnt = 0;
+                crc = 0xffff;
+                bad_crc = false;
+                timer_counter = 0;
             }
 
             inline void update_crc(uint8_t byte) {
+                n_minus_2_crc = n_minus_1_crc;
+                n_minus_1_crc = crc;
                 crc = crc ^ byte;
 
                 for (unsigned char j = 1; j <= 8; ++j)
@@ -106,14 +175,11 @@ namespace modbus {
                 }
             }
 
-            auto process(const uint8_t c) -> process_outcome_t {
-                buffer[idx++] = c; // Store the data
+            auto process_char(const uint8_t c) -> process_outcome_t {
+                buffer[cnt++] = c; // Store the data
+                update_crc(c);
 
-                if ( not expecting_crc ) {
-                    update_crc(c); // Update the CRC as we go
-                }
-
-                switch(state) {
+                switch(dg_state) {
                 @CASES@
                 default:
                     break;
@@ -124,7 +190,7 @@ namespace modbus {
 
             /** Called when a T3.5 has been detected, in a good sequence */
             auto process_end_of_frame() -> callback_outcome_t {
-                switch(state) {
+                switch(dg_state) {
                 @CALLBACKS@
                 default:
                     break;
@@ -149,7 +215,10 @@ INDENT = " " * 4
 
 class Integral:
     """Base class for integral types."""
+    bits = None
+
     def __init__(self, i):
+        """ Set the value """
         self.value = i
 
     @property
@@ -284,7 +353,7 @@ class f32(Matcher, _32bits):
 class Crc(UnsignedMatcher, _16bits):
     _bits = -16 # Negative for little endian
     def to_code(self):
-        return "crc == c"
+        return "packet_crc == c"
 
 READ_COILS                    = u8(0x01, alias="READ_COILS")
 READ_DISCRETE_INPUTS          = u8(0x02, alias="READ_DISCRETE_INPUTS")
@@ -314,11 +383,11 @@ class Transition:
         opening += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
 
         if self.set_crc:
-            opening += f"{INDENT}expecting_crc = true;\n{tab}"
+            close += f"\n{tab}{INDENT}return process_outcome_t::expecting_no_more;"
 
-        close = f"\n{tab}}}"
+        close += f"\n{tab}}}"
 
-        return f"{opening}{INDENT}state = state_t::{self.next.name};{close}"
+        return f"{opening}{INDENT}dg_state = dg_state_t::{self.next.name};{close}"
 
 class TransitionGroup:
     """ Holds a group of matchers of the same type """
@@ -340,13 +409,13 @@ class TransitionGroup:
         # Redefine c
         if size == 2:
             if crc:
-                retval += f"{tab}{extra}uint8_t *data = &buffer[idx-2];\n"
+                retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-2];\n"
                 retval += f"{tab}{extra}{self.integral.ctype} c = (data[1] << 8) | data[0];\n\n"
             else:
-                retval += f"{tab}{extra}uint8_t *data = &buffer[idx-2];\n"
+                retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-2];\n"
                 retval += f"{tab}{extra}{self.integral.ctype} c = (data[0] << 8) | data[1];\n\n"
         elif size == 4:
-            retval += f"{tab}{extra}uint8_t *data = &buffer[idx-4];\n"
+            retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-4];\n"
             retval += f"{tab}{extra}{self.integral.ctype} c = data[0] << 24 | data[0] << 16 | data[0] << 8 | data[1];\n\n"
 
         for matcher in self.transitions:
@@ -363,14 +432,14 @@ class TransitionGroup:
         if self.pos == 0:
             retval += "process_outcome_t::ignore"
         elif self.pos == 1:
-            retval += "process_outcome_t::unsupported_operation"
+            retval += "process_outcome_t::illegal_function_code"
         else:
-            retval += "process_outcome_t::invalid_value"
+            retval += "process_outcome_t::illegal_data_value"
 
         if size == 1:
             return retval
 
-        return f"{tab}if ( idx == {self.pos+size} ) {{\n{retval};\n{INDENT}{tab}}}"
+        return f"{tab}if ( cnt == {self.pos+size} ) {{\n{retval};\n{INDENT}{tab}}}"
 
 class Operation:
     def __init__(self, name, prototype, chain):
@@ -591,7 +660,7 @@ class CodeGenerator:
         for name, proto in self.callbacks.items():
             retval += f"{tab}callback_outcome_t {name}("
 
-            for idx, param in enumerate(proto):
+            for cnt, param in enumerate(proto):
                 if isinstance(param, tuple):
                     # Skip the name
                     param, param_name = param
@@ -599,7 +668,7 @@ class CodeGenerator:
                 else:
                     param_name = ""
 
-                comma = ", " if len(proto) - idx > 1 else ""
+                comma = ", " if len(proto) - cnt > 1 else ""
 
                 retval += f"{param(0).ctype}{param_name}{comma}"
 
@@ -652,10 +721,6 @@ class CodeGenerator:
                 state = state.get_next_state_of(matcher)
             else:
                 if isinstance(cmd[index+1], str): # Command to follow?
-                    next_state = self.new_state(state.next(matcher.alias), state.pos + matcher.size)
-                    state.add(Transition(matcher, next_state))
-                    state = next_state
-
                     command_name = cmd[-1] # Grab the command name
 
                     if command_name not in self.callbacks:

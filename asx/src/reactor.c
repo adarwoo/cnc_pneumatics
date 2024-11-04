@@ -57,7 +57,7 @@ static reactor_item_t _handlers[REACTOR_MAX_HANDLERS] = {0};
 static bool _reactor_lock = false;
 
 /** Notification registry - use the GPIO for added performance */
-#define _reactor_notifications (*(volatile uint32_t *)(&GPIO_GPIOR0))
+uint32_t _reactor_notifications = 0;
 
 /** Initialize the reactor API */
 void reactor_init(void)
@@ -113,169 +113,14 @@ reactor_handle_t reactor_register(const reactor_handler_t handler, reactor_prior
 /**
  * Helper which clears a bit of the GPIO register
  */
-static inline void _clear_notification_bit(reactor_handle_t handle)
+static void _clear_notification_bit(reactor_handle_t handle)
 {
-    // Inline assembly to clear the notification using CBI and a jump table
-    asm volatile (
-        "ldi r30, lo8(pm_clear_table_start)\n"  // Load the low byte of the jump table address into Z
-        "ldi r31, hi8(pm_clear_table_start)\n"  // Load the high byte of the jump table address into Z
-        "lsl %[handle]\n"                 // Multiply handle by 2 (each entry is 2 instructions)
-        "add r30, %[handle]\n"            // Add handle to calculate the correct offset
-        "adc r31, __zero_reg__\n"         // Handle carry in case of overflow
-        "ijmp\n"                          // Indirect jump based on Z (r30:r31)
-        "pm_clear_table_start:\n"
-        "cbi %[gpior0], 0\n"          // Clear bit 0 in GPIOR0
-        "rjmp endall\n"
-        "cbi %[gpior0], 1\n"          // Clear bit 1 in GPIOR0
-        "rjmp endall\n"
-        "cbi %[gpior0], 2\n"          // Clear bit 2 in GPIOR0
-        "rjmp endall\n"
-        "cbi %[gpior0], 3\n"          // Clear bit 3 in GPIOR0
-        "rjmp endall\n"
-        "cbi %[gpior0], 4\n"          // Clear bit 4 in GPIOR0
-        "rjmp endall\n"
-        "cbi %[gpior0], 5\n"          // Clear bit 5 in GPIOR0
-        "rjmp endall\n"
-        "cbi %[gpior0], 6\n"          // Clear bit 6 in GPIOR0
-        "rjmp endall\n"
-        "cbi %[gpior0], 7\n"          // Clear bit 7 in GPIOR0
-        "rjmp endall\n"
-        "cbi %[gpior1], 0\n"          // Clear bit 0 in GPIOR1
-        "rjmp endall\n"
-        "cbi %[gpior1], 1\n"          // Clear bit 1 in GPIOR1
-        "rjmp endall\n"
-        "cbi %[gpior1], 2\n"          // Clear bit 2 in GPIOR1
-        "rjmp endall\n"
-        "cbi %[gpior1], 3\n"          // Clear bit 3 in GPIOR1
-        "rjmp endall\n"
-        "cbi %[gpior1], 4\n"          // Clear bit 4 in GPIOR1
-        "rjmp endall\n"
-        "cbi %[gpior1], 5\n"          // Clear bit 5 in GPIOR1
-        "rjmp endall\n"
-        "cbi %[gpior1], 6\n"          // Clear bit 6 in GPIOR1
-        "rjmp endall\n"
-        "cbi %[gpior1], 7\n"          // Clear bit 7 in GPIOR1
-        "rjmp endall\n"
-        "cbi %[gpior2], 0\n"          // Clear bit 0 in GPIOR2
-        "rjmp endall\n"
-        "cbi %[gpior2], 1\n"          // Clear bit 1 in GPIOR2
-        "rjmp endall\n"
-        "cbi %[gpior2], 2\n"          // Clear bit 2 in GPIOR2
-        "rjmp endall\n"
-        "cbi %[gpior2], 3\n"          // Clear bit 3 in GPIOR2
-        "rjmp endall\n"
-        "cbi %[gpior2], 4\n"          // Clear bit 4 in GPIOR2
-        "rjmp endall\n"
-        "cbi %[gpior2], 5\n"          // Clear bit 5 in GPIOR2
-        "rjmp endall\n"
-        "cbi %[gpior2], 6\n"          // Clear bit 6 in GPIOR2
-        "rjmp endall\n"
-        "cbi %[gpior2], 7\n"          // Clear bit 7 in GPIOR2
-        "rjmp endall\n"
-        "cbi %[gpior3], 0\n"          // Clear bit 0 in GPIOR3
-        "rjmp endall\n"
-        "cbi %[gpior3], 1\n"          // Clear bit 1 in GPIOR3
-        "rjmp endall\n"
-        "cbi %[gpior3], 2\n"          // Clear bit 2 in GPIOR3
-        "rjmp endall\n"
-        "cbi %[gpior3], 3\n"          // Clear bit 3 in GPIOR3
-        "rjmp endall\n"
-        "cbi %[gpior3], 4\n"          // Clear bit 4 in GPIOR3
-        "rjmp endall\n"
-        "cbi %[gpior3], 5\n"          // Clear bit 5 in GPIOR3
-        "rjmp endall\n"
-        "cbi %[gpior3], 6\n"          // Clear bit 6 in GPIOR3
-        "rjmp endall\n"
-        "cbi %[gpior3], 7\n"          // Clear bit 7 in GPIOR3
-        "endall:\n"                       // End of the jump sequence
-        :
-        : [handle] "r" (handle), [gpior0] "I" (_SFR_IO_ADDR(GPIOR0)), [gpior1] "I" (_SFR_IO_ADDR(GPIOR1)), [gpior2] "I" (_SFR_IO_ADDR(GPIOR2)), [gpior3] "I" (_SFR_IO_ADDR(GPIOR3))
-        : "r30", "r31"                    // Clobbered registers
-    );
+   _reactor_notifications ^= (1L << handle);
 }
 
-/**
- * Helper which sets a bit of the GPIO register
- */
-static inline void _set_notification_bit( reactor_handle_t handle )
+void reactor_null_notify_from_isr(reactor_handle_t handle)
 {
-   // Inline assembly to handle the notification using SBI and jump table
-   asm volatile (
-        "ldi r30, lo8(pm_table_start)\n"  // Load the low byte of the jump table address into Z
-        "ldi r31, hi8(pm_table_start)\n"  // Load the high byte of the jump table address into Z
-        "lsl %[handle]\n"                 // Multiply handle by 2 (each entry is 2 instructions)
-        "add r30, %[handle]\n"            // Add the handle to calculate the correct offset
-        "adc r31, __zero_reg__\n"         // Handle carry in case of overflow
-        "ijmp\n"                          // Indirect jump based on Z (r30:r31)
-        "pm_table_start:\n"
-        "sbi %[gpior0], 0\n"          // Set bit 0 in GPIOR0
-        "rjmp endallclear\n"
-        "sbi %[gpior0], 1\n"          // Set bit 1 in GPIOR0
-        "rjmp endallclear\n"
-        "sbi %[gpior0], 2\n"          // Set bit 2 in GPIOR0
-        "rjmp endallclear\n"
-        "sbi %[gpior0], 3\n"          // Set bit 3 in GPIOR0
-        "rjmp endallclear\n"
-        "sbi %[gpior0], 4\n"          // Set bit 4 in GPIOR0
-        "rjmp endallclear\n"
-        "sbi %[gpior0], 5\n"          // Set bit 5 in GPIOR0
-        "rjmp endallclear\n"
-        "sbi %[gpior0], 6\n"          // Set bit 6 in GPIOR0
-        "rjmp endallclear\n"
-        "sbi %[gpior0], 7\n"          // Set bit 7 in GPIOR0
-        "rjmp endallclear\n"
-        "sbi %[gpior1], 0\n"          // Set bit 0 in GPIOR1
-        "rjmp endallclear\n"
-        "sbi %[gpior1], 1\n"          // Set bit 1 in GPIOR1
-        "rjmp endallclear\n"
-        "sbi %[gpior1], 2\n"          // Set bit 2 in GPIOR1
-        "rjmp endallclear\n"
-        "sbi %[gpior1], 3\n"          // Set bit 3 in GPIOR1
-        "rjmp endallclear\n"
-        "sbi %[gpior1], 4\n"          // Set bit 4 in GPIOR1
-        "rjmp endallclear\n"
-        "sbi %[gpior1], 5\n"          // Set bit 5 in GPIOR1
-        "rjmp endallclear\n"
-        "sbi %[gpior1], 6\n"          // Set bit 6 in GPIOR1
-        "rjmp endallclear\n"
-        "sbi %[gpior1], 7\n"          // Set bit 7 in GPIOR1
-        "rjmp endallclear\n"
-        "sbi %[gpior2], 0\n"          // Set bit 0 in GPIOR2
-        "rjmp endallclear\n"
-        "sbi %[gpior2], 1\n"          // Set bit 1 in GPIOR2
-        "rjmp endallclear\n"
-        "sbi %[gpior2], 2\n"          // Set bit 2 in GPIOR2
-        "rjmp endallclear\n"
-        "sbi %[gpior2], 3\n"          // Set bit 3 in GPIOR2
-        "rjmp endallclear\n"
-        "sbi %[gpior2], 4\n"          // Set bit 4 in GPIOR2
-        "rjmp endallclear\n"
-        "sbi %[gpior2], 5\n"          // Set bit 5 in GPIOR2
-        "rjmp endallclear\n"
-        "sbi %[gpior2], 6\n"          // Set bit 6 in GPIOR2
-        "rjmp endallclear\n"
-        "sbi %[gpior2], 7\n"          // Set bit 7 in GPIOR2
-        "rjmp endallclear\n"
-        "sbi %[gpior3], 0\n"          // Set bit 0 in GPIOR3
-        "rjmp endallclear\n"
-        "sbi %[gpior3], 1\n"          // Set bit 1 in GPIOR3
-        "rjmp endallclear\n"
-        "sbi %[gpior3], 2\n"          // Set bit 2 in GPIOR3
-        "rjmp endallclear\n"
-        "sbi %[gpior3], 3\n"          // Set bit 3 in GPIOR3
-        "rjmp endallclear\n"
-        "sbi %[gpior3], 4\n"          // Set bit 4 in GPIOR3
-        "rjmp endallclear\n"
-        "sbi %[gpior3], 5\n"          // Set bit 5 in GPIOR3
-        "rjmp endallclear\n"
-        "sbi %[gpior3], 6\n"          // Set bit 6 in GPIOR3
-        "rjmp endallclear\n"
-        "sbi %[gpior3], 7\n"          // Set bit 7 in GPIOR3
-        "endallclear:\n"                       // End of the jump sequence
-        :
-        : [handle] "r" (handle), [gpior0] "I" (_SFR_IO_ADDR(GPIOR0)), [gpior1] "I" (_SFR_IO_ADDR(GPIOR1)), [gpior2] "I" (_SFR_IO_ADDR(GPIOR2)), [gpior3] "I" (_SFR_IO_ADDR(GPIOR3))
-        : "r30", "r31"                    // Clobbered registers
-   );
+   _reactor_notifications |= (1L << handle);
 }
 
 /**
@@ -287,14 +132,9 @@ void reactor_notify( reactor_handle_t handle, void *data )
    irqflags_t flags = cpu_irq_save();
 
    _handlers[handle].arg = data;
-   _set_notification_bit(handle);
+   reactor_null_notify_from_isr(handle);
 
    cpu_irq_restore(flags);
-}
-
-void reactor_null_notify_from_isr( reactor_handle_t handle )
-{
-   _set_notification_bit(handle);
 }
 
 /** Process the reactor loop */
@@ -303,7 +143,7 @@ void reactor_run(void)
    // Set the watchdog which is reset by the reactor
    // If the timer is uses, the watchdog would be refreshed every 1ms, but otherwise, we don't know
    // There is no need for too aggressive timings
-   wdt_enable(WDTO_1S);
+   //wdt_enable(WDTO_1S);
 
    // Atomically read and clear the notification flags allowing more
    //  interrupt from setting the flags which will be processed next time round

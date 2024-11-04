@@ -743,6 +743,8 @@ static inline int_fast8_t ilog2(uint32_t x)
  */
 //! @{
 
+// min/max are defined the std lib
+#ifndef __cplusplus
 /*! \brief Takes the absolute value of \a a.
  *
  * \param a Input value.
@@ -781,7 +783,7 @@ static inline int_fast8_t ilog2(uint32_t x)
 #define max(a, b)           Max(a, b)
 
 //! @}
-
+#endif
 
 /*! \brief Calls the routine at address \a addr.
  *
