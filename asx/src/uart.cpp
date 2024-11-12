@@ -1,3 +1,4 @@
+#include <avr/io.h>
 #include <avr/interrupt.h>
 #include <asx/reactor.hpp>
 
@@ -33,7 +34,9 @@ namespace asx {
 
       ISR(USART1_TXC_vect)
       {
+
          reactor::notify_from_isr(on_usart1_tx_complete);
+         USART1.STATUS |= USART_RXCIE_bm;
       }
 
       ISR(USART0_DRE_vect)

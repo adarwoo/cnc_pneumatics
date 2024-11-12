@@ -36,16 +36,16 @@ FLASH_END := \
 CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p)) -D$(if $(NDEBUG),NDEBUG,DEBUG)=1 -DCRC_AT=$(strip $(FLASH_END))
 
 # Flags for the compilation of C files
-CFLAGS          += -ggdb3 -Wall
+CFLAGS          += -Wall -gdwarf-2
 
 # Flags for the compilation of C++ files
 CXXFLAGS        += $(CFLAGS) -std=c++20 -fno-exceptions -fno-rtti
 
 # Assembler flags
-ASFLAGS         += -Wa,-gdwarf2 -x assembler-with-cpp -Wa,-g
+ASFLAGS         += -Wa,-gdwarf-2 -x assembler-with-cpp -Wa,-g
 
 # Flag for the linker
-LDFLAGS         += -ggdb3
+LDFLAGS         += -gdwarf-2
 
 # Dependencies creation flags
 DEPFLAGS         = -MT $@ -MMD -MP -MF $(BUILD_DIR)/$*.d

@@ -1,29 +1,46 @@
 #pragma once
 
-#include <cstdint>
-#include <type_trait>
-
 #include <avr/io.h>
+
+#include <cstdint>
+#include <chrono>
+#include <tuple>
+
 
 #include "sysclk.h"
 #include "asx/reactor.hpp"
 
-namespace timer
+
+namespace hw_timer
 {
-   extern reactor::handle on_timer_event;
+   extern reactor::handle on_timera_compare0;
+   extern reactor::handle on_timera_compare1;
+   extern reactor::handle on_timera_compare2;
+   extern reactor::handle on_timerb_compare;
+
+   using cpu_tick_t = std::chrono::duration<long long, std::ratio<1, F_CPU>>;
+
+   ///< Convert any duration into CPU ticks
+   constexpr auto to_ticks = [](auto duration) -> cpu_tick_t {
+      return std::chrono::duration_cast<cpu_tick_t>(duration).count();
+   };
 
    enum class mode : uint8_t {
-      period, timeout, input_capture_on_event, input_capture_freq, input_capture_pwm, pwm, single_shot, pwm_8bits };
-
-   // Define a concept that enforces the TimerType must be TCA_t or TCB_t
-   template<typename T>
-   concept IsValidTimerType = std::is_same_v<T, TCB_t> || std::is_same_v<T, TCA_t>;
+      period,
+      timeout,
+      input_capture_on_event,
+      input_capture_freq,
+      input_capture_pwm,
+      pwm,
+      single_shot,
+      pwm_8bits
+   };
 
    template <typename T>
    struct Counting {
       using Type = T;
 
-      static constexpr Value maximum = std::numeric_limits<Type>::max();
+      static constexpr auto maximum = std::numeric_limits<Type>::max();
 
       /** 8 for 8-bit timer, 16 for 16-bit timer */
       static constexpr uint8_t maximumPower2 = sizeof(Type) * 8;
@@ -32,90 +49,111 @@ namespace timer
    using Counting8 = Counting<uint8_t>;
    using Counting16 = Counting<uint16_t>;
 
-   // Concept to check if a type is a specialization of Counting
-   template <typename T>
-   concept CountingType = requires {
-      typename T::Type;
-      { T::maximum } -> std::convertible_to<typename T::Type>;
-   };
-
-   template <CountingType T>
-   class TimerValue {
-   public:
-      using Value = typename T::value;
-
-   private:
-      Value value;
-
-   public:
-      constexpr static TimerValue maximum() { return Counting<Value>::maximum; }
-
-      constexpr TimerValue(): value(0) {}
-      constexpr TimerValue(Value v): value(v) {}
-      constexpr TimerValue(const TimerValue<Prescaled> &v): value(v.value) {}
-      constexpr TimerValue(const volatile TimerValue<Prescaled> &v): value(v.value) {}
-
-      template <uint64_t v>
-      constexpr TimerValue(::Time::Lit::Counts<v> counts): value(counts.getValue()) {}
-
-      void operator= (Value v) volatile { value = v; }
-      void operator= (const TimerValue &v) volatile { value = v.value; }
-      void operator= (const volatile TimerValue &v) volatile { value = v.value; }
-
-      constexpr bool operator> (const TimerValue &that) const volatile { return value > that.value; }
-      constexpr bool operator> (const volatile TimerValue &that) const volatile { return value > that.value; }
-      template <uint64_t v> constexpr TimerValue operator- (Lit::Counts<v>) const volatile { return value - v; }
-      constexpr TimerValue operator- (const TimerValue &that) const volatile { return value - that.value; }
-      constexpr TimerValue operator- (const volatile TimerValue &that) const volatile { return value - that.value; }
-
-      constexpr Value getValue() const volatile { return value; }
-      constexpr operator Value() const volatile { return value; }
-   };
-
-
-   // You must define a PrescalerMeta for your prescaler_t / prescaler combination,
-   // with field "constexpr static uint8_t power2 = XXX", where XXX is the power of 2
-   // by which the CPU clock is divided, e.g. 8 for a prescaler of 256.
-   template<typename T, T V>
-   struct PrescalerMeta {
-      constexpr static uint8_t power2 = V;
-   };
-
-   template <typename T, typename P, P V>
-   class Prescaled: public Counting<V> {
-      using Meta = PrescalerMeta<P, V>;
-   public:
-      using Counting<T>::maximum;
-      using Counting<T>::maximumPower2;
-
-      using prescaler = P;
-
-      static constexpr P prescaler = V;
-      static constexpr uint8_t prescalerPower2 = Meta::power2;
-   };
-
-   /**
-    * CRTP base for specialized timers in the system
-    */
-   template<typename IMPL>
-   requires IsValidTimerType<typename IMPL::TimerType>
-   struct ITimer
-   {
-      using type = typename IMPL::type;  // Access the timer type from the derived class
-
-      constexpr void init() { static_cast<IMPL*>(this)->init(); }
-      }
-   };
-
    /**
     * Specialized instance of the timer A
     */
-   class TimerA : public ITimer<TimerA>
+   template <long long COUNT, typename Duration =  std::chrono::milliseconds>
+   struct TimerA
    {
-      using type = TCA_t;  // Specify the timer type as TCB_t
+      using type_t = TCA_t;  // Specify the timer type as TCA_t
+      using value_t = Counting16;
+      using self = TimerA;
 
-      static constexpr TCA_t * const get_timer() {
-         return &TCA0;
+      ///< Fixed period duration of this timer in CPU ticks
+      static constexpr auto duration = cpu_tick_t{Duration{COUNT}};
+
+      ///< @brief Possible prescaling values
+      static constexpr TCA_SINGLE_CLKSEL_t clksel[] = {
+         TCA_SINGLE_CLKSEL_DIV1_gc,
+         TCA_SINGLE_CLKSEL_DIV2_gc,
+         TCA_SINGLE_CLKSEL_DIV4_gc,
+         TCA_SINGLE_CLKSEL_DIV8_gc,
+         TCA_SINGLE_CLKSEL_DIV16_gc,
+         TCA_SINGLE_CLKSEL_DIV64_gc,
+         TCA_SINGLE_CLKSEL_DIV256_gc,
+         TCA_SINGLE_CLKSEL_DIV1024_gc
+      };
+
+      ///< Actualling prescaling count - mapping clksel
+      static constexpr long prescalers[] = {1, 2, 4, 8, 16, 64, 256, 1024};
+
+      // Use statically only (there is only 1 timerA)
+      TimerA() = delete;
+
+      static constexpr TCA_SINGLE_t &TCA() {
+         return *&(TCA0.SINGLE);
+      }
+
+      // Replace the lambda function with this constexpr function
+      static constexpr auto set_prescaler_for_maximum_ticks() {
+         return (
+               duration.count() <= prescalers[0] * value_t::maximum) ? std::make_tuple(prescalers[0], clksel[0])
+            : (duration.count() <= prescalers[1] * value_t::maximum) ? std::make_tuple(prescalers[1], clksel[1])
+            : (duration.count() <= prescalers[2] * value_t::maximum) ? std::make_tuple(prescalers[2], clksel[2])
+            : (duration.count() <= prescalers[3] * value_t::maximum) ? std::make_tuple(prescalers[3], clksel[3])
+            : (duration.count() <= prescalers[4] * value_t::maximum) ? std::make_tuple(prescalers[4], clksel[4])
+            : (duration.count() <= prescalers[5] * value_t::maximum) ? std::make_tuple(prescalers[5], clksel[5])
+            : (duration.count() <= prescalers[6] * value_t::maximum) ? std::make_tuple(prescalers[6], clksel[6])
+            : (duration.count() <= prescalers[7] * value_t::maximum) ? std::make_tuple(prescalers[7], clksel[7])
+            : std::make_tuple(prescalers[0], clksel[0]); // Fallback (shouldn't happen with valid MaxTicks)
+      }
+
+      // Update the way you access prescaler and clk_setting
+      static constexpr auto prescaler = std::get<0>(set_prescaler_for_maximum_ticks());
+      static constexpr auto clk_setting = std::get<1>(set_prescaler_for_maximum_ticks());
+
+      // Hold the 3 possible compare reactor handle
+      template <typename... H>
+      static constexpr void react_on_cmp(H... reactor_handles) {
+         static_assert(sizeof...(H) <= 3, "Error: Too many handles, maximum is 3.");
+
+         // Helper lambda to set each compare value (CMP0, CMP1, CMP2)
+         auto set_rh = [](const int cmp_index, reactor::handle h) {
+            if (cmp_index==0) {
+               on_timera_compare0 = h;
+               TCA().INTCTRL |= TCA_SINGLE_CMP0_bm;
+               TCA().CTRLB |= TCA_SINGLE_CMP0EN_bm;
+            } else if (cmp_index==1) {
+               on_timera_compare1 = h;
+               TCA().INTCTRL |= TCA_SINGLE_CMP1_bm;
+               TCA().CTRLB |= TCA_SINGLE_CMP1EN_bm;
+            } else {
+               on_timera_compare2 = h;
+               TCA().INTCTRL |= TCA_SINGLE_CMP2_bm;
+               TCA().CTRLB |= TCA_SINGLE_CMP2EN_bm;
+            }
+         };
+
+         auto indices = 0;
+         (set_rh(indices++, reactor_handles), ...);
+      }
+
+      // Variadic template function to set multiple compare registers
+      template <typename... Durations>
+      static constexpr void set_compare(Durations... compare_values) {
+         static_assert(sizeof...(compare_values) <= 3, "Error: Too many compare values, maximum is 3.");
+
+         // Ensure each duration is less than or equal to MaxDuration
+         //(static_assert(compare_values <= max_duration, "Error: Compare value exceeds max timer duration"), ...);
+
+         // Helper lambda to set each compare value (CMP0, CMP1, CMP2)
+         auto set_cmp = [&](int cmp_index, cpu_tick_t cmp_value) {
+            (&(TCA().CMP0))[cmp_index] = cmp_value.count() / prescaler;
+         };
+
+         auto indices = 0;
+         (set_cmp(indices++, compare_values), ...);
+      }
+
+      static void start() {
+         TCA().CTRLA |= TCA_SINGLE_ENABLE_bm;
+      }
+
+      static void init() {
+         TCA().CNT = 0;
+         TCA().PER = duration.count() / prescaler;
+         TCA().CTRLA = clk_setting;
+         TCA().CTRLB = 0; // Normal mode
       }
    };
 
@@ -123,13 +161,14 @@ namespace timer
     * Specialized instance of the timer B
     */
    template<int N>
-   class TimerB : public ITimer<TimerB<N>>
+   class TimerB
    {
       using type = TCB_t;  // Specify the timer type as TCB_t
+      using value_t = Counting16;
 
       static_assert(N < 2, "Invalid timer number");
 
-      static constexpr TCB_t * const get_timer() {
+      static TCB_t * const get_timer() {
          if constexpr (N == 0) {
             return &TCB0;
          }
@@ -137,29 +176,34 @@ namespace timer
          return &TCB1;
       }
 
-      init() {
-         get_timer->CTRLA = 0;
+      static void react_on_cmp( reactor::handle reactor ) {
+         on_timerb_compare = reactor;
+         // Enable the interrupt
+         get_timer()->CTRLA |= TCB_ENABLE_bm;
       }
 
-      void set_compare_value(uint16_t value) {
-         get_timer->
+      // Variadic template function to set multiple compare registers
+      template <typename Duration>
+      constexpr void set_compare(const Duration& duration) {
+         // Convert the given duration to cpu_tick_t based on F_CPU
+         constexpr cpu_tick_t compare_value = std::chrono::duration_cast<cpu_tick_t>(duration);
+
+         static_assert( compare_value.count() < (value_t::maximum * 2), "Number of ticks is too big" );
+
+         // Set the timer prescaler
+         auto* timer = get_timer();
+         timer->CNT = 0;  // Reset the counter
+
+         if (compare_value.count() < value_t::maximum) {
+            timer->CTRLA = TCB_CLKSEL_DIV1_gc;
+            timer->CCMP = compare_value.count();
+         } else {
+            timer->CTRLA = TCB_CLKSEL_DIV2_gc;
+            timer->CCMP = compare_value.count() >> 1;
+         }
       }
+
+      // Use statically only (there is only 1 timerA)
+      TimerB() = delete;
    };
 }
-
-
-// Idea
-
-// Create a class for functions
-
-template<int CMP>
-struct CompareTimer
-{
-   constexpr CompareTimer(
-      TimerA &timer,
-      const std::chrono::duration &duration
-   ) {
-      if constexpr (CMP === 0) {
-         timer.get_timer()->CMP0 =
-   }
-};

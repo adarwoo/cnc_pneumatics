@@ -50,7 +50,7 @@ namespace asx {
 
          static constexpr uint16_t get_baud() {
             // Compute on full precision
-            unsigned long baud = (64UL * F_CPU) / (BAUD / 16);
+            unsigned long baud = ((64UL * F_CPU) / ((unsigned long)BAUD)) / 16UL;
             return static_cast<uint16_t>(baud);
          }
 
@@ -124,6 +124,7 @@ namespace asx {
 
                   if (OPTIONS & onewire) {
                      PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
+                     VPORTA_DIR |= _BV(4);
                   } else {
                      VPORTA_DIR |= _BV(1);
                   }
@@ -132,6 +133,7 @@ namespace asx {
 
                   if (OPTIONS & onewire) {
                      PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
+                     VPORTC_DIR |= _BV(3);
                   } else {
                      VPORTC_DIR |= _BV(2);
                   }
@@ -140,6 +142,7 @@ namespace asx {
                if (N == 0) {
                   if (OPTIONS & onewire) {
                      PORTB.PIN2CTRL |= PORT_PULLUPEN_bm;
+                     VPORTB_DIR |= _BV(0);
                   } else {
                      VPORTB_DIR |= _BV(2);
                   }
@@ -147,9 +150,10 @@ namespace asx {
                } else {
                   if (OPTIONS & onewire) {
                      PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
+                     VPORTA_DIR |= _BV(4);
                   } else {
                      VPORTA_DIR |= _BV(1);
-                  }
+                  }  
                }
             }
 
@@ -171,10 +175,7 @@ namespace asx {
             to_send = view_to_send;
 
             // Enable the DRE and TXCIE interrupts
-            get().CTRLA |= USART_DREIE_bm | USART_TXCIE_bm;;
-
-            // Need to kick-start the process
-            on_dre();
+            get().CTRLA |= USART_DREIE_bm | USART_TXCIE_bm;
          }
 
          // Called from the DRE interrupt to indicate there is space in the Tx buffer

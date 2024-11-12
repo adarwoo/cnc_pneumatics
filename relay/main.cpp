@@ -59,7 +59,7 @@ using Rs485 = Uart<1, 9600, width::_8, parity::none, stop::_1, rs485 | onewire>;
 
 void on_send_more() {
    static bool open = false;
-   std::string_view data_to_send = "Hello, world!";
+   std::string_view data_to_send = "0123456789\n\r";
 
    Rs485::write(data_to_send);
    relays[2].set(open);
@@ -71,7 +71,7 @@ int main()
    // Configure the clock
    sysclk_init();
    reactor_init();
-
+#if 0
    timer::init();
 
    timer::set_compare(
@@ -85,10 +85,10 @@ int main()
    );
 
    timer::start();
-
-   //Rs485::init();
-   //Rs485::react_on_send_complete( reactor::bind(on_send_more) );
-   //on_send_more(nullptr);
+#endif
+   Rs485::init();
+   Rs485::react_on_send_complete( reactor::bind(on_send_more) );
+   on_send_more();
 
    reactor::run();
 }

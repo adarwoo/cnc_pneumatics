@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7E2BE5AE-FEA
 		asx\src\ccp.c = asx\src\ccp.c
 		asx\src\digital_input.c = asx\src\digital_input.c
 		asx\src\digital_output.c = asx\src\digital_output.c
+		asx\src\hw_timer.cpp = asx\src\hw_timer.cpp
 		asx\src\mem.c = asx\src\mem.c
 		asx\src\pca9555.cpp = asx\src\pca9555.cpp
 		asx\src\piezzo.c = asx\src\piezzo.c
@@ -41,6 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{2B38
 		asx\include\asx\deferred.hpp = asx\include\asx\deferred.hpp
 		asx\include\digital_input.h = asx\include\digital_input.h
 		asx\include\digital_output.h = asx\include\digital_output.h
+		asx\include\asx\hw_timer.hpp = asx\include\asx\hw_timer.hpp
 		asx\include\ioport.h = asx\include\ioport.h
 		asx\include\mem.h = asx\include\mem.h
 		asx\include\osc.h = asx\include\osc.h
@@ -57,6 +59,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{2B38
 		asx\include\twim.h = asx\include\twim.h
 		asx\include\twis.h = asx\include\twis.h
 		asx\include\typestring.hpp = asx\include\typestring.hpp
+		asx\include\asx\uart.hpp = asx\include\asx\uart.hpp
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{DF6E1EA5-BDA6-4CE6-BB93-9164EC48B8ED}"

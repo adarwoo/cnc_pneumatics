@@ -60,9 +60,10 @@ SRCS = \
    $(ASX_DIR)/src/alert.c \
    $(ASX_DIR)/src/queue.c 	\
    $(ASX_DIR)/src/reactor.c \
+   $(ASX_DIR)/src/hw_timer.cpp \
    $(ASX_DIR)/src/uart.cpp \
-	$(ASX_DIR)/src/modbus_rtu_slave.cpp \
    main.cpp \
+
 
 # Inlude the actual build rules
 include $(TOP)/make/rules.mak
