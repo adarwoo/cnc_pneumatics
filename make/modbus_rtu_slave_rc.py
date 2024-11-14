@@ -48,160 +48,47 @@ TEMPLATE_CODE="""/**
 #include <stdint.h>
 
 namespace modbus {
-    namespace slave {
-        enum class process_outcome_t : uint8_t {
-            ignore,             // Wait for the stream to stop (3.5T) as it is not for us
-            illegal_function_code = 0x01, // Nodbus standard for illegal function code
-            illegal_data_address = 0x02,
-            illegal_data_value = 0x03,
-            expecting_more,     // Char was processed, another is expected
-            expecting_no_more,  // No more expected
-            invalid_value,      // Value is out-of-range or not valid
-            unsupported_operation
-        };
+    // All callbacks registered
+    @PROTOTYPES@
 
-        enum class callback_outcome_t : uint8_t {
-            reply_ready,            // A reply is ready to send
-            unsupported_operation,  // Operation is not supported
-            invalid_value,          // Value is out-of-range or not valid
-        };
+    // All states to consider
+    enum class dg_state_t : uint8_t {
+        @ENUMS@
+    };
 
-        namespace event {
-            struct char_received;
-            struct timeout_t15;
-            struct timeout_t35;
-            struct error_detected;
+    class Processor {
+        ///< Adjusted buffer to only receive the largest amount of data
+        uint8_t buffer[@BUFSIZE@];
+        ///< Number of characters in the buffer
+        uint8_t cnt;
+        ///< Error code
+        error_t error;
+
+    public:
+        auto process_char(const uint8_t c) -> process_outcome_t {
+            buffer[cnt++] = c; // Store the data
+
+            switch(dg_state) {
+            @CASES@
+            default:
+                break;
+            }
+
+            return process_outcome_t::invalid_value;
         }
 
-        // All callbacks registered
-        @PROTOTYPES@
-
-        // All states to consider
-        enum class dg_state_t : uint8_t {
-            @ENUMS@
-        };
-
-        enum class slave_state_t : uint8_t {
-            idle,
-            in_frame,
-            ignore_frame,
-            bad_frame,
-        };
-
-        template <class UART, class TIMER>
-        class Processor {
-            ///< State of datagram processing
-            inline static state_t dg_state;
-            ///< Outer state for the slave
-            inline static slave_state_t slave_state;
-            ///< Number of characters in the buffer
-            inline static uint8_t cnt;
-            ///< The CRC for the currently received frame
-            inline static uint16_t crc;
-            ///< The CRC 1 char ago. Temporary storage
-            inline static uint16_t n_minus_1_crc;
-            ///< The CRC 2 characters ago. That's the one to use when the end of frame is detected
-            inline static uint16_t n_minus_2_crc; // Copy of the CRC at n-2
-            ///< The receiving buffer which holds the maximum possible number of characters + 2 for the CRC
-            inline static uint8_t buffer[@BUFSIZE@ + 2];
-            ///< Timer counter for race detection
-            uint8_t timer_counter;
-
-            /**
-             * Constructor
-             *
-            Processor() :
-                slave_state{slave_state_t::ignore_frame},
-                timer_counter{0} {
-                clock::perclk_duration d = 1_s / UART.get_baud();
-                TIMER.set_prescaler(d);
-                reset();
-
-                // Install the reactor handler
-                UART.react_on_data_ready
+        /** Called when a T3.5 has been detected, in a good sequence */
+        auto process_end_of_frame() -> callback_outcome_t {
+            switch(dg_state) {
+            @CALLBACKS@
+            default:
+                break;
             }
 
-            static void rearm_t35() {
-                clock::perclk_duration d = 1_s / UART.get_baud();
-                TIMER::count_t
-
-                TIMER.start();
-            }
-
-            // Calculate tick count for UART byte duration at a given baud rate
-            static constexpr cpu_tick calculate_uart_duration(int baud_rate, double bit_multiplier) {
-                using namespace std::chrono;
-                auto byte_duration = duration_cast<cpu_tick>(duration<double>(bit_multiplier / baud_rate));
-                return byte_duration;
-            }
-
-
-            static void on_rx_char() {
-
-            }
-
-            static void on_timeout_t15() {
-
-            }
-
-            static void on_timeout_t35() {
-
-            }
-
-
-            void reset() {
-                dg_state = state_t::DEVICE_ADDRESS;
-                cnt = 0;
-                crc = 0xffff;
-                bad_crc = false;
-                timer_counter = 0;
-            }
-
-            inline void update_crc(uint8_t byte) {
-                n_minus_2_crc = n_minus_1_crc;
-                n_minus_1_crc = crc;
-                crc = crc ^ byte;
-
-                for (unsigned char j = 1; j <= 8; ++j)
-                {
-                    bool flag = crc & 0x0001;
-
-                    crc >>=1;
-
-                    if (flag)
-                    {
-                        crc ^= 0xa001;
-                    }
-                }
-            }
-
-            auto process_char(const uint8_t c) -> process_outcome_t {
-                buffer[cnt++] = c; // Store the data
-                update_crc(c);
-
-                switch(dg_state) {
-                @CASES@
-                default:
-                    break;
-                }
-
-                return process_outcome_t::invalid_value;
-            }
-
-            /** Called when a T3.5 has been detected, in a good sequence */
-            auto process_end_of_frame() -> callback_outcome_t {
-                switch(dg_state) {
-                @CALLBACKS@
-                default:
-                    break;
-                }
-
-                // This is un-reachable!
-                return callback_outcome_t::unsupported_operation;
-            }
-        }; // struct Processor
-
-    } // namespace slave
+            // This is un-reachable!
+            return callback_outcome_t::unsupported_operation;
+        }
+    }; // struct Processor
 } // namespace modbus"""
 
 # Regex to check the device address (and extract it)

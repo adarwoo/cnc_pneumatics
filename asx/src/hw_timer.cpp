@@ -4,10 +4,11 @@
 
 namespace hw_timer {
 
-   reactor::handle on_timera_compare0 = reactor::null;;
-   reactor::handle on_timera_compare1 = reactor::null;;
-   reactor::handle on_timera_compare2 = reactor::null;;
-   reactor::handle on_timerb_compare = reactor::null;;
+   reactor::handle on_timera_compare0 = reactor::null;
+   reactor::handle on_timera_compare1 = reactor::null;
+   reactor::handle on_timera_compare2 = reactor::null;
+   reactor::handle on_timera_ovf = reactor::null;
+   reactor::handle on_timerb_compare = reactor::null;
 
    ISR(TCA0_CMP0_vect)
    {
@@ -25,6 +26,12 @@ namespace hw_timer {
    {
       reactor::notify_from_isr(on_timera_compare2);
       TCA0.SINGLE.INTFLAGS |= TCA_SINGLE_CMP2_bm;
+   }
+   
+   ISR(TCA0_OVF_vect)
+   {
+      reactor::notify_from_isr(on_timera_ovf);
+      TCA0.SINGLE.INTFLAGS |= TCA_SINGLE_OVF_bm;
    }
 
    ISR(TCB0_INT_vect)

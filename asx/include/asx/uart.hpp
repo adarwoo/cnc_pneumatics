@@ -153,7 +153,7 @@ namespace asx {
                      VPORTA_DIR |= _BV(4);
                   } else {
                      VPORTA_DIR |= _BV(1);
-                  }  
+                  }
                }
             }
 
@@ -198,6 +198,20 @@ namespace asx {
                on_usart1_tx_complete = reactor;
             }
 		   }
+
+		   static void react_on_character_received( reactor_handle_t reactor ) {
+            // Register a reactor for filling the buffer
+            if ( N == 0 ) {
+               on_usart0_rx_complete = reactor;
+            } else {
+               on_usart1_rx_complete = reactor;
+            }
+		   }
+
+         static constexpr asx::cpu_tick_t get_byte_duration(float length_multipler=1.0) {
+            unsigned long width = W + S + P + 1;
+            return asx::cpu_tick_t((width * F_CPU * length_multipler) / (unsigned long)BAUD)));
+         }
       };
    } // end of namespace uart
 } // end of namespace asx

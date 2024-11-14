@@ -3,13 +3,10 @@
 #include <avr/io.h>
 
 #include <cstdint>
-#include <chrono>
 #include <tuple>
 
-
-#include "sysclk.h"
 #include "asx/reactor.hpp"
-
+#include "asx/chrono.hpp"
 
 namespace hw_timer
 {
@@ -17,13 +14,7 @@ namespace hw_timer
    extern reactor::handle on_timera_compare1;
    extern reactor::handle on_timera_compare2;
    extern reactor::handle on_timerb_compare;
-
-   using cpu_tick_t = std::chrono::duration<long long, std::ratio<1, F_CPU>>;
-
-   ///< Convert any duration into CPU ticks
-   constexpr auto to_ticks = [](auto duration) -> cpu_tick_t {
-      return std::chrono::duration_cast<cpu_tick_t>(duration).count();
-   };
+   extern reactor::handle on_timera_ovf;
 
    enum class mode : uint8_t {
       period,
@@ -52,15 +43,15 @@ namespace hw_timer
    /**
     * Specialized instance of the timer A
     */
-   template <long long COUNT, typename Duration =  std::chrono::milliseconds>
+   template<asx::cpu_tick_t::rep N>
    struct TimerA
    {
       using type_t = TCA_t;  // Specify the timer type as TCA_t
       using value_t = Counting16;
       using self = TimerA;
 
-      ///< Fixed period duration of this timer in CPU ticks
-      static constexpr auto duration = cpu_tick_t{Duration{COUNT}};
+      // Recover cpu_tick_t from the raw tick count N
+      static constexpr asx::cpu_tick_t duration = asx::cpu_tick_t(N);
 
       ///< @brief Possible prescaling values
       static constexpr TCA_SINGLE_CLKSEL_t clksel[] = {
@@ -98,13 +89,9 @@ namespace hw_timer
             : std::make_tuple(prescalers[0], clksel[0]); // Fallback (shouldn't happen with valid MaxTicks)
       }
 
-      // Update the way you access prescaler and clk_setting
-      static constexpr auto prescaler = std::get<0>(set_prescaler_for_maximum_ticks());
-      static constexpr auto clk_setting = std::get<1>(set_prescaler_for_maximum_ticks());
-
       // Hold the 3 possible compare reactor handle
       template <typename... H>
-      static constexpr void react_on_cmp(H... reactor_handles) {
+      static constexpr void react_on_compare(H... reactor_handles) {
          static_assert(sizeof...(H) <= 3, "Error: Too many handles, maximum is 3.");
 
          // Helper lambda to set each compare value (CMP0, CMP1, CMP2)
@@ -128,6 +115,17 @@ namespace hw_timer
          (set_rh(indices++, reactor_handles), ...);
       }
 
+      static constexpr void react_on_overflow(reactor::handle h) {
+         on_timera_ovf = h;
+         TCA().INTCTRL |= TCA_SINGLE_OVF_bm;
+         TCA().CTRLB |= TCA_SINGLE_OVF_bm;
+      }
+
+      // Overload for accessor
+      static constexpr auto react_on_overflow() -> reactor::handle {
+         return on_timera_ovf;
+      }
+
       // Variadic template function to set multiple compare registers
       template <typename... Durations>
       static constexpr void set_compare(Durations... compare_values) {
@@ -137,8 +135,8 @@ namespace hw_timer
          //(static_assert(compare_values <= max_duration, "Error: Compare value exceeds max timer duration"), ...);
 
          // Helper lambda to set each compare value (CMP0, CMP1, CMP2)
-         auto set_cmp = [&](int cmp_index, cpu_tick_t cmp_value) {
-            (&(TCA().CMP0))[cmp_index] = cmp_value.count() / prescaler;
+         auto set_cmp = [&](int cmp_index, asx::cpu_tick_t cmp_value) {
+            (&(TCA().CMP0))[cmp_index] = cmp_value.count() / std::get<0>(set_prescaler_for_maximum_ticks());
          };
 
          auto indices = 0;
@@ -146,13 +144,27 @@ namespace hw_timer
       }
 
       static void start() {
+         cli(); // Prevent race -> The interrupt may have just ticked!
+
+         // Clear the reactor flags - so no callback pass this point
+         reactor::clear( react_on_overflow() | react_on_compare() );
+
          TCA().CTRLA |= TCA_SINGLE_ENABLE_bm;
+
+         sei();
+      }
+
+      static void stop() {
+         TCA().CTRLA &= ~TCA_SINGLE_ENABLE_bm;
       }
 
       static void init() {
+         // Update the way you access prescaler and clk_setting
+         auto prescaler = set_prescaler_for_maximum_ticks();
+
          TCA().CNT = 0;
-         TCA().PER = duration.count() / prescaler;
-         TCA().CTRLA = clk_setting;
+         TCA().PER = duration.count() / std::get<0>(prescaler);
+         TCA().CTRLA = std::get<1>(prescaler);
          TCA().CTRLB = 0; // Normal mode
       }
    };
@@ -186,7 +198,7 @@ namespace hw_timer
       template <typename Duration>
       constexpr void set_compare(const Duration& duration) {
          // Convert the given duration to cpu_tick_t based on F_CPU
-         constexpr cpu_tick_t compare_value = std::chrono::duration_cast<cpu_tick_t>(duration);
+         constexpr asx::cpu_tick_t compare_value = std::chrono::duration_cast<asx::cpu_tick_t>(duration);
 
          static_assert( compare_value.count() < (value_t::maximum * 2), "Number of ticks is too big" );
 
