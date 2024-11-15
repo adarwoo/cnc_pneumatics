@@ -121,11 +121,6 @@ namespace hw_timer
          TCA().CTRLB |= TCA_SINGLE_OVF_bm;
       }
 
-      // Overload for accessor
-      static constexpr auto react_on_overflow() -> reactor::handle {
-         return on_timera_ovf;
-      }
-
       // Variadic template function to set multiple compare registers
       template <typename... Durations>
       static constexpr void set_compare(Durations... compare_values) {
@@ -143,14 +138,31 @@ namespace hw_timer
          (set_cmp(indices++, compare_values), ...);
       }
 
+      /**
+       * Start the timer
+       * Any pending reactor actions are cleared
+       */
       static void start() {
          cli(); // Prevent race -> The interrupt may have just ticked!
+         // START of critical section
+
+         // Stop the timer so we don't try to aim at a moving target
+         TCA().CTRLA &= ~TCA_SINGLE_ENABLE_bm;
+         TCA().CNT = 0;        // Reset counter
+         TCA().INTFLAGS = 255; // Clear all pending interrupts
 
          // Clear the reactor flags - so no callback pass this point
-         reactor::clear( react_on_overflow() | react_on_compare() );
+         reactor::clear(
+            on_timera_compare0,
+            on_timera_compare1,
+            on_timera_compare2,
+            on_timera_ovf
+         );
 
+         // Restart the timer
          TCA().CTRLA |= TCA_SINGLE_ENABLE_bm;
 
+         // END of critical section
          sei();
       }
 
