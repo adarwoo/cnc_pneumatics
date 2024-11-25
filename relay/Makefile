@@ -1,7 +1,7 @@
 TOP=..
 
 # Select the architecture
-ARCH=attiny3224
+ARCH=attiny824
 
 # Name of the binary to produce
 BIN := relay
@@ -45,7 +45,7 @@ SRCS := \
    $(ASX_DIR)/src/timer.c \
    $(ASX_DIR)/src/twis.c \
    $(ASX_DIR)/src/digital_input.c \
-
+# $(ASX_DIR)/src/asx.cpp \
 
 # Generate the modbus_rtu code
 #$(ASX_DIR)/src/modbus_rtu_slave.cpp : conf/modbus_rtu_slave.hpp
@@ -60,11 +60,22 @@ SRCS = \
    $(ASX_DIR)/src/alert.c \
    $(ASX_DIR)/src/queue.c 	\
    $(ASX_DIR)/src/reactor.c \
-   $(ASX_DIR)/src/hw_timer.cpp \
    $(ASX_DIR)/src/uart.cpp \
-   $(ASX_DIR)/src/modbus_rtu.cpp \
+	$(ASX_DIR)/src/modbus_rtu_slave.cpp \
    main.cpp \
 
+ifdef SIM
+SRCS = \
+   $(ASX_DIR)/src/timer.c \
+   $(ASX_DIR)/src/alert.c \
+   $(ASX_DIR)/src/queue.c 	\
+   $(ASX_DIR)/src/reactor.c \
+   $(ASX_DIR)/src/uart.cpp \
+	$(ASX_DIR)/src/modbus_rtu.cpp \
+   $(ASX_DIR)/src/hw_timer.cpp \
+   ../sim/sim.cpp \
+   main.cpp 
+endif
 
 # Inlude the actual build rules
 include $(TOP)/make/rules.mak

@@ -22,7 +22,7 @@ namespace asx
       }
 
       char value[N];
-      constexpr etl::string_view view() const { return { value, N - 1 }; }
+      constexpr std::string_view view() const { return { value, N - 1 }; }
    };
 
 }

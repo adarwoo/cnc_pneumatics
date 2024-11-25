@@ -174,7 +174,6 @@ namespace asx {
 
       static inline void notify_from_isr(Handle on_xx) { reactor_null_notify_from_isr(on_xx); }
       static inline void init() {
-         sysclk_init();
          reactor_init();
          timer_init();
       }

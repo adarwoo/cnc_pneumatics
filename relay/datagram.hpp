@@ -8,7 +8,7 @@
 
 namespace relay {
     // All callbacks registered
-    void on_get_single(uint8_t relay_index);
+    void on_get_status(uint8_t relay_index, uint8_t operation);
     void on_set_single(uint8_t relay_index, uint8_t operation);
     void on_write_all(uint8_t operation);
     void on_read_version();
@@ -20,8 +20,9 @@ namespace relay {
         DEVICE_ADDRESS,
         DEVICE_44,
         DEVICE_44_READ_COILS,
-        DEVICE_44_READ_COILS__ON_GET_SINGLE__CRC,
-        RDY_TO_CALL__ON_GET_SINGLE,
+        DEVICE_44_READ_COILS_address,
+        DEVICE_44_READ_COILS_address__ON_GET_STATUS__CRC,
+        RDY_TO_CALL__ON_GET_STATUS,
         DEVICE_44_WRITE_SINGLE_COIL,
         DEVICE_44_WRITE_SINGLE_COIL_ID,
         DEVICE_44_WRITE_SINGLE_COIL_ID__ON_SET_SINGLE__CRC,
@@ -53,7 +54,6 @@ namespace relay {
 
     public:
         static void reset() {
-            strcpy((char *)buffer, "Hello World! Said the old man");
             cnt=0;
             crc.reset();
             error = error_t::ok;
@@ -62,7 +62,7 @@ namespace relay {
 
         static bool can_reply() {
             return state != state_t::IGNORE and crc.check();
-        }
+        }        
 
         static void process_char(const uint8_t c) {
             if (state == state_t::IGNORE) {
@@ -101,20 +101,25 @@ namespace relay {
                 break;
             case state_t::DEVICE_44_READ_COILS:
                 if ( cnt == 4 ) {
+                    state = state_t::DEVICE_44_READ_COILS_address;;
+                }
+                break;
+            case state_t::DEVICE_44_READ_COILS_address:
+                if ( cnt == 6 ) {
                     uint8_t *data = &buffer[cnt-2];
                     uint16_t c = (data[0] << 8) | data[1];
 
-                    if ( c < 3 ) {
-                        state = state_t::DEVICE_44_READ_COILS__ON_GET_SINGLE__CRC;
+                    if ( c == 1 ) {
+                        state = state_t::DEVICE_44_READ_COILS_address__ON_GET_STATUS__CRC;
                     } else {
                         error = error_t::illegal_data_value;
                         state = state_t::ERROR;
                     };
                 }
                 break;
-            case state_t::DEVICE_44_READ_COILS__ON_GET_SINGLE__CRC:
-                if ( cnt == 6 ) {
-                    state = state_t::RDY_TO_CALL__ON_GET_SINGLE;
+            case state_t::DEVICE_44_READ_COILS_address__ON_GET_STATUS__CRC:
+                if ( cnt == 8 ) {
+                    state = state_t::RDY_TO_CALL__ON_GET_STATUS;
                 }
                 break;
             case state_t::DEVICE_44_WRITE_SINGLE_COIL:
@@ -186,7 +191,7 @@ namespace relay {
                     state = state_t::RDY_TO_CALL__ON_READ_VERSION;
                 }
                 break;
-            case state_t::RDY_TO_CALL__ON_GET_SINGLE:
+            case state_t::RDY_TO_CALL__ON_GET_STATUS:
             case state_t::RDY_TO_CALL__ON_SET_SINGLE:
             case state_t::RDY_TO_CALL__ON_WRITE_ALL:
             case state_t::RDY_TO_CALL__ON_READ_VERSION:
@@ -228,7 +233,8 @@ namespace relay {
             case state_t::DEVICE_ADDRESS:
             case state_t::DEVICE_44:
             case state_t::DEVICE_44_READ_COILS:
-            case state_t::DEVICE_44_READ_COILS__ON_GET_SINGLE__CRC:
+            case state_t::DEVICE_44_READ_COILS_address:
+            case state_t::DEVICE_44_READ_COILS_address__ON_GET_STATUS__CRC:
             case state_t::DEVICE_44_WRITE_SINGLE_COIL:
             case state_t::DEVICE_44_WRITE_SINGLE_COIL_ID:
             case state_t::DEVICE_44_WRITE_SINGLE_COIL_ID__ON_SET_SINGLE__CRC:
@@ -241,8 +247,8 @@ namespace relay {
                 buffer[cnt++] |= 0x80; // Mark the error
                 buffer[cnt++] = (uint8_t)error; // Add the error code
                 break;
-            case state_t::RDY_TO_CALL__ON_GET_SINGLE:
-                on_get_single(uint8_t{buffer[3]});
+            case state_t::RDY_TO_CALL__ON_GET_STATUS:
+                on_get_status(uint8_t{buffer[3]}, uint8_t{buffer[5]});
                 break;
             case state_t::RDY_TO_CALL__ON_SET_SINGLE:
                 on_set_single(uint8_t{buffer[3]}, uint8_t{buffer[5]});
@@ -263,15 +269,15 @@ namespace relay {
             } else {
                 // Add the CRC
                 crc.reset();
-                auto _crc = crc.update(etl::string_view{(char *)buffer, cnt});
+                auto _crc = crc.update(std::string_view{(char *)buffer, cnt});
                 buffer[cnt++] = _crc & 0xff;
                 buffer[cnt++] = _crc >> 8;
             }
         }
 
-        static etl::string_view get_buffer() {
+        static std::string_view get_buffer() {
             // Return the buffer ready to send
-            return etl::string_view{(char *)buffer, cnt};
+            return std::string_view{(char *)buffer, cnt};
         }
     }; // struct Processor
 } // namespace modbus

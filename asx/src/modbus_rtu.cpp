@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "asx/reactor.hpp"
 #include "asx/modbus_rtu.hpp"
 
@@ -18,38 +19,39 @@ namespace asx {
        * Call @check when done.
        */
       void Crc::operator()(uint8_t byte) {
-         n_minus_2 = n_minus_1;
-         n_minus_1 = byte;
-
-         if ( count > 2 ) {
+         if ( count >= 2 ) {
             update(n_minus_2);
-         }
-         else {
+         } else {
             ++count;
          }
+
+         n_minus_2 = n_minus_1;
+         n_minus_1 = byte;
       }
 
       void Crc::update(uint8_t byte) {
-         crc = crc ^ byte;
+         crc ^= (uint16_t)byte;
 
-         for (unsigned char j = 1; j <= 8; ++j)
+         for (uint8_t j=8; j!=0; --j)
          {
-            bool flag = crc & 0x0001;
-
-            crc >>=1;
-
-            if (flag)
-            {
-               crc ^= 0xa001;
+            if (crc & 1) {
+               crc >>= 1;
+               crc ^= 0xA001;
+            } else {
+               crc >>= 1;
             }
          }
       }
 
       bool Crc::check() {
-         return ((crc & 0xff) == n_minus_1) && ((crc >> 8) == n_minus_2);
+         uint8_t msb = crc >> 8;
+         uint8_t lsb = crc & 0xff;
+
+         bool retval = (msb == n_minus_1) && (lsb == n_minus_2);
+         return retval;         
       }
 
-      uint16_t Crc::update(etl::string_view view) {
+      uint16_t Crc::update(std::string_view view) {
          reset();
          
          for (auto c : view) {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <etl/string_view.h>
+#include <string_view>
 
 #include <asx/reactor.hpp>
 #include <asx/utils.hpp>
@@ -38,7 +38,7 @@ namespace asx {
       template<int N, long BAUD, width W, parity P, stop S, int OPTIONS=0>
       class Uart {
          ///< Contains a view to transmit
-         inline static etl::string_view to_send;
+         inline static std::string_view to_send;
 
          static_assert(N < 2, "Invalid USART number");
 
@@ -170,7 +170,7 @@ namespace asx {
             }
          }
 
-         static void send(const etl::string_view view_to_send) {
+         static void send(const std::string_view view_to_send) {
             // Store the view to transmit
             to_send = view_to_send;
 

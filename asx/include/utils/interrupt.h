@@ -88,28 +88,6 @@
 #  define cpu_irq_disable()    __disable_interrupt()
 #endif
 
-typedef uint8_t irqflags_t;
-
-static inline irqflags_t cpu_irq_save(void)
-{
-	volatile irqflags_t flags = SREG;
-	cpu_irq_disable();
-	return flags;
-}
-
-static inline void cpu_irq_restore(irqflags_t flags)
-{
-	barrier();
-	SREG = flags;
-}
-
-static inline bool cpu_irq_is_enabled_flags(irqflags_t flags)
-{
-	return flags & (1 << SREG);
-}
-
-#define cpu_irq_is_enabled()             cpu_irq_is_enabled_flags(SREG)
-
 //! @}
 
 

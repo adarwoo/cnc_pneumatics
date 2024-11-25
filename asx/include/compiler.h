@@ -415,6 +415,7 @@ ERROR_FUNC(compiler_demux_bad_size, "Invalid parameter size");
  * becomes.
  */
 #if (defined __GNUC__)
+  #undef __always_inline
 	#define __always_inline     inline __attribute__((__always_inline__))
 #elif (defined __ICCAVR__)
 	#define __always_inline     _Pragma("inline=forced")

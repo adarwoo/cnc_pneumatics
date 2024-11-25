@@ -3,7 +3,7 @@
  *
  * API to control the relays
  */
-#include <etl/array.h>
+#include <array>
 
 #include "board.h"
 #include "ioport.h"
@@ -49,7 +49,7 @@ namespace relay
       }
    };
 
-   static inline auto relays = etl::array<RelayCtrl, 3> {
+   static inline auto relays = std::array<RelayCtrl, 3> {
       RelayCtrl(LED_A, RELAY_A),
       RelayCtrl(LED_B, RELAY_B),
       RelayCtrl(LED_C, RELAY_C),

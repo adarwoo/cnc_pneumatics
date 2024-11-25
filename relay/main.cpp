@@ -1,6 +1,7 @@
 /*
  * Relay modbus device
  */
+#include <sysclk.h>
 #include <asx/reactor.hpp>
 #include <asx/modbus_rtu.hpp>
 
@@ -17,8 +18,22 @@ namespace relay {
    //
    // Implement all the callbacks
    //
-   void on_get_single(uint8_t index) {
-      Datagram::pack( relays[index].status() );
+   void on_get_status(uint8_t index, uint8_t op) {
+      Datagram::pack( uint8_t{1} ); // Number of bytes returned
+
+      if ( index == 255 ) {
+         uint8_t value = relays[2].status();
+         value <<=1;
+         value |= relays[1].status();
+         value <<=1;
+         value |= relays[0].status();
+
+         Datagram::pack(value);
+      } else if ( index < 3 ) {
+         Datagram::pack( relays[index].status() );
+      } else {
+         Datagram::reply_error(modbus::error_t::illegal_data_value);
+      }
    }
 
    void on_set_single(uint8_t index, uint8_t operation) {
@@ -47,6 +62,7 @@ namespace relay {
 
 int main()
 {
+   sysclk_init();
    reactor::init();
    relay::modbus_slave::init();
    

@@ -84,9 +84,9 @@ namespace @NAMESPACE@ {
             state = state_t::DEVICE_ADDRESS;
         }
 
-        static error_t get_error() {
-            return error;
-        }
+        static bool can_reply() {
+            return state != state_t::IGNORE and crc.check();
+        }        
 
         static void process_char(const uint8_t c) {
             if (state == state_t::IGNORE) {
@@ -113,17 +113,17 @@ namespace @NAMESPACE@ {
 
         static void reply_error( error_t err ) {
             buffer[1] |= 0x80;
-            buffer[3] = err;
+            buffer[3] = (uint8_t)err;
         }
 
         template<typename T>
         static void pack(const T& value) {
-            constexpr if ( sizeof(T) == 1 ) {
+            if constexpr ( sizeof(T) == 1 ) {
                 buffer[cnt++] = value;
-            } else if constexpr if ( sizeof(T) == 2 ) {
+            } else if constexpr ( sizeof(T) == 2 ) {
                 buffer[cnt++] = value >> 8;
                 buffer[cnt++] = value & 0xff;
-            } else if constexpr if ( sizeof(T) == 4 ) {
+            } else if constexpr ( sizeof(T) == 4 ) {
                 buffer[cnt++] = value >> 24;
                 buffer[cnt++] = value >> 16 & 0xff;
                 buffer[cnt++] = value >> 8 & 0xff;
@@ -143,7 +143,7 @@ namespace @NAMESPACE@ {
                 error = error_t::illegal_data_value;
             case state_t::ERROR:
                 buffer[cnt++] |= 0x80; // Mark the error
-                buffer[cnt++] = error; // Add the error code
+                buffer[cnt++] = (uint8_t)error; // Add the error code
                 break;
             @CALLBACKS@
             default:
@@ -156,19 +156,15 @@ namespace @NAMESPACE@ {
             } else {
                 // Add the CRC
                 crc.reset();
-                auto _crc = crc.update(etl::string_view{buffer, cnt});
-                buffer[cnt++] = crc & 0xff;
-                buffer[cnt++] = crc >> 8;
+                auto _crc = crc.update(std::string_view{(char *)buffer, cnt});
+                buffer[cnt++] = _crc & 0xff;
+                buffer[cnt++] = _crc >> 8;
             }
         }
 
-        bool Datagram::check_frame() {
-            auto _crc = crc.chec
-        }
-
-        etl::string_view get_buffer() {
+        static std::string_view get_buffer() {
             // Return the buffer ready to send
-            return etl::string_view{buffer, cnt};
+            return std::string_view{(char *)buffer, cnt};
         }
     }; // struct Processor
 } // namespace modbus"""
@@ -275,7 +271,7 @@ class Matcher:
         elif isinstance(self.value, list):
             return " || ".join(f"c == {value}" for value in self.value)
         elif self.value == None:
-            "true"
+            return None
         else:
             return f"c == {self.value}"
 
@@ -348,12 +344,16 @@ class Transition:
     def to_code(self, indent):
         tab = INDENT * indent
         opening = close = ""
+        test = self.matcher.to_code()
+        has_test = test is not None
 
-        opening += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
+        if has_test:
+            opening += f"if ( {test} ) {{\n{tab}{INDENT}"
+            close += f"\n{tab}}}"
+        else:
+            tab = ""
 
-        close += f"\n{tab}}}"
-
-        return f"{opening}{INDENT}state = state_t::{self.next.name};{close}"
+        return has_test, f"{opening}state = state_t::{self.next.name};{close}"
 
 class TransitionGroup:
     """ Holds a group of matchers of the same type """
@@ -369,15 +369,17 @@ class TransitionGroup:
         size = self.integral.size
         extra_indent = 1 if size > 1 else 0
         extra = INDENT * extra_indent
+        test_cnt = 0
+        data = str()
 
         # Skip if CRC - we don't compute the CRC
         if not self.transitions[0].next.name.startswith('RDY_TO_CALL'):
             if size == 2: # Redefine c
-                retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-2];\n"
-                retval += f"{tab}{extra}{self.integral.ctype} c = (data[0] << 8) | data[1];\n\n"
+                data = f"{tab}{extra}uint8_t *data = &buffer[cnt-2];\n"
+                data += f"{tab}{extra}{self.integral.ctype} c = (data[0] << 8) | data[1];\n\n"
             elif size == 4:
-                retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-4];\n"
-                retval += f"{tab}{extra}{self.integral.ctype} c = data[0] << 24 | data[0] << 16 | data[0] << 8 | data[1];\n\n"
+                data = f"{tab}{extra}uint8_t *data = &buffer[cnt-4];\n"
+                data += f"{tab}{extra}{self.integral.ctype} c = data[0] << 24 | data[0] << 16 | data[0] << 8 | data[1];\n\n"
 
             for matcher in self.transitions:
                 if next_flag:
@@ -386,27 +388,35 @@ class TransitionGroup:
                     retval += tab+extra
 
                 next_flag = True
-                retval += matcher.to_code(indent+extra_indent)
+                has_test, to_append = matcher.to_code(indent+extra_indent)
+                retval += to_append
+                test_cnt += 1 if has_test else 0
 
-            retval += f" else {{"
+            if test_cnt:
+                retval = data + retval + f" else {{"
 
-            if self.pos == 0:
-                retval += f"\n{tab}{extra}{INDENT}error = error_t::ignore_frame;"
-                retval += f"\n{tab}{extra}{INDENT}state = state_t::IGNORE"
-            elif self.pos == 1:
-                retval += f"\n{tab}{extra}{INDENT}error = error_t::illegal_function_code;"
-                retval += f"\n{tab}{extra}{INDENT}state = state_t::ERROR"
+                if self.pos == 0:
+                    retval += f"\n{tab}{extra}{INDENT}error = error_t::ignore_frame;"
+                    retval += f"\n{tab}{extra}{INDENT}state = state_t::IGNORE"
+                elif self.pos == 1:
+                    retval += f"\n{tab}{extra}{INDENT}error = error_t::illegal_function_code;"
+                    retval += f"\n{tab}{extra}{INDENT}state = state_t::ERROR"
+                else:
+                    retval += f"\n{tab}{extra}{INDENT}error = error_t::illegal_data_value;"
+                    retval += f"\n{tab}{extra}{INDENT}state = state_t::ERROR"
             else:
-                retval += f"\n{tab}{extra}{INDENT}error = error_t::illegal_data_value;"
-                retval += f"\n{tab}{extra}{INDENT}state = state_t::ERROR"
+                pass
 
             if size == 1:
                 return retval
         else:
             t=self.transitions[0]
             return f"{tab}if ( cnt == {self.pos+size} ) {{\n{tab}{INDENT}state = state_t::{t.next.name}"
-
-        return f"{tab}if ( cnt == {self.pos+size} ) {{\n{retval};\n{INDENT}{tab}}}"
+        
+        if ( test_cnt ):
+            return f"{tab}if ( cnt == {self.pos+size} ) {{\n{retval};\n{INDENT}{tab}}}"
+        
+        return f"{tab}if ( cnt == {self.pos+size} ) {{\n{retval}"
 
 class Operation:
     def __init__(self, name, prototype, chain):

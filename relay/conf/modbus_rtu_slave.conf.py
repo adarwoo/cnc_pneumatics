@@ -6,15 +6,16 @@ Modbus({
     "namespace": "relay",
 
     "callbacks": {
-        "on_get_single":                [(u8, "relay_index")],
+        "on_get_status":                [(u8, "relay_index"), (u8, "operation")],
         "on_set_single":                [(u8, "relay_index"), (u8, "operation")],
         "on_write_all":                 [(u8, "operation")],
         "on_read_version":              [],
     },
 
     "device@44": [
-        (READ_COILS,            u16(0, 3, alias="ID"),
-                                "on_get_single"),
+        (READ_COILS,            u16(alias="address"),
+                                u16(1), # Valid command is 1
+                                "on_get_status"),
         (WRITE_SINGLE_COIL,     u16(0, 3, alias="ID"),
                                 u16([0xFF, 0, 0x55], alias="OP"),
                                 "on_set_single"),

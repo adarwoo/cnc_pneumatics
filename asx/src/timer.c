@@ -278,10 +278,10 @@ timer_instance_t _timer_arm(
 	// Insert the new item
 	_timer_future_t next = {
 		 .reactor = reactor,
-		 .count = count,
 		 .instance = retval,
-		 .arg = arg,
-		 .repeat = repeat
+		 .count = count,
+		 .repeat = repeat,
+		 .arg = arg
 	};
 
 	_timer_future_sorted_list[insertPoint] = next;

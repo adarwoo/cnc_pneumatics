@@ -1,5 +1,8 @@
 #pragma once
-#include <etl/string_view.h>
+#ifdef SIM
+#include <cstdio>
+#endif
+#include <string_view>
 
 #include <boost/sml.hpp>
 
@@ -23,6 +26,7 @@ namespace asx {
          uint8_t count;
          ///< The CRC for the currently received frame
          uint16_t crc;
+         
          /// @brief Buffer of the last 2 bytes so they are not processed
          uint8_t n_minus_1;
          uint8_t n_minus_2;
@@ -33,7 +37,7 @@ namespace asx {
          void operator()(uint8_t byte);
          void update(uint8_t byte);
          bool check();
-         uint16_t update(etl::string_view view);
+         uint16_t update(std::string_view view);
       };
 
       struct can_start_receiving {};
@@ -69,11 +73,11 @@ namespace asx {
          using Timer = asx::hw_timer::TimerA<T40.count()>;
 
          inline static const auto must_reply = [](const t35_timeout&) {
-            return Datagram::can_reply();
+            bool retval = Datagram::can_reply();
+            return retval;
          };
 
-         struct StateMachine
-         {
+         struct StateMachine {
             // Internal SM
             auto operator()() {
                using namespace boost::sml;
@@ -91,6 +95,7 @@ namespace asx {
                , "control_and_waiting"_s + event<t35_timeout> [must_reply] = "reply"_s
                , "control_and_waiting"_s + event<t35_timeout> = "idle"_s
                , "reply"_s + on_entry<_> / [] { Datagram::ready_reply(); }
+               , "reply"_s + event<char_received> = "initial"_s // Unlikely - but a possibility
                , "reply"_s + event<t40_timeout> = "emission"_s
                , "emission"_s + on_entry<_> / [] { Uart::send(Datagram::get_buffer()); }
                , "emission"_s + event<frame_sent> / [] { Timer::start(); } = "emission"_s
@@ -99,8 +104,40 @@ namespace asx {
             }
          };
 
+#ifdef SIM
+         struct Logging {
+            template <class SM, class TEvent>
+            void log_process_event(const TEvent&) {
+               printf("[process_event] %s\n", boost::sml::aux::get_type_name<TEvent>());
+            }
+
+            template <class SM, class TGuard, class TEvent>
+            void log_guard(const TGuard&, const TEvent&, bool result) {
+               printf("[guard] %s %s %s\n", boost::sml::aux::get_type_name<TGuard>(),
+                     boost::sml::aux::get_type_name<TEvent>(), (result ? "[OK]" : "[Reject]"));
+            }
+
+            template <class SM, class TAction, class TEvent>
+            void log_action(const TAction&, const TEvent&) {
+               printf("[action] %s %s\n", boost::sml::aux::get_type_name<TAction>(),
+                     boost::sml::aux::get_type_name<TEvent>());
+            }
+
+            template <class SM, class TSrcState, class TDstState>
+            void log_state_change(const TSrcState& src, const TDstState& dst) {
+               printf("[transition] %s -> %s\n", src.c_str(), dst.c_str());
+            }
+         };
+         
+         inline static Logging logger;
+         inline static auto sm = boost::sml::sm<StateMachine, boost::sml::logger<Logging>>{logger};
+
+#else
          ///< The overall modbus state machine
          inline static auto sm = boost::sml::sm<StateMachine>{};
+#endif
+
+
 
       public:
          static void init() {
@@ -148,7 +185,7 @@ namespace asx {
          }
 
          static void on_send_complete() {
-            Timer::start();
+            sm.process_event(frame_sent{});
          }
       };
    } // namespace modbus
