@@ -26,6 +26,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <limits.h>  // for CHAR_BIT
+#include <stdarg.h>
 
 #include "utils/interrupt.h"
 
@@ -56,7 +57,7 @@ static reactor_item_t _handlers[REACTOR_MAX_HANDLERS] = {0};
 /** Lock new registrations once the reactor is started */
 static bool _reactor_lock = false;
 
-/** Notification registry - use the GPIO for added performance */
+/** Notification registry */
 uint32_t _reactor_notifications = 0;
 
 /** Initialize the reactor API */
@@ -110,17 +111,12 @@ reactor_handle_t reactor_register(const reactor_handler_t handler, reactor_prior
    return 0;
 }
 
-/**
- * Helper which clears a bit of the GPIO register
- */
-static void _clear_notification_bit(reactor_handle_t handle)
-{
-   _reactor_notifications ^= (1L << handle);
-}
-
 void reactor_null_notify_from_isr(reactor_handle_t handle)
 {
-   _reactor_notifications |= (1L << handle);
+   if ( handle != REACTOR_NULL_HANDLE )
+   {
+      _reactor_notifications |= (1L << handle);
+   }
 }
 
 /**
@@ -129,12 +125,43 @@ void reactor_null_notify_from_isr(reactor_handle_t handle)
  */
 void reactor_notify( reactor_handle_t handle, void *data )
 {
-   irqflags_t flags = cpu_irq_save();
+   if ( handle != REACTOR_NULL_HANDLE )
+   {
+      irqflags_t flags = cpu_irq_save();
 
-   _handlers[handle].arg = data;
-   reactor_null_notify_from_isr(handle);
+      _handlers[handle].arg = data;
+      reactor_null_notify_from_isr(handle);
 
-   cpu_irq_restore(flags);
+      cpu_irq_restore(flags);
+   }
+}
+
+/**
+ * Clear pending operations. This should be called in a critical section to prevent races.
+ * @param handle Handle to clear.
+ * @param ... More handles are accepted
+ */
+void reactor_clear(reactor_handle_t handle, ...)
+{
+   // Initialize the variable argument list
+   va_list args;
+   va_start(args, handle);
+
+   // Process each handle in the variadic arguments
+   for (
+      reactor_handle_t h = handle;
+      h != REACTOR_NULL_HANDLE;
+      h = (reactor_handle_t)va_arg(args, int)
+      )
+   {
+      if ( handle != REACTOR_NULL_HANDLE )
+      {
+         _reactor_notifications &= ~(1UL << h);
+      }
+   }
+
+   // Cleanup the variable argument list
+   va_end(args);
 }
 
 /** Process the reactor loop */
@@ -166,8 +193,8 @@ void reactor_run(void)
          // At least 1 flag set
          uint8_t pos = __builtin_ctzl(_reactor_notifications);
 
-         // Clear the flag before calling - so it could be set again by the caller
-         _clear_notification_bit(pos);
+         // Flip the flag before calling - so it could be set again by the caller
+         _reactor_notifications ^= (1L << pos);
 
          sei();
 

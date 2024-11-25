@@ -1,30 +1,32 @@
 #pragma once
 
-#include <cstdint>
-#include <type_traits>
-#include <string_view>
+#include <stdint.h>
+#include <etl/string_view.h>
+
 #include <asx/reactor.hpp>
 #include <asx/utils.hpp>
+#include <asx/chrono.hpp>
 
 #include <avr/io.h>
 
 #include "sysclk.h"
 
 
-
 namespace asx {
    namespace uart {
-      extern reactor::handle on_usart0_tx_complete;
-      extern reactor::handle on_usart1_tx_complete;
+      extern reactor::Handle on_usart0_tx_complete;
+      extern reactor::Handle on_usart1_tx_complete;
+      extern reactor::Handle on_usart0_rx_complete;
+      extern reactor::Handle on_usart1_rx_complete;
 
       using dre_callback = void(*)();
 
       extern dre_callback dre_callback_uart0;
       extern dre_callback dre_callback_uart1;
 
-      enum class width { _5, _6, _7, _8, _9 };
-      enum class parity { odd, even, none };
-      enum class stop { _1, _2 };
+      enum class width { _5=5, _6=6, _7=7, _8=8 }; // Note 9bits is not supported
+      enum class parity { none, odd, even };
+      enum class stop { _1=1, _2=2 };
 
       // Options
       constexpr auto onewire = 1<<1;
@@ -36,7 +38,7 @@ namespace asx {
       template<int N, long BAUD, width W, parity P, stop S, int OPTIONS=0>
       class Uart {
          ///< Contains a view to transmit
-         static std::string_view to_send;
+         inline static etl::string_view to_send;
 
          static_assert(N < 2, "Invalid USART number");
 
@@ -97,8 +99,6 @@ namespace asx {
                retval |= USART_CHSIZE_7BIT_gc;
             } else if (W == width::_8) {
                retval |= USART_CHSIZE_8BIT_gc;
-            } else if (W == width::_9) {
-               retval |= USART_CHSIZE_9BITH_gc;
             }
 
             if (P == parity::odd) {
@@ -170,7 +170,7 @@ namespace asx {
             }
          }
 
-         static void write(const std::string_view &view_to_send) {
+         static void send(const etl::string_view view_to_send) {
             // Store the view to transmit
             to_send = view_to_send;
 
@@ -205,18 +205,25 @@ namespace asx {
                on_usart0_rx_complete = reactor;
             } else {
                on_usart1_rx_complete = reactor;
+               // Enable the interrupt
+               get().CTRLA |= USART_RXCIE_bm;
             }
 		   }
 
-         static constexpr asx::cpu_tick_t get_byte_duration(float length_multipler=1.0) {
-            unsigned long width = W + S + P + 1;
-            return asx::cpu_tick_t((width * F_CPU * length_multipler) / (unsigned long)BAUD)));
+         static constexpr asx::chrono::cpu_tick_t get_byte_duration(const float length_multipler=1.0) {
+            int width = 1 /* start bit */
+               + (int)W /* Width 5 to 9 */
+               + (int)S /* Number of stop bits 1 to 2 */
+               + (P==parity::none ? 0 : 1); /* Extra parity bit */
+
+            return asx::chrono::cpu_tick_t(
+               static_cast<unsigned long>(
+                  (width * F_CPU * length_multipler) / (unsigned long)BAUD
+               )
+            );
          }
       };
    } // end of namespace uart
 } // end of namespace asx
 
-// Define the static member
-template<int N, long BAUD, asx::uart::width W, asx::uart::parity P, asx::uart::stop S, int OPTIONS>
-std::string_view asx::uart::Uart<N, BAUD, W, P, S, OPTIONS>::to_send;
 

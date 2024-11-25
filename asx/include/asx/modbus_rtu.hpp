@@ -1,25 +1,21 @@
 #pragma once
-#include "asx/reactor.hpp"
+#include <etl/string_view.h>
+
+#include <boost/sml.hpp>
+
+#include <asx/chrono.hpp>
+#include <asx/reactor.hpp>
+#include <asx/hw_timer.hpp>
+
 
 namespace asx {
    namespace modbus {
-      enum class process_outcome_t : uint8_t {
-         ignore,             // Wait for the stream to stop (3.5T) as it is not for us
-         expecting_more,     // Char was processed, another is expected
-         expecting_no_more,  // No more expected
-      };
-
-      enum class callback_outcome_t : uint8_t {
-         reply_ready,            // A reply is ready to send
-         unsupported_operation,  // Operation is not supported
-         invalid_value,          // Value is out-of-range or not valid
-      };
-
-      enum class error_t : uint8_t
-         illegal_function_code = 0x01, // Nodbus standard for illegal function code
+      enum class error_t : uint8_t {
+         ok = 0,
+         illegal_function_code = 0x01, // Modbus standard for illegal function code
          illegal_data_address = 0x02,
          illegal_data_value = 0x03,
-         invalid_value,      // Value is out-of-range or not valid
+         ignore_frame = 255
       };
 
       class Crc {
@@ -32,104 +28,127 @@ namespace asx {
          uint8_t n_minus_2;
 
       public:
-         Crc() : {reset();}
-
-         void reset() {
-            crc = 0xffff;
-            count = 0;
-         }
-
-         void operator()(uint8_t byte) {
-            n_minus_2 = n_minus_1;
-            n_minus_1 = byte;
-
-            if ( count > 2 ) {
-               update(n_minus_2);
-            }
-            else {
-               ++count;
-            }
-         }
-
-         void update(uint8_t byte) {
-            crc = crc ^ byte;
-
-            for (unsigned char j = 1; j <= 8; ++j)
-            {
-               bool flag = crc & 0x0001;
-
-               crc >>=1;
-
-               if (flag)
-               {
-                  crc ^= 0xa001;
-               }
-            }
-         }
-
-         bool check() {
-            return (crc & 0xff == n_minus_1) && (crc >> 8 == n_minus_2);
-         }
+         Crc();
+         void reset();
+         void operator()(uint8_t byte);
+         void update(uint8_t byte);
+         bool check();
+         uint16_t update(etl::string_view view);
       };
 
-      class DatagramProcessor {
-         ///< State of datagram processing
-         state_t dg_state;
-         ///< Number of characters in the buffer
-         uint8_t cnt;
-         ///< Error code
-         error_t error;
+      struct can_start_receiving {};
+      struct t15_timeout {};
+      struct t35_timeout {};
+      struct t40_timeout {};
+      struct demand_of_emission {};
+      struct char_received {};
+      struct frame_sent {};
 
-      protected:
-         /**
-          * The receiving buffer which holds the maximum possible number of characters.
-          * Set by the derived class
-          */
-         uint8_t *buffer;
-
-         ///< Crc
-         Crc crc{};
-
-      public:
-         void reset() {
-            dg_state = 0;
-            cnt = 0;
-            error = error_t::ok;
-         }
-
-         void update_crc(uint8_t byte) {
-            n_minus_2_crc = n_minus_1_crc;
-            n_minus_1_crc = crc;
-            crc = crc ^ byte;
-
-            for (unsigned char j = 1; j <= 8; ++j)
-            {
-               bool flag = crc & 0x0001;
-
-               crc >>=1;
-
-               if (flag)
-               {
-                  crc ^= 0xa001;
-               }
-            }
-         }
-      };
-
-      template<class Proc, class Uart, template <asx::cpu_tick_t::rep> typename _Timer>
+      template<class Datagram, class Uart>
       class Slave {
-         Proc dg_proc{};
+         using Self = Slave;
+
+         // Counters for stats
+         inline static uint32_t cpt[8] = {0};
+
+         // Helper
+         static constexpr auto _ticks(float multiplier, const int ms) {
+            auto actual = Uart::get_byte_duration(multiplier);
+            auto upto = std::chrono::duration_cast<asx::chrono::cpu_tick_t>(
+               std::chrono::microseconds(ms)
+            );
+            return std::max(actual, upto);
+         };
+
+         // Timing for the RTU. The T40 is used to prevent race when sending.
+         static constexpr auto T15 = _ticks(1.5, 750);
+         static constexpr auto T35 = _ticks(3.5, 1750);
+         static constexpr auto T40 = _ticks(4.0, 2000);
+
+         // Create a 4xT or 2ms timer - whichever is the longest
+         using Timer = asx::hw_timer::TimerA<T40.count()>;
+
+         inline static const auto must_reply = [](const t35_timeout&) {
+            return Datagram::can_reply();
+         };
+
+         struct StateMachine
+         {
+            // Internal SM
+            auto operator()() {
+               using namespace boost::sml;
+
+               return make_transition_table(
+               * "cold"_s + event<can_start_receiving> = "initial"_s
+               , "initial"_s + on_entry<_> / [] { Timer::start(); }
+               , "initial"_s + event<t35_timeout> = "idle"_s
+               , "idle"_s + on_entry<_> / [] { Datagram::reset(); }
+               , "idle"_s + event<demand_of_emission> = "emission"_s
+               , "idle"_s + event<char_received> = "reception"_s
+               , "reception"_s + event<t15_timeout> = "control_and_waiting"_s
+               , "reception"_s + event<char_received> = "reception"_s
+               // Timer is started when a char is received
+               , "control_and_waiting"_s + event<t35_timeout> [must_reply] = "reply"_s
+               , "control_and_waiting"_s + event<t35_timeout> = "idle"_s
+               , "reply"_s + on_entry<_> / [] { Datagram::ready_reply(); }
+               , "reply"_s + event<t40_timeout> = "emission"_s
+               , "emission"_s + on_entry<_> / [] { Uart::send(Datagram::get_buffer()); }
+               , "emission"_s + event<frame_sent> / [] { Timer::start(); } = "emission"_s
+               , "emission"_s + event<t35_timeout> = "idle"_s
+               );
+            }
+         };
+
+         ///< The overall modbus state machine
+         inline static auto sm = boost::sml::sm<StateMachine>{};
 
       public:
-         void on_timeout_t15() {
+         static void init() {
+            Uart::init();
+
+            // Set the compare for T15 and T35
+            Timer::set_compare(T15, T35);
+
+            // Add reactor handler
+            Timer::react_on_compare(
+               reactor::bind(on_timeout_t15),
+               reactor::bind(on_timeout_t35)
+            );
+
+            Timer::react_on_overflow(reactor::bind(on_timeout_t40));
+
+            // Add reactor handler for the Uart
+            Uart::react_on_character_received(reactor::bind(on_rx_char));
+
+            // Add a reactor handler for when the transmit is complete
+            Uart::react_on_send_complete(reactor::bind(on_send_complete));
+
+            // Start the SM
+            sm.process_event(can_start_receiving{});
          }
 
-         void on_rx_char(char c) {
-            TIMER::start(); // Restart the timer (both)
-            dg_proc.process_char(c);
+         static void on_rx_char(char c) {
+            Timer::start(); // Restart the timers (both)
+            Datagram::process_char(c);
+            sm.process_event(char_received{});
          }
 
-         void on_timeout_t35() {
+         static void on_timeout_t15() {
+            sm.process_event(t15_timeout{});
+         }
+
+         static void on_timeout_t35() {
+            sm.process_event(t35_timeout{});
+         }
+
+         static void on_timeout_t40() {
+            // Stop the timer
+            Timer::stop();
+            sm.process_event(t40_timeout{});
+         }
+
+         static void on_send_complete() {
+            Timer::start();
          }
       };
    } // namespace modbus

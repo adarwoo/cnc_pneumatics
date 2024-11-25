@@ -46,47 +46,129 @@ TEMPLATE_CODE="""/**
  * the modbus_rtu_slave.cpp file only which will create a full rtu slave device.
  */
 #include <stdint.h>
+#include <asx/modbus_rtu.hpp>
 
-namespace modbus {
+namespace @NAMESPACE@ {
     // All callbacks registered
     @PROTOTYPES@
 
     // All states to consider
-    enum class dg_state_t : uint8_t {
+    enum class state_t : uint8_t {
+        IGNORE = 0,
+        ERROR = 1,
         @ENUMS@
     };
 
-    class Processor {
-        ///< Adjusted buffer to only receive the largest amount of data
-        uint8_t buffer[@BUFSIZE@];
+    class Datagram {
+        using error_t = asx::modbus::error_t;
+
+        ///< Adjusted buffer to only receive the largest amount of data possible
+        inline static uint8_t buffer[@BUFSIZE@];
         ///< Number of characters in the buffer
-        uint8_t cnt;
+        inline static uint8_t cnt;
+        ///< Number of characters to send
+        inline static uint8_t frame_size;
         ///< Error code
-        error_t error;
+        inline static error_t error;
+        ///< State
+        inline static state_t state;
+        ///< CRC for the datagram
+        inline static asx::modbus::Crc crc{};
+
 
     public:
-        auto process_char(const uint8_t c) -> process_outcome_t {
-            buffer[cnt++] = c; // Store the data
+        static void reset() {
+            cnt=0;
+            crc.reset();
+            error = error_t::ok;
+            state = state_t::DEVICE_ADDRESS;
+        }
 
-            switch(dg_state) {
-            @CASES@
-            default:
-                break;
+        static error_t get_error() {
+            return error;
+        }
+
+        static void process_char(const uint8_t c) {
+            if (state == state_t::IGNORE) {
+                return;
             }
 
-            return process_outcome_t::invalid_value;
+            crc(c);
+
+            if (state != state_t::ERROR) {
+                // Store the frame
+                buffer[cnt++] = c; // Store the data
+            }
+
+            switch(state) {
+            case state_t::ERROR:
+                break;
+            @CASES@
+            default:
+                error = error_t::illegal_data_value;
+                state = state_t::ERROR;
+                break;
+            }
+        }
+
+        static void reply_error( error_t err ) {
+            buffer[1] |= 0x80;
+            buffer[3] = err;
+        }
+
+        template<typename T>
+        static void pack(const T& value) {
+            constexpr if ( sizeof(T) == 1 ) {
+                buffer[cnt++] = value;
+            } else if constexpr if ( sizeof(T) == 2 ) {
+                buffer[cnt++] = value >> 8;
+                buffer[cnt++] = value & 0xff;
+            } else if constexpr if ( sizeof(T) == 4 ) {
+                buffer[cnt++] = value >> 24;
+                buffer[cnt++] = value >> 16 & 0xff;
+                buffer[cnt++] = value >> 8 & 0xff;
+                buffer[cnt++] = value & 0xff;
+            }
         }
 
         /** Called when a T3.5 has been detected, in a good sequence */
-        auto process_end_of_frame() -> callback_outcome_t {
-            switch(dg_state) {
+        static void ready_reply() {
+            frame_size = cnt; // Store the frame size
+            cnt = 2; // Points to the function code
+
+            switch(state) {
+            case state_t::IGNORE:
+                break;
+            @INCOMPLETE@
+                error = error_t::illegal_data_value;
+            case state_t::ERROR:
+                buffer[cnt++] |= 0x80; // Mark the error
+                buffer[cnt++] = error; // Add the error code
+                break;
             @CALLBACKS@
             default:
                 break;
             }
 
-            // This is un-reachable!
-            return callback_outcome_t::unsupported_operation;
+            // If the cnt is 2 - nothing was changed in the buffer - return it as is
+            if ( cnt == 2 ) {
+                cnt = frame_size; // Framesize includes the previous CRC which still holds valid
+            } else {
+                // Add the CRC
+                crc.reset();
+                auto _crc = crc.update(etl::string_view{buffer, cnt});
+                buffer[cnt++] = crc & 0xff;
+                buffer[cnt++] = crc >> 8;
+            }
+        }
+
+        bool Datagram::check_frame() {
+            auto _crc = crc.chec
+        }
+
+        etl::string_view get_buffer() {
+            // Return the buffer ready to send
+            return etl::string_view{buffer, cnt};
         }
     }; // struct Processor
 } // namespace modbus"""
@@ -240,7 +322,7 @@ class f32(Matcher, _32bits):
 class Crc(UnsignedMatcher, _16bits):
     _bits = -16 # Negative for little endian
     def to_code(self):
-        return "packet_crc == c"
+        return "true"
 
 READ_COILS                    = u8(0x01, alias="READ_COILS")
 READ_DISCRETE_INPUTS          = u8(0x02, alias="READ_DISCRETE_INPUTS")
@@ -269,12 +351,9 @@ class Transition:
 
         opening += f"if ( {self.matcher.to_code()} ) {{\n{tab}"
 
-        if self.set_crc:
-            close += f"\n{tab}{INDENT}return process_outcome_t::expecting_no_more;"
-
         close += f"\n{tab}}}"
 
-        return f"{opening}{INDENT}dg_state = dg_state_t::{self.next.name};{close}"
+        return f"{opening}{INDENT}state = state_t::{self.next.name};{close}"
 
 class TransitionGroup:
     """ Holds a group of matchers of the same type """
@@ -291,40 +370,41 @@ class TransitionGroup:
         extra_indent = 1 if size > 1 else 0
         extra = INDENT * extra_indent
 
-        crc = isinstance(self.integral, Crc)
-
-        # Redefine c
-        if size == 2:
-            if crc:
-                retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-2];\n"
-                retval += f"{tab}{extra}{self.integral.ctype} c = (data[1] << 8) | data[0];\n\n"
-            else:
+        # Skip if CRC - we don't compute the CRC
+        if not self.transitions[0].next.name.startswith('RDY_TO_CALL'):
+            if size == 2: # Redefine c
                 retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-2];\n"
                 retval += f"{tab}{extra}{self.integral.ctype} c = (data[0] << 8) | data[1];\n\n"
-        elif size == 4:
-            retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-4];\n"
-            retval += f"{tab}{extra}{self.integral.ctype} c = data[0] << 24 | data[0] << 16 | data[0] << 8 | data[1];\n\n"
+            elif size == 4:
+                retval += f"{tab}{extra}uint8_t *data = &buffer[cnt-4];\n"
+                retval += f"{tab}{extra}{self.integral.ctype} c = data[0] << 24 | data[0] << 16 | data[0] << 8 | data[1];\n\n"
 
-        for matcher in self.transitions:
-            if next_flag:
-                retval += " else "
+            for matcher in self.transitions:
+                if next_flag:
+                    retval += " else "
+                else:
+                    retval += tab+extra
+
+                next_flag = True
+                retval += matcher.to_code(indent+extra_indent)
+
+            retval += f" else {{"
+
+            if self.pos == 0:
+                retval += f"\n{tab}{extra}{INDENT}error = error_t::ignore_frame;"
+                retval += f"\n{tab}{extra}{INDENT}state = state_t::IGNORE"
+            elif self.pos == 1:
+                retval += f"\n{tab}{extra}{INDENT}error = error_t::illegal_function_code;"
+                retval += f"\n{tab}{extra}{INDENT}state = state_t::ERROR"
             else:
-                retval += tab+extra
+                retval += f"\n{tab}{extra}{INDENT}error = error_t::illegal_data_value;"
+                retval += f"\n{tab}{extra}{INDENT}state = state_t::ERROR"
 
-            next_flag = True
-            retval += matcher.to_code(indent+extra_indent)
-
-        retval += f" else {{\n{tab}{extra}{INDENT}return "
-
-        if self.pos == 0:
-            retval += "process_outcome_t::ignore"
-        elif self.pos == 1:
-            retval += "process_outcome_t::illegal_function_code"
+            if size == 1:
+                return retval
         else:
-            retval += "process_outcome_t::illegal_data_value"
-
-        if size == 1:
-            return retval
+            t=self.transitions[0]
+            return f"{tab}if ( cnt == {self.pos+size} ) {{\n{tab}{INDENT}state = state_t::{t.next.name}"
 
         return f"{tab}if ( cnt == {self.pos+size} ) {{\n{retval};\n{INDENT}{tab}}}"
 
@@ -438,7 +518,7 @@ class OperationState(State):
     """ A state which leads to an operation """
     def to_code(self, indent):
         tab = INDENT * indent
-        return f"{tab}return {self.op.to_code()};\n{tab}break;\n"
+        return f"{tab}{self.op.to_code()}\n{tab}break;\n"
 
 class ParsingException(Exception):
     pass
@@ -468,6 +548,11 @@ class CodeGenerator:
 
         # Add space for the device address, the command and the CRC
         self.max_buf_size += 4
+        # Overwrite with the configuration
+        self.max_buf_size = max(self.max_buf_size, tree.get("buffer_size", 0))
+
+        # Set the namespace
+        self.namespace = tree.get("namespace", "slave")
 
         self.process_devices(tree)
 
@@ -489,19 +574,22 @@ class CodeGenerator:
     def generate_code(self):
         placeholders = {
             "BUFSIZE" : str(self.max_buf_size),
-            "ENUMS" : self.get_enums_text(3),
-            "CASES" : self.get_cases_text(4),
-            "CALLBACKS" : self.get_callbacks_text(3),
-            "PROTOTYPES" : self.get_prototypes(2),
+            "NAMESPACE" : self.namespace,
+            "ENUMS" : self.get_enums_text(2),
+            "CASES" : self.get_cases_text(3),
+            "CALLBACKS" : self.get_callbacks_text(2),
+            "INCOMPLETE": self.get_incomplete_text(2),
+            "PROTOTYPES" : self.get_prototypes(1),
         }
 
         # Function to replace each placeholder
         def replace_placeholder(match):
+            linestart = match.group(1)
             placeholder = match.group(2)
             endl = match.group(3) or ""
 
             # Call the corresponding method based on the placeholder name
-            return placeholders[placeholder].strip() + endl
+            return linestart + placeholders[placeholder].strip() + endl
 
         return re.sub(r"(\s*)@(.*?)@(\n?)", replace_placeholder, TEMPLATE_CODE)
 
@@ -526,6 +614,15 @@ class CodeGenerator:
 
         return state_code
 
+    def get_incomplete_text(self, indent):
+        state_code = str()
+
+        for state in self.states:
+            if not isinstance(state, OperationState):
+                state_code += state.to_code_case(indent+1)
+
+        return state_code
+
     def get_callbacks_text(self, indent):
         state_code = str()
 
@@ -534,10 +631,6 @@ class CodeGenerator:
                 state_code += state.to_code_case(indent+1)
                 state_code += state.to_code(indent+2)
 
-        for state in self.states:
-            if not isinstance(state, OperationState):
-                state_code += state.to_code_case(indent+1)
-
         return state_code
 
     def get_prototypes(self, indent):
@@ -545,7 +638,7 @@ class CodeGenerator:
         retval = str()
 
         for name, proto in self.callbacks.items():
-            retval += f"{tab}callback_outcome_t {name}("
+            retval += f"{tab}void {name}("
 
             for cnt, param in enumerate(proto):
                 if isinstance(param, tuple):
@@ -613,7 +706,7 @@ class CodeGenerator:
                     if command_name not in self.callbacks:
                         raise ParsingException(f"Cmd {command_name} does not have a prototype")
 
-                    # Add the CRC calculation
+                    # Add the CRC state
                     next_state = self.new_state(state.next("_" + command_name.upper() + "__CRC"), state.pos + matcher.size)
                     to_crc_transition = Transition(matcher, next_state)
                     to_crc_transition.set_crc = True
@@ -644,7 +737,14 @@ class Modbus:
         import argparse
         parser = argparse.ArgumentParser(description="Generate code for Modbus.")
         parser.add_argument('-o', '--output', type=str, help='Output file name')
+        parser.add_argument("-t", "--tab-size", type=int, default=4, choices=range(0, 9),
+            help="Set the tab size (0-8). Defaults to 4.)"
+        )
         args = parser.parse_args()
+
+        # Override the tab size
+        global INDENT
+        INDENT = args.tab_size * ' '
 
         try:
             gen = CodeGenerator(self.modbus)

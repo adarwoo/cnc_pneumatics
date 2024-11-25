@@ -6,13 +6,13 @@ namespace board {
 
    /** Define the Usart to use by the rs485 */
    using Uart =
-      asx::usart::Uart<
-         1,                      // UART to use
-         115200,                 // Baudrate
-         asx::usart::width::_8,       // Width 5 to 9
-         asx::usart::partity::odd,    // Parity Odd, Even, None
-         asx::usart::stop::_1,        // Number of stop bits
-         /* Add options as extra argument */
-         asx::usart::rs485 | asx::usart::onewire
+      asx::uart::Uart<
+         1,                            // We use UART1 with regular pin mux
+         115200,                       // Baudrate
+         asx::uart::width::_8,         // Width standard 8 bits per frame
+         asx::uart::parity::even,      // Even parity (standard for Modbus)
+         asx::uart::stop::_1,          // Unique stop bit (standard in Modbus)
+         // Force RS485 mode and one wire (Rx pin is not used)
+         asx::uart::rs485 | asx::uart::onewire
       >;
 }

@@ -70,6 +70,16 @@ reactor_handle_t reactor_register(
  */
 void reactor_notify( reactor_handle_t handle, void* );
 
+/**
+ * Clear pending operations. A number of handles can be given at once.
+ * Note: REACTOR_NULL_HANDLE have no effect.
+ * Note: This function must be called in a critical section since the handles
+ *  could be set right after being cleared. The function can safely be called
+ *  within an interrupt context
+ * @param handle Handle to clear
+ * @param ... More handles as required
+ */
+void reactor_clear( reactor_handle_t handle, ... );
 
 /** Process the reactor loop */
 void reactor_run(void);

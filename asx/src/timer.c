@@ -48,11 +48,11 @@ typedef volatile int_fast8_t _timer_slot_t;
 /************************************************************************/
 
 /**
- * @def TIMER_MAX_CALLBACK
- * Default number of callbacks
+ * @def TIMER_MAX_COUNT
+ * Maximum number of active timers
  */
-#ifndef TIMER_MAX_CALLBACK
-#  define TIMER_MAX_CALLBACK 16
+#ifndef TIMER_MAX_COUNT
+#  define TIMER_MAX_COUNT 16
 #endif
 
 /** Invalid slot marker */
@@ -85,7 +85,7 @@ typedef volatile int_fast8_t _timer_slot_t;
  *  those that expire first.
  * This way, the interrupt handler
  */
-static _timer_future_t _timer_future_sorted_list[TIMER_MAX_CALLBACK] = {0};
+static _timer_future_t _timer_future_sorted_list[TIMER_MAX_COUNT] = {0};
 
 /** Free running counter. */
 static volatile timer_count_t _timer_free_running_ms_counter = 0;
@@ -109,13 +109,13 @@ static reactor_handle_t _timer_reactor_handle = 0;
 /** @return The index to the right */
 static inline _timer_slot_t _timer_right_of(_timer_slot_t index)
 {
-	return index == (TIMER_MAX_CALLBACK - 1) ? 0 : index + 1;
+	return index == (TIMER_MAX_COUNT - 1) ? 0 : index + 1;
 }
 
 /** @return The index to the left */
 static inline _timer_slot_t _timer_left_of(_timer_slot_t index)
 {
-	return index == 0 ? (TIMER_MAX_CALLBACK - 1) : (index - 1);
+	return index == 0 ? (TIMER_MAX_COUNT - 1) : (index - 1);
 }
 
 /** @return The distance in tick from the current position */
@@ -178,7 +178,7 @@ void timer_init(void)
 #endif
 
    // Reset the internal
-   for ( i=0; i<TIMER_MAX_CALLBACK; ++i )
+   for ( i=0; i<TIMER_MAX_COUNT; ++i )
    {
       _timer_future_sorted_list[i].reactor = REACTOR_NULL_HANDLE;
    }
@@ -212,28 +212,20 @@ timer_count_t timer_time_lapsed_since(timer_count_t count)
 }
 
 /**
- * Arm a timer
+ * Internal version of arming a timer which allow recycling a handle for repeating timers
  * This function checks for several conditions:
- *  * Now more slots!
+ *  + No more slots!
  * The list is sorted to help the interrupt be short.
- * This function can be safely called from within an interrupt context.
+ * This function must not be called from interrupt context
  *
- * @param cb    Function to call on expiry. This function is called from within interrupt context
- * @param count Deadline value as a timer_count.
- *              This value is best computed by calling timer_get_count_from_now
- * @param repeat A timer count value to repeat the timer. It cannot be stopped.
- *              By adjusting the correct reactor priority, the repeat
- *              can form a round robin sequencer.
- *              If 0, does not repeat
- * @param arg   Extra argument passed to the caller.
- * 				 If NULL, the timer instance is passed as arg.
- * 				 If the timer is repeating, the initial value is passed every time
+ * @param reuse Handle to reuse for repeating timers
  * @return      The handle (slot position of the timer)
  */
-timer_instance_t timer_arm(
+timer_instance_t _timer_arm(
 	 reactor_handle_t reactor,
 	 timer_count_t count,
 	 timer_count_t repeat,
+    timer_instance_t reuse,
 	 void *arg)
 {
 	_timer_slot_t insertPoint;
@@ -280,12 +272,14 @@ timer_instance_t timer_arm(
 
 		i = oneLeftOf;
 	}
+   
+   timer_instance_t retval = (reuse == TIMER_INVALID_INSTANCE) ? ++_timer_current_instance : reuse;
 
 	// Insert the new item
 	_timer_future_t next = {
 		 .reactor = reactor,
 		 .count = count,
-		 .instance = ++_timer_current_instance,
+		 .instance = retval,
 		 .arg = arg,
 		 .repeat = repeat
 	};
@@ -296,7 +290,32 @@ timer_instance_t timer_arm(
 	_timer_slot_avail = _timer_right_of(_timer_slot_avail);
 
 	// Do not return a valid instance for the repeating timer as it will keep on changing
-	return repeat ? TIMER_INVALID_INSTANCE : _timer_current_instance;
+	return retval;
+}
+
+
+/**
+ * Arm a new timer
+ * This function must not be called from interrupt context
+ *
+ * @param count Deadline value as a timer_count.
+ *              This value is best computed by calling timer_get_count_from_now
+ * @param repeat A timer count value to repeat the timer. It cannot be stopped.
+ *              By adjusting the correct reactor priority, the repeat
+ *              can form a round robin sequencer.
+ *              If 0, does not repeat
+ * @param arg   Extra argument passed to the caller.
+ * 				 If NULL, the timer instance is passed as arg.
+ * 				 If the timer is repeating, the initial value is passed every time
+ * @return      The handle (slot position of the timer)
+ */
+timer_instance_t timer_arm(
+	 reactor_handle_t reactor,
+	 timer_count_t count,
+	 timer_count_t repeat,
+	 void *arg)
+{
+   return _timer_arm(reactor, count, repeat, TIMER_INVALID_INSTANCE, arg);
 }
 
 
@@ -340,7 +359,13 @@ void timer_dispatch(void *arg)
 			// Is it a repeating instance
 			if (pFuture->repeat)
 			{
-				timer_arm(pFuture->reactor, pFuture->count + pFuture->repeat, pFuture->repeat, NULL);
+				_timer_arm(
+               pFuture->reactor, 
+               pFuture->count + pFuture->repeat,
+               pFuture->repeat,
+               pFuture->instance,
+               NULL
+            );
 			}
 
 			// Move the pointer to the next item
@@ -362,7 +387,7 @@ void timer_dispatch(void *arg)
  * Effectively stops repeating timers.
  *
  * The result is that the slot used by the timer becomes available at the end of the call, but
- * the timer processing reactior may still be invoked after this call.
+ * the timer processing reactor may still be invoked after this call.
  * Therefore, it is recommended for the reactor callback to check if the timer instance is
  * still valid prior to executing the code.
  * In system which may restart timers often (invalidating the previous timer), this
