@@ -2,6 +2,7 @@
 #ifdef SIM
 #include <cstdio>
 #endif
+#include <logger.h>
 #include <string_view>
 
 #include <boost/sml.hpp>
@@ -108,24 +109,24 @@ namespace asx {
          struct Logging {
             template <class SM, class TEvent>
             void log_process_event(const TEvent&) {
-               printf("[process_event] %s\n", boost::sml::aux::get_type_name<TEvent>());
+               LOG_INFO("SM", "[process_event] %s\n", boost::sml::aux::get_type_name<TEvent>());
             }
 
             template <class SM, class TGuard, class TEvent>
             void log_guard(const TGuard&, const TEvent&, bool result) {
-               printf("[guard] %s %s %s\n", boost::sml::aux::get_type_name<TGuard>(),
+               LOG_INFO("SM", "[guard] %s %s %s\n", boost::sml::aux::get_type_name<TGuard>(),
                      boost::sml::aux::get_type_name<TEvent>(), (result ? "[OK]" : "[Reject]"));
             }
 
             template <class SM, class TAction, class TEvent>
             void log_action(const TAction&, const TEvent&) {
-               printf("[action] %s %s\n", boost::sml::aux::get_type_name<TAction>(),
+               LOG_INFO("SM", "[action] %s %s\n", boost::sml::aux::get_type_name<TAction>(),
                      boost::sml::aux::get_type_name<TEvent>());
             }
 
             template <class SM, class TSrcState, class TDstState>
             void log_state_change(const TSrcState& src, const TDstState& dst) {
-               printf("[transition] %s -> %s\n", src.c_str(), dst.c_str());
+               LOG_INFO("SM", "[transition] %s -> %s\n", src.c_str(), dst.c_str());
             }
          };
          
@@ -165,6 +166,7 @@ namespace asx {
          }
 
          static void on_rx_char(char c) {
+            LOG_INFO("SM", "Received 0x%.2X", (uint8_t)c);
             Timer::start(); // Restart the timers (both)
             Datagram::process_char(c);
             sm.process_event(char_received{});

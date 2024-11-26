@@ -14,6 +14,10 @@ extern "C" void interrupt_TCA0_CMP1_vect();
 extern "C" void interrupt_TCA0_OVF_vect();
 extern "C" void interrupt_USART1_TXC_vect();
 
+// Override the logger init here
+extern "C" const char *log_get_config_string()
+   { return "stdout debug"; }
+
 // Holds all the MCA registers here
 char sim_registers[0x1301];
 
@@ -37,7 +41,7 @@ test TEST_SEND_RECEIVE = {
     [](){ interrupt_TCA0_CMP1_vect(); /* 35 elapsed */ }
 };
 
-std::vector<test> ALL_TESTS = { TEST_SEND_RECEIVE };
+std::vector<test> ALL_TESTS = { TEST_SEND_RECEIVE, TEST_SEND_RECEIVE };
 auto itTest = ALL_TESTS.begin();
 auto itAction = itTest->begin();
 
@@ -48,5 +52,6 @@ extern "C" void sleep_cpu()
     if ( itAction == itTest->end() ) {
         itTest++;
         if ( itTest == ALL_TESTS.end() ) _exit(0);
+        itAction = itTest->begin();
     }
 }

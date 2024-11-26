@@ -36,6 +36,7 @@
 /** Clear the corresponding debug pin  */
 #define debug_clear(x) IIF(IS_DEBUG_PORT(x))(ioport_set_pin_low(DEBUG_ ## x),{})
 
+
 /**@}*/
 /**@}*/
 #endif /* ndef debug_h_HAS_ALREADY_BEEN_INCLUDED */

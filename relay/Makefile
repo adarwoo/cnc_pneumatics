@@ -13,6 +13,7 @@ VPATH=..
 THIS_DIR       := .
 COMMON_DIR     := common
 BOOST_DIR      := boost
+LOGGER_DIR     := logger
 ASX_DIR        := asx
 STDCXX_DIR     := libstdc++
 ETL_DIR        := etl
@@ -25,6 +26,7 @@ INCLUDE_DIRS = \
    ../$(COMMON_DIR)/include \
    ../${BOOST_DIR} \
    ../${ETL_DIR}/include \
+   ../${LOGGER_DIR}/include \
 	../$(STDCXX_DIR)/include \
    ../${ASX_DIR}/include \
    ../${ASX_DIR}/include/utils \
@@ -67,6 +69,12 @@ SRCS = \
 
 ifdef SIM
 SRCS = \
+   ${LOGGER_DIR}/src/logger_common.c \
+   ${LOGGER_DIR}/src/logger_cxx.cpp \
+   ${LOGGER_DIR}/src/logger_init_unix.cpp \
+   ${LOGGER_DIR}/src/logger_os_linux.cpp \
+   ${LOGGER_DIR}/src/logger_os_linux_thread.cpp \
+   ${LOGGER_DIR}/src/logger_trace_stack_linux.cpp \
    $(ASX_DIR)/src/timer.c \
    $(ASX_DIR)/src/alert.c \
    $(ASX_DIR)/src/queue.c 	\

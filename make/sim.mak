@@ -10,7 +10,8 @@ BUILD_DIR ?= sim
 tc_prefix:=
 CPPFLAGS += -D_POSIX -DSIM
 LDFLAGS += -pthread
-CC=c++
+CC=cc
+CXX=c++
 
 ifdef DEBUG
   CFLAGS += \
