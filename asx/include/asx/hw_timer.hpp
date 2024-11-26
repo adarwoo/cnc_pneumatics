@@ -151,12 +151,13 @@ namespace asx {
           * Any pending reactor actions are cleared
           */
          static void start() {
-            cli(); // Prevent race -> The interrupt may have just ticked!
-            // START of critical section
-
             // Stop the timer so we don't try to aim at a moving target
             TCA().CTRLA &= ~TCA_SINGLE_ENABLE_bm;
-            TCA().CTRLESET = TCA_SINGLE_CMD_RESTART_gc; // Reset counter
+
+            //
+            // No interrupts will fire from this point on
+            //
+
             // Clear any pending interrupts
             TCA().INTFLAGS =
                TCA_SINGLE_OVF_bm | TCA_SINGLE_CMP0_bm | TCA_SINGLE_CMP1_bm | TCA_SINGLE_CMP2_bm;
@@ -165,10 +166,10 @@ namespace asx {
             reactor::clear(clear_masks);
 
             // Restart the timer
-            TCA().CTRLA |= TCA_SINGLE_ENABLE_bm;
+            TCA().CTRLESET = TCA_SINGLE_CMD_RESTART_gc;
 
-            // END of critical section
-            sei();
+            // Restart the timer
+            TCA().CTRLA |= TCA_SINGLE_ENABLE_bm;
          }
 
          static void stop() {
