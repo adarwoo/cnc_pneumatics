@@ -46,7 +46,7 @@ namespace asx {
       struct t35_timeout {};
       struct t40_timeout {};
       struct demand_of_emission {};
-      struct char_received {};
+      struct char_received { uint8_t c{}; };
       struct frame_sent {};
 
       template<class Datagram, class Uart>
@@ -74,7 +74,22 @@ namespace asx {
          using Timer = asx::hw_timer::TimerA<T40.count()>;
 
          inline static const auto must_reply = [](const t35_timeout&) {
-            bool retval = Datagram::can_reply();
+            bool retval = false;
+
+            switch ( Datagram::get_status() ) {
+               case Datagram::status_t::NOT_FOR_ME:
+                  LOG_INFO("DGRAM", "Frame is not for me");
+                  break;
+               case Datagram::status_t::BAD_CRC:
+                  LOG_WARN("DGRAM", "Bad CRC");
+                  break;
+               case Datagram::status_t::GOOD_FRAME:
+                  LOG_WARN("DGRAM", "Good Frame received");
+                  return true;
+               default:
+                  break;
+            }
+
             return retval;
          };
 
@@ -83,24 +98,32 @@ namespace asx {
             auto operator()() {
                using namespace boost::sml;
 
+               auto start_timer = [] () { Timer::start(); };
+               auto reset_dgram = [] () { Datagram::reset(); };
+               auto ready_reply = [] () { Datagram::ready_reply(); };
+               auto reply       = [] () { Uart::send(Datagram::get_buffer()); };
+
+               auto handle_char = [] (const auto& event) {
+                  Timer::start(); // Restart the timers (15/35/40)
+                  Datagram::process_char(event.c);
+               };
+
                return make_transition_table(
-               * "cold"_s + event<can_start_receiving> = "initial"_s
-               , "initial"_s + on_entry<_> / [] { Timer::start(); }
-               , "initial"_s + event<t35_timeout> = "idle"_s
-               , "idle"_s + on_entry<_> / [] { Datagram::reset(); }
-               , "idle"_s + event<demand_of_emission> = "emission"_s
-               , "idle"_s + event<char_received> = "reception"_s
-               , "reception"_s + event<t15_timeout> = "control_and_waiting"_s
-               , "reception"_s + event<char_received> = "reception"_s
-               // Timer is started when a char is received
-               , "control_and_waiting"_s + event<t35_timeout> [must_reply] = "reply"_s
-               , "control_and_waiting"_s + event<t35_timeout> = "idle"_s
-               , "reply"_s + on_entry<_> / [] { Datagram::ready_reply(); }
-               , "reply"_s + event<char_received> = "initial"_s // Unlikely - but a possibility
-               , "reply"_s + event<t40_timeout> = "emission"_s
-               , "emission"_s + on_entry<_> / [] { Uart::send(Datagram::get_buffer()); }
-               , "emission"_s + event<frame_sent> / [] { Timer::start(); } = "emission"_s
-               , "emission"_s + event<t35_timeout> = "idle"_s
+               * "cold"_s                + event<can_start_receiving>                    = "initial"_s
+               , "initial"_s             + on_entry<_>                     / start_timer
+               , "initial"_s             + event<t35_timeout>                            = "idle"_s
+               , "idle"_s                + on_entry<_>                     / reset_dgram
+               , "idle"_s                + event<demand_of_emission>                     = "emission"_s
+               , "idle"_s                + event<char_received>            / handle_char = "reception"_s
+               , "reception"_s           + event<t15_timeout>                            = "control_and_waiting"_s
+               , "reception"_s           + event<char_received>            / handle_char = "reception"_s
+               , "control_and_waiting"_s + event<t35_timeout> [must_reply]               = "reply"_s
+               , "control_and_waiting"_s + event<t35_timeout>                            = "idle"_s
+               , "reply"_s               + on_entry<_>                     / ready_reply
+               , "reply"_s               + event<char_received>            / handle_char = "initial"_s // Unlikely - but a possibility
+               , "reply"_s               + event<t40_timeout>                            = "emission"_s
+               , "emission"_s            + on_entry<_>                     / reply
+               , "emission"_s            + event<frame_sent>                             = "initial"_s
                );
             }
          };
@@ -109,24 +132,24 @@ namespace asx {
          struct Logging {
             template <class SM, class TEvent>
             void log_process_event(const TEvent&) {
-               LOG_INFO("SM", "[process_event] %s\n", boost::sml::aux::get_type_name<TEvent>());
+               LOG_INFO("SM", "[process_event] %s", boost::sml::aux::get_type_name<TEvent>());
             }
 
             template <class SM, class TGuard, class TEvent>
             void log_guard(const TGuard&, const TEvent&, bool result) {
-               LOG_INFO("SM", "[guard] %s %s %s\n", boost::sml::aux::get_type_name<TGuard>(),
+               LOG_INFO("SM", "[guard] %s %s %s", boost::sml::aux::get_type_name<TGuard>(),
                      boost::sml::aux::get_type_name<TEvent>(), (result ? "[OK]" : "[Reject]"));
             }
 
             template <class SM, class TAction, class TEvent>
             void log_action(const TAction&, const TEvent&) {
-               LOG_INFO("SM", "[action] %s %s\n", boost::sml::aux::get_type_name<TAction>(),
+               LOG_INFO("SM", "[action] %s %s", boost::sml::aux::get_type_name<TAction>(),
                      boost::sml::aux::get_type_name<TEvent>());
             }
 
             template <class SM, class TSrcState, class TDstState>
             void log_state_change(const TSrcState& src, const TDstState& dst) {
-               LOG_INFO("SM", "[transition] %s -> %s\n", src.c_str(), dst.c_str());
+               LOG_INFO("SM", "[transition] %s -> %s", src.c_str(), dst.c_str());
             }
          };
          
@@ -138,10 +161,9 @@ namespace asx {
          inline static auto sm = boost::sml::sm<StateMachine>{};
 #endif
 
-
-
       public:
          static void init() {
+            Timer::init(hw_timer::single_use);
             Uart::init();
 
             // Set the compare for T15 and T35
@@ -165,11 +187,8 @@ namespace asx {
             sm.process_event(can_start_receiving{});
          }
 
-         static void on_rx_char(char c) {
-            LOG_INFO("SM", "Received 0x%.2X", (uint8_t)c);
-            Timer::start(); // Restart the timers (both)
-            Datagram::process_char(c);
-            sm.process_event(char_received{});
+         static void on_rx_char(uint8_t c) {
+            sm.process_event(char_received{c});
          }
 
          static void on_timeout_t15() {
@@ -181,8 +200,6 @@ namespace asx {
          }
 
          static void on_timeout_t40() {
-            // Stop the timer
-            Timer::stop();
             sm.process_event(t40_timeout{});
          }
 

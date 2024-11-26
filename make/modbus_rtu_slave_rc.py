@@ -45,6 +45,7 @@ TEMPLATE_CODE="""/**
  * uart data used for a modbus RTU. It should be included by
  * the modbus_rtu_slave.cpp file only which will create a full rtu slave device.
  */
+#include <logger.h>
 #include <stdint.h>
 #include <asx/modbus_rtu.hpp>
 
@@ -77,18 +78,31 @@ namespace @NAMESPACE@ {
 
 
     public:
-        static void reset() {
+        // Status of the datagram
+        enum class status_t : uint8_t {
+            GOOD_FRAME = 0,
+            NOT_FOR_ME = 1,
+            BAD_CRC = 2
+        };
+
+        static void reset() noexcept {
             cnt=0;
             crc.reset();
             error = error_t::ok;
             state = state_t::DEVICE_ADDRESS;
         }
 
-        static bool can_reply() {
-            return state != state_t::IGNORE and crc.check();
-        }        
+        static status_t get_status() noexcept {
+            if (state == state_t::IGNORE) {
+                return status_t::NOT_FOR_ME;
+            }
 
-        static void process_char(const uint8_t c) {
+            return crc.check() ? status_t::GOOD_FRAME : status_t::BAD_CRC;
+        }
+
+        static void process_char(const uint8_t c) noexcept {
+            LOG_TRACE("DGRAM", "Char: 0x%.2x, index: %d, state: %d", c, cnt, (uint8_t)state);
+
             if (state == state_t::IGNORE) {
                 return;
             }
@@ -111,13 +125,13 @@ namespace @NAMESPACE@ {
             }
         }
 
-        static void reply_error( error_t err ) {
+        static void reply_error( error_t err ) noexcept {
             buffer[1] |= 0x80;
             buffer[3] = (uint8_t)err;
         }
 
         template<typename T>
-        static void pack(const T& value) {
+        static void pack(const T& value) noexcept {
             if constexpr ( sizeof(T) == 1 ) {
                 buffer[cnt++] = value;
             } else if constexpr ( sizeof(T) == 2 ) {
@@ -132,7 +146,7 @@ namespace @NAMESPACE@ {
         }
 
         /** Called when a T3.5 has been detected, in a good sequence */
-        static void ready_reply() {
+        static void ready_reply() noexcept {
             frame_size = cnt; // Store the frame size
             cnt = 2; // Points to the function code
 
@@ -162,7 +176,7 @@ namespace @NAMESPACE@ {
             }
         }
 
-        static std::string_view get_buffer() {
+        static std::string_view get_buffer() noexcept {
             // Return the buffer ready to send
             return std::string_view{(char *)buffer, cnt};
         }

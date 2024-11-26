@@ -1,6 +1,7 @@
 /*
  * Relay modbus device
  */
+#include <logger.h>
 #include <sysclk.h>
 #include <asx/reactor.hpp>
 #include <asx/modbus_rtu.hpp>
@@ -19,6 +20,8 @@ namespace relay {
    // Implement all the callbacks
    //
    void on_get_status(uint8_t index, uint8_t op) {
+      LOG_TRACE("RELAY", "%d - %d", index, op);
+
       Datagram::pack( uint8_t{1} ); // Number of bytes returned
 
       if ( index == 255 ) {
@@ -37,6 +40,8 @@ namespace relay {
    }
 
    void on_set_single(uint8_t index, uint8_t operation) {
+      LOG_TRACE("RELAY", "%d - %d", index, operation);
+
       switch ( operation ) {
          case 0x00: relays[index].clr(); break;
          case 0xFF: relays[index].set(); break;
@@ -46,6 +51,8 @@ namespace relay {
    }
 
    void on_write_all(uint8_t operation) {
+      LOG_TRACE("RELAY", "%d", operation);
+
       switch ( operation ) {
          case 0x00: clr(); break;
          case 0xFF: set(); break;

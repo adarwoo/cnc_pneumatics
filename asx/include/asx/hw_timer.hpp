@@ -17,6 +17,11 @@ namespace asx {
       extern reactor::Handle on_timerb_compare;
       extern reactor::Handle on_timera_ovf;
 
+      extern uint8_t timera_config_flag;
+
+      // Single use flag
+      constexpr auto single_use = uint8_t{1<<1};
+
       enum class mode : uint8_t {
          period,
          timeout,
@@ -151,7 +156,7 @@ namespace asx {
 
             // Stop the timer so we don't try to aim at a moving target
             TCA().CTRLA &= ~TCA_SINGLE_ENABLE_bm;
-            TCA().CTRLECLR = TCA_SINGLE_CMD_RESET_gc;        // Reset counter
+            TCA().CTRLESET = TCA_SINGLE_CMD_RESTART_gc; // Reset counter
             // Clear any pending interrupts
             TCA().INTFLAGS =
                TCA_SINGLE_OVF_bm | TCA_SINGLE_CMP0_bm | TCA_SINGLE_CMP1_bm | TCA_SINGLE_CMP2_bm;
@@ -170,9 +175,12 @@ namespace asx {
             TCA().CTRLA &= ~TCA_SINGLE_ENABLE_bm;
          }
 
-         static void init() {
+         static void init( uint8_t flags ) {
             // Update the way you access prescaler and clk_setting
             auto prescaler = set_prescaler_for_maximum_ticks();
+
+            // Copy the flags
+            timera_config_flag = flags;
 
             TCA().CNT = 0;
             TCA().PER = duration.count() / std::get<0>(prescaler);
