@@ -2,7 +2,7 @@
 
 #include <avr/io.h>
 
-#include <cstdint>
+#include <stdint.h>
 #include <tuple>
 
 #include "asx/reactor.hpp"
@@ -53,6 +53,8 @@ namespace asx {
 
          // Recover cpu_tick_t from the raw tick count N
          static constexpr asx::chrono::cpu_tick_t duration = asx::chrono::cpu_tick_t(N);
+         
+         static inline reactor::mask clear_masks = 0;
 
          ///< @brief Possible prescaling values
          static constexpr TCA_SINGLE_CLKSEL_t clksel[] = {
@@ -100,12 +102,15 @@ namespace asx {
                if (cmp_index==0) {
                   on_timera_compare0 = h;
                   TCA().INTCTRL |= TCA_SINGLE_CMP0_bm;
+                  clear_masks |= reactor::mask_of(h);
                } else if (cmp_index==1) {
                   on_timera_compare1 = h;
                   TCA().INTCTRL |= TCA_SINGLE_CMP1_bm;
+                  clear_masks |= reactor::mask_of(h);
                } else {
                   on_timera_compare2 = h;
                   TCA().INTCTRL |= TCA_SINGLE_CMP2_bm;
+                  clear_masks |= reactor::mask_of(h);
                }
             };
 
@@ -116,6 +121,7 @@ namespace asx {
          static constexpr void react_on_overflow(reactor::Handle h) {
             on_timera_ovf = h;
             TCA().INTCTRL |= TCA_SINGLE_OVF_bm;
+            clear_masks |= reactor::mask_of(h);
          }
 
          // Variadic template function to set multiple compare registers
@@ -151,12 +157,7 @@ namespace asx {
                TCA_SINGLE_OVF_bm | TCA_SINGLE_CMP0_bm | TCA_SINGLE_CMP1_bm | TCA_SINGLE_CMP2_bm;
 
             // Clear the reactor flags - so no callback pass this point
-            reactor::clear(
-               on_timera_compare0,
-               on_timera_compare1,
-               on_timera_compare2,
-               on_timera_ovf
-            );
+            reactor::clear(clear_masks);
 
             // Restart the timer
             TCA().CTRLA |= TCA_SINGLE_ENABLE_bm;

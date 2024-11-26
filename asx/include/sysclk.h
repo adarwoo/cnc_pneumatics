@@ -38,6 +38,7 @@
 
 #include <board.h>
 #include <compiler.h>
+#include <ccp.h>
 
 // Include clock configuration for the project.
 #include <conf_clock.h>

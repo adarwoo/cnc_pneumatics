@@ -1,7 +1,7 @@
 TOP=..
 
 # Select the architecture
-ARCH=attiny824
+ARCH=attiny3224
 
 # Name of the binary to produce
 BIN := relay
@@ -61,7 +61,8 @@ SRCS = \
    $(ASX_DIR)/src/queue.c 	\
    $(ASX_DIR)/src/reactor.c \
    $(ASX_DIR)/src/uart.cpp \
-	$(ASX_DIR)/src/modbus_rtu_slave.cpp \
+   $(ASX_DIR)/src/hw_timer.cpp \
+   $(ASX_DIR)/src/modbus_rtu.cpp \
    main.cpp \
 
 ifdef SIM
@@ -71,7 +72,7 @@ SRCS = \
    $(ASX_DIR)/src/queue.c 	\
    $(ASX_DIR)/src/reactor.c \
    $(ASX_DIR)/src/uart.cpp \
-	$(ASX_DIR)/src/modbus_rtu.cpp \
+   $(ASX_DIR)/src/modbus_rtu.cpp \
    $(ASX_DIR)/src/hw_timer.cpp \
    ../sim/sim.cpp \
    main.cpp 

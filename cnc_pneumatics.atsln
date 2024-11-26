@@ -43,6 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{2B38
 		asx\include\digital_input.h = asx\include\digital_input.h
 		asx\include\digital_output.h = asx\include\digital_output.h
 		asx\include\asx\hw_timer.hpp = asx\include\asx\hw_timer.hpp
+		asx\include\utils\interrupt.h = asx\include\utils\interrupt.h
 		asx\include\ioport.h = asx\include\ioport.h
 		asx\include\mem.h = asx\include\mem.h
 		asx\include\osc.h = asx\include\osc.h

@@ -141,27 +141,9 @@ void reactor_notify( reactor_handle_t handle, void *data )
  * @param handle Handle to clear.
  * @param ... More handles are accepted
  */
-void reactor_clear(reactor_handle_t handle, ...)
+void reactor_clear(reactor_mask_t mask)
 {
-   // Initialize the variable argument list
-   va_list args;
-   va_start(args, handle);
-
-   // Process each handle in the variadic arguments
-   for (
-      reactor_handle_t h = handle;
-      h != REACTOR_NULL_HANDLE;
-      h = (reactor_handle_t)va_arg(args, int)
-      )
-   {
-      if ( handle != REACTOR_NULL_HANDLE )
-      {
-         _reactor_notifications &= ~(1UL << h);
-      }
-   }
-
-   // Cleanup the variable argument list
-   va_end(args);
+    _reactor_notifications &= ~(mask);
 }
 
 /** Process the reactor loop */

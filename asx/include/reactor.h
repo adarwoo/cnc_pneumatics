@@ -53,6 +53,9 @@ typedef enum : uint8_t {
  */
 typedef uint8_t reactor_handle_t;
 
+/** Internal mask for notifications */
+typedef uint32_t reactor_mask_t;
+
 /** Callback type called by the reactor when an event has been logged */
 typedef void (*reactor_handler_t)(void*);
 
@@ -71,15 +74,11 @@ reactor_handle_t reactor_register(
 void reactor_notify( reactor_handle_t handle, void* );
 
 /**
- * Clear pending operations. A number of handles can be given at once.
- * Note: REACTOR_NULL_HANDLE have no effect.
- * Note: This function must be called in a critical section since the handles
- *  could be set right after being cleared. The function can safely be called
- *  within an interrupt context
- * @param handle Handle to clear
+ * Clear pending operations
+ * @param mask A mask created with reactor_mask_of
  * @param ... More handles as required
  */
-void reactor_clear( reactor_handle_t handle, ... );
+void reactor_clear( reactor_mask_t mask );
 
 /** Process the reactor loop */
 void reactor_run(void);
@@ -89,6 +88,17 @@ void reactor_run(void);
  * Make sure to activate -flto to inline this function
  */
 void reactor_null_notify_from_isr(reactor_handle_t handle);
+
+/** Get the mask of a handler. The mask can be OR'd with other masks */
+inline reactor_mask_t reactor_mask_of(reactor_handle_t handle) {
+   uint32_t retval = 0;
+   
+   if ( handle != REACTOR_NULL_HANDLE ) {
+      return (1L << handle);
+   }
+   
+   return retval;      
+}   
 
 
 #ifdef __cplusplus
