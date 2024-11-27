@@ -1,5 +1,2 @@
-[submodule "modbus"]
-	path = modbus
-	url = https://github.com/liyanboy74/modbus.git
 [submodule "libstdc++"]
 	path = libstdc++
