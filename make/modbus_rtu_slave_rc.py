@@ -76,16 +76,16 @@ namespace @NAMESPACE@ {
         ///< CRC for the datagram
         inline static asx::modbus::Crc crc{};
 
-        template <typename T>
-        static constexpr T ntoh(const uint8_t offset) {
-            static_assert(std::is_unsigned_v<T>, "Type T must be an unsigned integer type");
-            static_assert(sizeof(T) <= 4, "Only uint8_t, uint16_t, and uint32_t are supported");
+        static inline auto ntoh(const uint8_t offset) -> uint16_t {
+            return (static_cast<uint16_t>(buffer[offset]) << 8) | static_cast<uint16_t>(buffer[offset + 1]);
+        }
 
-            T result = 0;
-            for (size_t i = 0; i < sizeof(T); ++i) {
-                result = (result << 8) | static_cast<T>(buffer[offset + i]);
-            }
-            return result;
+        static inline auto ntohl(const uint8_t offset) -> uint32_t {
+            return
+                (static_cast<uint32_t>(buffer[offset]) << 24) |
+                (static_cast<uint32_t>(buffer[offset+1]) << 16) |
+                (static_cast<uint32_t>(buffer[offset+2]) << 8) |
+                static_cast<uint16_t>(buffer[offset+3]);
         }
 
     public:
@@ -294,7 +294,7 @@ class Matcher:
                 return f"c < {self.value._to}"
             return f"c >= {self.value._from} and c < {self.value._to}"
         elif isinstance(self.value, list):
-            return " || ".join(f"c == {value}" for value in self.value)
+            return " || ".join(f"c == {hex(value)}" for value in self.value)
         elif self.value == None:
             return None
         else:
@@ -400,11 +400,9 @@ class TransitionGroup:
         # Skip if CRC - we don't compute the CRC
         if not self.transitions[0].next.name.startswith('RDY_TO_CALL'):
             if size == 2: # Redefine c
-                data = f"{tab}{extra}uint8_t *data = &buffer[cnt-2];\n"
-                data += f"{tab}{extra}{self.integral.ctype} c = (data[0] << 8) | data[1];\n\n"
+                data = f"{tab}{extra}auto c = ntoh(cnt-2);\n\n"
             elif size == 4:
-                data = f"{tab}{extra}uint8_t *data = &buffer[cnt-4];\n"
-                data += f"{tab}{extra}{self.integral.ctype} c = data[0] << 24 | data[0] << 16 | data[0] << 8 | data[1];\n\n"
+                data = f"{tab}{extra}auto c = ntohl(cnt-4);\n\n"
 
             for matcher in self.transitions:
                 if next_flag:
@@ -477,9 +475,11 @@ class Operation:
             offset += chain_item.size - param_size
 
             if param_size == 1:
-                values_str.insert(0, f"{param.ctype}{{buffer[{offset}]}}")
-            else:
-                values_str.insert(0, f"ntoh<{param.ctype}>({offset})")
+                values_str.insert(0, f"buffer[{offset}]")
+            elif param_size == 2:
+                values_str.insert(0, f"ntoh({offset})")
+            elif param_size == 4:
+                values_str.insert(0, f"ntohl({offset})")
 
         # Add the params (the list is ordered)
         return f"{self.name}({', '.join(values_str)});"
