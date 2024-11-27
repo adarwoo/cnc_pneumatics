@@ -14,7 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7E2BE5AE-FEA
 		asx\src\_ccp.s = asx\src\_ccp.s
 		asx\src\alert.c = asx\src\alert.c
 		asx\src\builtin.cpp = asx\src\builtin.cpp
-		asx\src\ccp.c = asx\src\ccp.c
 		asx\src\digital_input.c = asx\src\digital_input.c
 		asx\src\digital_output.c = asx\src\digital_output.c
 		asx\src\hw_timer.cpp = asx\src\hw_timer.cpp

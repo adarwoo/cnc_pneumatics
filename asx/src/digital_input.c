@@ -27,7 +27,7 @@
  * Defaults to reactor_prio_medium_plus
  */
 #ifndef DIGITAL_INPUT_PRIO
-#  define DIGITAL_INPUT_PRIO reactor_prio_medium_plus
+#  define DIGITAL_INPUT_PRIO reactor_prio_high
 #endif
 
 /**
@@ -36,7 +36,7 @@
  * Defaults to reactor_prio_very_high_minus
  */
 #ifndef DIGITAL_INPUT_ACK_PRIO
-#  define DIGITAL_INPUT_ACK_PRIO reactor_prio_very_high_minus
+#  define DIGITAL_INPUT_ACK_PRIO reactor_prio_high
 #endif
 
 /**
