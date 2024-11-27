@@ -10,8 +10,8 @@
 namespace relay {
     // All callbacks registered
     void on_get_status(uint8_t relay_index, uint8_t operation);
-    void on_set_single(uint8_t relay_index, uint8_t operation);
-    void on_write_all(uint8_t operation);
+    void on_set_single(uint8_t relay_index, uint16_t operation);
+    void on_write_all(uint16_t operation);
     void on_read_version();
 
     // All states to consider
@@ -52,6 +52,17 @@ namespace relay {
         ///< CRC for the datagram
         inline static asx::modbus::Crc crc{};
 
+        template <typename T>
+        static constexpr T ntoh(const uint8_t offset) {
+            static_assert(std::is_unsigned_v<T>, "Type T must be an unsigned integer type");
+            static_assert(sizeof(T) <= 4, "Only uint8_t, uint16_t, and uint32_t are supported");
+
+            T result = 0;
+            for (size_t i = 0; i < sizeof(T); ++i) {
+                result = (result << 8) | static_cast<T>(buffer[offset + i]);
+            }
+            return result;
+        }
 
     public:
         // Status of the datagram
@@ -141,7 +152,7 @@ namespace relay {
                     uint8_t *data = &buffer[cnt-2];
                     uint16_t c = (data[0] << 8) | data[1];
 
-                    if ( c < 3 ) {
+                    if ( c < 2 ) {
                         state = state_t::DEVICE_44_WRITE_SINGLE_COIL_ID;
                     } else if ( c == 255 ) {
                         state = state_t::DEVICE_44_WRITE_SINGLE_COIL_ID_1;
@@ -156,7 +167,7 @@ namespace relay {
                     uint8_t *data = &buffer[cnt-2];
                     uint16_t c = (data[0] << 8) | data[1];
 
-                    if ( c == 255 || c == 0 || c == 85 ) {
+                    if ( c == 65280 || c == 0 || c == 21760 ) {
                         state = state_t::DEVICE_44_WRITE_SINGLE_COIL_ID__ON_SET_SINGLE__CRC;
                     } else {
                         error = error_t::illegal_data_value;
@@ -174,7 +185,7 @@ namespace relay {
                     uint8_t *data = &buffer[cnt-2];
                     uint16_t c = (data[0] << 8) | data[1];
 
-                    if ( c == 255 || c == 0 || c == 85 ) {
+                    if ( c == 65280 || c == 0 || c == 21760 ) {
                         state = state_t::DEVICE_44_WRITE_SINGLE_COIL_ID_1__ON_WRITE_ALL__CRC;
                     } else {
                         error = error_t::illegal_data_value;
@@ -265,10 +276,10 @@ namespace relay {
                 on_get_status(uint8_t{buffer[3]}, uint8_t{buffer[5]});
                 break;
             case state_t::RDY_TO_CALL__ON_SET_SINGLE:
-                on_set_single(uint8_t{buffer[3]}, uint8_t{buffer[5]});
+                on_set_single(uint8_t{buffer[3]}, ntoh<uint16_t>(4));
                 break;
             case state_t::RDY_TO_CALL__ON_WRITE_ALL:
-                on_write_all(uint8_t{buffer[5]});
+                on_write_all(ntoh<uint16_t>(4));
                 break;
             case state_t::RDY_TO_CALL__ON_READ_VERSION:
                 on_read_version();

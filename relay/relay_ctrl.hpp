@@ -17,10 +17,11 @@ namespace relay
    class RelayCtrl {
       ioport_pin_t led;
       ioport_pin_t relay;
-      
+
    public:
-      RelayCtrl( ioport_pin_t _led, ioport_pin_t _relay ) : 
-         led(_led), relay(_relay) 
+      /** When constructed, the LED is ON to test it */
+      RelayCtrl( ioport_pin_t _led, ioport_pin_t _relay ) :
+         led(_led), relay(_relay)
       {
          // Light LED on power-up
          ioport_set_pin_level(led, true);
@@ -31,21 +32,22 @@ namespace relay
 
       inline void set(bool close=true) {
          ioport_set_pin_level(led, close);
-         //ioport_set_pin_level(relay, close);
+         ioport_set_pin_level(relay, close);
       }
 
       inline void clr() {
          ioport_set_pin_level(led, false);
-         //ioport_set_pin_level(relay, close);
+         ioport_set_pin_level(relay, false);
       }
-      
+
       inline void tgl() {
-         ioport_set_pin_level(led, !status());
-         //ioport_set_pin_level(relay, close);
+         bool onoff = status() ? false : true;
+         ioport_set_pin_level(led, onoff);
+         ioport_set_pin_level(relay, onoff);
       }
 
       inline bool status() {
-         return ioport_get_pin_level(led);
+         return ioport_get_pin_level(relay);
       }
    };
 
@@ -54,7 +56,7 @@ namespace relay
       RelayCtrl(LED_B, RELAY_B),
       RelayCtrl(LED_C, RELAY_C),
    };
-   
+
    void set() {
       for (auto r : relays) {
          r.set();
@@ -69,7 +71,13 @@ namespace relay
    void tgl() {
       for (auto r : relays) {
          r.tgl();
-      }         
+      }
    }
 
+   /** Reset the led to the actual relay state */
+   void clean_led() {
+      for (auto r : relays) {
+         r.set(r.status());
+      }
+   }
 }

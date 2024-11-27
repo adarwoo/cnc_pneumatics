@@ -1,4 +1,4 @@
-﻿#include <avr/io.h>
+#include <avr/io.h>
 #include "twim.h"
 #include "reactor.h"
 #include "pca9555.h"

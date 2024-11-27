@@ -41,10 +41,11 @@ extern "C" {
 #define REACTOR_NULL_HANDLE 255
 
 /** Standard priorities for the reactor */
-typedef enum : uint8_t {
-   reactor_prio_low,
-   reactor_prio_high,
-} reactor_priority_t;
+typedef uint8_t reactor_priority_t;
+
+#define reactor_prio_low 0
+#define reactor_prio_high 1
+
 
 /**
  * @typedef reactor_handle_t
@@ -92,13 +93,13 @@ void reactor_null_notify_from_isr(reactor_handle_t handle);
 /** Get the mask of a handler. The mask can be OR'd with other masks */
 inline reactor_mask_t reactor_mask_of(reactor_handle_t handle) {
    uint32_t retval = 0;
-   
+
    if ( handle != REACTOR_NULL_HANDLE ) {
       return (1L << handle);
    }
-   
-   return retval;      
-}   
+
+   return retval;
+}
 
 
 #ifdef __cplusplus

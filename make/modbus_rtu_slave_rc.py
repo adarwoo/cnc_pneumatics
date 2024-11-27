@@ -76,6 +76,17 @@ namespace @NAMESPACE@ {
         ///< CRC for the datagram
         inline static asx::modbus::Crc crc{};
 
+        template <typename T>
+        static constexpr T ntoh(const uint8_t offset) {
+            static_assert(std::is_unsigned_v<T>, "Type T must be an unsigned integer type");
+            static_assert(sizeof(T) <= 4, "Only uint8_t, uint16_t, and uint32_t are supported");
+
+            T result = 0;
+            for (size_t i = 0; i < sizeof(T); ++i) {
+                result = (result << 8) | static_cast<T>(buffer[offset + i]);
+            }
+            return result;
+        }
 
     public:
         // Status of the datagram
@@ -426,10 +437,10 @@ class TransitionGroup:
         else:
             t=self.transitions[0]
             return f"{tab}if ( cnt == {self.pos+size} ) {{\n{tab}{INDENT}state = state_t::{t.next.name}"
-        
+
         if ( test_cnt ):
             return f"{tab}if ( cnt == {self.pos+size} ) {{\n{retval};\n{INDENT}{tab}}}"
-        
+
         return f"{tab}if ( cnt == {self.pos+size} ) {{\n{retval}"
 
 class Operation:
@@ -467,12 +478,8 @@ class Operation:
 
             if param_size == 1:
                 values_str.insert(0, f"{param.ctype}{{buffer[{offset}]}}")
-            elif param_size == 2:
-                values_str.insert(0, f"{param.ctype}{{buffer[{offset}]<<8 || buffer[{offset+1}]}}")
-            elif param_size == 4:
-                values_str.insert(0, f"{param.ctype}{{buffer[{offset}]<<24 || buffer[{offset+1}]<<16 || buffer[{offset+2}]<<8 || buffer[{offset+3}]}}")
-            elif param_size == -2: # CRC
-                values_str.insert(0, f"{param.ctype}{{buffer[{offset+1}]<<8 || buffer[{offset}]}}")
+            else:
+                values_str.insert(0, f"ntoh<{param.ctype}>({offset})")
 
         # Add the params (the list is ordered)
         return f"{self.name}({', '.join(values_str)});"

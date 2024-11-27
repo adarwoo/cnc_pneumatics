@@ -7,8 +7,8 @@ Modbus({
 
     "callbacks": {
         "on_get_status":                [(u8, "relay_index"), (u8, "operation")],
-        "on_set_single":                [(u8, "relay_index"), (u8, "operation")],
-        "on_write_all":                 [(u8, "operation")],
+        "on_set_single":                [(u8, "relay_index"), (u16, "operation")],
+        "on_write_all":                 [(u16, "operation")],
         "on_read_version":              [],
     },
 
@@ -16,11 +16,11 @@ Modbus({
         (READ_COILS,            u16(alias="address"),
                                 u16(1), # Valid command is 1
                                 "on_get_status"),
-        (WRITE_SINGLE_COIL,     u16(0, 3, alias="ID"),
-                                u16([0xFF, 0, 0x55], alias="OP"),
+        (WRITE_SINGLE_COIL,     u16(0, 2, alias="ID"),
+                                u16([0xFF00, 0, 0x5500], alias="OP"),
                                 "on_set_single"),
         (WRITE_SINGLE_COIL,     u16(0xFF, alias="ID"),
-                                u16([0xFF, 0, 0x55], alias="OP"),
+                                u16([0xFF00, 0, 0x5500], alias="OP"),
                                 "on_write_all"),
         (READ_HOLDING_REGISTERS, u16(1), "on_read_version"),
     ]

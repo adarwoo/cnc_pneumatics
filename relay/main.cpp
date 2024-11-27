@@ -15,7 +15,7 @@ using namespace asx;
 namespace relay {
    // Our relay modbus rtu slave templated class
    using modbus_slave = modbus::Slave<Datagram, board::Uart>;
-   
+
    //
    // Implement all the callbacks
    //
@@ -39,31 +39,31 @@ namespace relay {
       }
    }
 
-   void on_set_single(uint8_t index, uint8_t operation) {
+   void on_set_single(uint8_t index, uint16_t operation) {
       LOG_TRACE("RELAY", "%d - %d", index, operation);
 
       switch ( operation ) {
-         case 0x00: relays[index].clr(); break;
-         case 0xFF: relays[index].set(); break;
-         case 0x55: relays[index].tgl(); break;
+         case 0x0000: relays[index].clr(); break;
+         case 0xFF00: relays[index].set(); break;
+         case 0x5500: relays[index].tgl(); break;
          default:                        break;
       }
    }
 
-   void on_write_all(uint8_t operation) {
+   void on_write_all(uint16_t operation) {
       LOG_TRACE("RELAY", "%d", operation);
 
       switch ( operation ) {
-         case 0x00: clr(); break;
-         case 0xFF: set(); break;
-         case 0x55: tgl(); break;
+         case 0x0000: clr(); break;
+         case 0xFF00: set(); break;
+         case 0x5500: tgl(); break;
          default:          break;
       }
    }
 
    void on_read_version() {
       Datagram::pack( uint16_t{0x0001} );
-   }   
+   }
 } // End of namespace relay
 
 
@@ -72,6 +72,9 @@ int main()
    sysclk_init();
    reactor::init();
    relay::modbus_slave::init();
-   
+
+   // Clean the relay LED after 2 seconds
+   reactor::bind(relay::clean_led).delay(std::chrono::seconds{2});
+
    reactor::run();
 }

@@ -42,6 +42,23 @@ test TEST_SEND_RECEIVE = {
     [](){ interrupt_TCA0_CMP1_vect(); /* 35 elapsed */ }
 };
 
+test TEST_TURN_ON = {
+    [](){ interrupt_TCA0_CMP1_vect(); },
+    [](){ USART1.RXDATAL = 0x2C;   interrupt_USART1_RXC_vect(); },
+    [](){ USART1.RXDATAL = 0x05; interrupt_USART1_RXC_vect(); },
+    [](){ USART1.RXDATAL = 0x00; interrupt_USART1_RXC_vect(); },
+    [](){ USART1.RXDATAL = 0x00; interrupt_USART1_RXC_vect(); },
+    [](){ USART1.RXDATAL = 0xFF; interrupt_USART1_RXC_vect(); },
+    [](){ USART1.RXDATAL = 0x00; interrupt_USART1_RXC_vect(); },
+    [](){ USART1.RXDATAL = 0x8A; interrupt_USART1_RXC_vect(); },
+    [](){ USART1.RXDATAL = 0x47; interrupt_USART1_RXC_vect(); },
+    [](){ interrupt_TCA0_CMP0_vect(); },
+    [](){ interrupt_TCA0_CMP1_vect(); },
+    [](){ interrupt_TCA0_OVF_vect(); /* Reply should be sent */ },
+    [](){ interrupt_USART1_TXC_vect(); /* Buffer sent! */ },
+    [](){ interrupt_TCA0_CMP1_vect(); /* 35 elapsed */ }
+};
+
 test TEST_IGNORE = {
     [](){ interrupt_TCA0_CMP1_vect(); },
     [](){ USART1.RXDATAL = 45;   interrupt_USART1_RXC_vect(); },
@@ -81,10 +98,11 @@ test TEST_INTERRUPTED_THEN_RESUMED = {
     [](){ interrupt_TCA0_CMP1_vect(); /* 35 elapsed */ }
 };
 
-std::vector<test> ALL_TESTS = { 
+std::vector<test> ALL_TESTS = {
     TEST_SEND_RECEIVE,
     TEST_IGNORE,
-    TEST_INTERRUPTED_THEN_RESUMED
+    TEST_INTERRUPTED_THEN_RESUMED,
+    TEST_TURN_ON
 };
 auto itTest = ALL_TESTS.begin();
 auto itAction = itTest->begin();

@@ -27,7 +27,7 @@ namespace asx {
          uint8_t count;
          ///< The CRC for the currently received frame
          uint16_t crc;
-         
+
          /// @brief Buffer of the last 2 bytes so they are not processed
          uint8_t n_minus_1;
          uint8_t n_minus_2;
@@ -99,7 +99,7 @@ namespace asx {
                using namespace boost::sml;
 
                auto start_timer = [] () { Timer::start(); };
-               auto reset_dgram = [] () { Datagram::reset(); };
+               auto reset       = [] () { Datagram::reset(); };
                auto ready_reply = [] () { Datagram::ready_reply(); };
                auto reply       = [] () { Uart::send(Datagram::get_buffer()); };
 
@@ -112,12 +112,14 @@ namespace asx {
                * "cold"_s                + event<can_start_receiving>                    = "initial"_s
                , "initial"_s             + on_entry<_>                     / start_timer
                , "initial"_s             + event<t35_timeout>                            = "idle"_s
-               , "idle"_s                + on_entry<_>                     / reset_dgram
-               , "idle"_s                + event<demand_of_emission>                     = "emission"_s
+               , "initial"_s             + event<char_received>            / start_timer = "initial"_s
+               , "idle"_s                + on_entry<_>                     / reset
                , "idle"_s                + event<char_received>            / handle_char = "reception"_s
+               , "idle"_s                + event<demand_of_emission>                     = "emission"_s
                , "reception"_s           + event<t15_timeout>                            = "control_and_waiting"_s
                , "reception"_s           + event<char_received>            / handle_char = "reception"_s
                , "control_and_waiting"_s + event<t35_timeout> [must_reply]               = "reply"_s
+               , "control_and_waiting"_s + event<char_received>                          = "initial"_s
                , "control_and_waiting"_s + event<t35_timeout>                            = "idle"_s
                , "reply"_s               + on_entry<_>                     / ready_reply
                , "reply"_s               + event<char_received>            / handle_char = "initial"_s // Unlikely - but a possibility
@@ -152,7 +154,7 @@ namespace asx {
                LOG_INFO("SM", "[transition] %s -> %s", src.c_str(), dst.c_str());
             }
          };
-         
+
          inline static Logging logger;
          inline static auto sm = boost::sml::sm<StateMachine, boost::sml::logger<Logging>>{logger};
 

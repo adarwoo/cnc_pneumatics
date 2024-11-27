@@ -15,8 +15,11 @@ COMMON_DIR     := common
 BOOST_DIR      := boost
 LOGGER_DIR     := logger
 ASX_DIR        := asx
-STDCXX_DIR     := libstdc++
 ETL_DIR        := etl
+
+ifndef SIM
+STDCXX_DIR     := libstdc++
+endif
 
 # -I throughout (C and C++)
 INCLUDE_DIRS = \
@@ -83,7 +86,7 @@ SRCS = \
    $(ASX_DIR)/src/modbus_rtu.cpp \
    $(ASX_DIR)/src/hw_timer.cpp \
    ../sim/sim.cpp \
-   main.cpp 
+   main.cpp
 endif
 
 # Inlude the actual build rules
