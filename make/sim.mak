@@ -6,7 +6,7 @@ ifndef NDEBUG
 DEBUG=1
 endif
 
-BUILD_DIR ?= sim
+BUILD_DIR ?= $(build_type)_sim
 tc_prefix:=
 CPPFLAGS += -D_POSIX -DSIM
 LDFLAGS += -pthread
@@ -15,7 +15,7 @@ CXX=c++
 
 ifdef DEBUG
   CFLAGS += \
-    -I$(TOP)/sim
+    -I$(TOP)/asx/include/sim
     -fsanitize=address \
     -fsanitize=alignment \
     -fno-omit-frame-pointer \
