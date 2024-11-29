@@ -152,7 +152,7 @@ void reactor_run(void)
    // Set the watchdog which is reset by the reactor
    // If the timer is uses, the watchdog would be refreshed every 1ms, but otherwise, we don't know
    // There is no need for too aggressive timings
-   //wdt_enable(WDTO_1S);
+   wdt_enable(WDTO_1S);
 
    // Atomically read and clear the notification flags allowing more
    //  interrupt from setting the flags which will be processed next time round

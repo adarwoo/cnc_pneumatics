@@ -7,37 +7,33 @@ ARCH=attiny3224
 BIN := relay
 
 # Reference all from the solution
-VPATH=..
+VPATH=$(TOP)
 
 # Paths, local to src
-THIS_DIR       := .
 COMMON_DIR     := common
 BOOST_DIR      := boost
 LOGGER_DIR     := logger
 ASX_DIR        := asx
 ETL_DIR        := etl
-
-ifndef SIM
 STDCXX_DIR     := libstdc++
-endif
 
 # -I throughout (C and C++)
 INCLUDE_DIRS = \
    src \
    include \
    conf \
-   ../$(COMMON_DIR)/include \
-   ../${BOOST_DIR} \
-   ../${ETL_DIR}/include \
-   ../${LOGGER_DIR}/include \
-	../$(STDCXX_DIR)/include \
-   ../${ASX_DIR}/include \
-   ../${ASX_DIR}/include/utils \
-   ../${ASX_DIR}/include/utils/preprocessor \
+   $(TOP)/$(COMMON_DIR)/include \
+   $(TOP)/${BOOST_DIR} \
+   $(TOP)/${ETL_DIR}/include \
+   $(TOP)/${LOGGER_DIR}/include \
+	$(TOP)/$(STDCXX_DIR)/include \
+   $(TOP)/${ASX_DIR}/include \
+   $(TOP)/${ASX_DIR}/include/utils \
+   $(TOP)/${ASX_DIR}/include/utils/preprocessor \
 
-
-# Generate the modbus_rtu code
-#$(ASX_DIR)/src/modbus_rtu_slave.cpp : conf/modbus_rtu_slave.hpp
+ifndef SIM
+INCLUDE_DIRS += $(TOP)/$(STDCXX_DIR)/include
+endif
 
 # Project own files
 SRCS = \
@@ -67,9 +63,14 @@ SRCS = \
    $(ASX_DIR)/src/uart.cpp \
    $(ASX_DIR)/src/modbus_rtu.cpp \
    $(ASX_DIR)/src/hw_timer.cpp \
-   ../sim/sim.cpp \
-   main.cpp
+   relay_ctrl.cpp \
+   modbus.cpp \
+   main.cpp \
+   test_relay.cpp
 endif
 
 # Inlude the actual build rules
 include $(TOP)/make/rules.mak
+
+# Add dependency to generate the datagram from the config
+main.cpp : conf/datagram.hpp

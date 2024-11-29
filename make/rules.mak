@@ -73,13 +73,10 @@ BUILDDIRS        = $(sort $(dir $(OBJS)))
 
 all : $(BUILDDIRS) $(BIN)$(BIN_EXT)
 
-sim :
-	$(MUTE)$(MAKE) --no-print-directory $(MAKEFLAGS) SIM=1 all
-
 -include $(RCDEP_FILES)
 
 # Create the build directory
-$(BUILD_DIR): ; @-mkdir -p $@
+$(BUILD_DIR): ; $(MUTE)-mkdir -p $@
 
 $(BIN)$(BIN_EXT) : $(BUILD_DIR)/$(BIN)$(BIN_EXT)
 	@echo Copying $^ to $@
@@ -129,7 +126,7 @@ endef
 # Build directory creation
 #
 $(BUILDDIRS) :
-	$(MKDIR) "$@"
+	$(MUTE)$(MKDIR) "$@"
 
 # Include the .d if they exists
 -include $(DEP_FILES)
@@ -138,4 +135,5 @@ $(BUILDDIRS) :
 # Clean rules
 #
 clean:
-	rm -rf $(BUILD_DIR)
+	@echo Removing build directory: $(BUILD_DIR) 
+	$(MUTE)rm -rf $(BUILD_DIR)

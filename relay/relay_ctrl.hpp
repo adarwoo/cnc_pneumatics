@@ -3,13 +3,9 @@
  *
  * API to control the relays
  */
-#include <array>
-
-#include "board.h"
 #include "ioport.h"
 
-namespace relay
-{
+namespace relay {
    /**
     * Relay control
     * Drives the coil and the led.
@@ -51,33 +47,9 @@ namespace relay
       }
    };
 
-   static inline auto relays = std::array<RelayCtrl, 3> {
-      RelayCtrl(LED_A, RELAY_A),
-      RelayCtrl(LED_B, RELAY_B),
-      RelayCtrl(LED_C, RELAY_C),
-   };
-
-   void set() {
-      for (auto r : relays) {
-         r.set();
-      }
-   }
-   void clr() {
-      for (auto r : relays) {
-         r.clr();
-      }
-   }
-
-   void tgl() {
-      for (auto r : relays) {
-         r.tgl();
-      }
-   }
+   /** Accessor */
+   auto get_relay(uint8_t index) -> RelayCtrl&;
 
    /** Reset the led to the actual relay state */
-   void clean_led() {
-      for (auto r : relays) {
-         r.set(r.status());
-      }
-   }
+   void clean_relay_leds();
 }
