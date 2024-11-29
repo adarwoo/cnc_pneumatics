@@ -6,10 +6,10 @@ Modbus({
     "namespace": "relay",
 
     "callbacks": {
-        "on_get_status":                [(u8, "relay_index"), (u8, "operation")],
-        "on_set_single":                [(u8, "relay_index"), (u16, "operation")],
-        "on_write_all":                 [(u16, "operation")],
-        "on_read_version":              [],
+        "on_get_status":        [(u8, "relay_index"), (u8, "operation")],
+        "on_set_single":        [(u8, "relay_index"), (u16, "operation")],
+        "on_write_all":         [(u16, "operation")],
+        "on_read_version":      [],
     },
 
     "device@44": [
