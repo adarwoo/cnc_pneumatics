@@ -19,7 +19,7 @@ using namespace std::chrono;
 
 using namespace asx::ioport;
 
-using LED0 = Pin<A, 4, dir_t::out, enabled, rising>;
+using LED0 = Pin<A, 4, dir::in, pullup::enabled, sense::rising, invert::inverted>;
 auto led0 = LED0{};
 
 

@@ -11,13 +11,13 @@ namespace asx
       using pin_t = uint8_t;
       using mask_t = uint8_t;
 
-      enum class dir_t : uint8_t
+      enum class dir : uint8_t
       {
          in = 0,
          out = 1
       };
 
-      enum class value_t : uint8_t
+      enum class value : uint8_t
       {
          low = 0,
          high = 1
@@ -43,28 +43,34 @@ namespace asx
          constexpr explicit sense_t(uint8_t v) : scoped_option_t(v) {}
       };
 
-      static constexpr sense_t interrupt_disable{PORT_ISC_INTDISABLE_gc};
-      static constexpr sense_t bothedges{PORT_ISC_BOTHEDGES_gc};
-      static constexpr sense_t rising{PORT_ISC_RISING_gc};
-      static constexpr sense_t falling{PORT_ISC_FALLING_gc};
-      static constexpr sense_t input_disabled{PORT_ISC_INPUT_DISABLE_gc};
-      static constexpr sense_t level_low{PORT_ISC_LEVEL_gc};
+      namespace sense {
+         static constexpr sense_t interrupt_disable{PORT_ISC_INTDISABLE_gc};
+         static constexpr sense_t bothedges{PORT_ISC_BOTHEDGES_gc};
+         static constexpr sense_t rising{PORT_ISC_RISING_gc};
+         static constexpr sense_t falling{PORT_ISC_FALLING_gc};
+         static constexpr sense_t input_disabled{PORT_ISC_INPUT_DISABLE_gc};
+         static constexpr sense_t level_low{PORT_ISC_LEVEL_gc};
+      }
 
       struct invert_t : scoped_option_t<invert_t> {
          constexpr explicit invert_t(uint8_t v) : scoped_option_t(v) {}
       };
 
-      static constexpr invert_t normal{0};
-      static constexpr invert_t inverted{PORT_INVEN_bm};
+      namespace invert {
+         static constexpr invert_t normal{0};
+         static constexpr invert_t inverted{PORT_INVEN_bm};
+      }
 
       struct pullup_t : scoped_option_t<pullup_t> {
          constexpr explicit pullup_t(uint8_t v) : scoped_option_t(v) {}
       };
 
-      static constexpr pullup_t disabled{0};
-      static constexpr pullup_t enabled{PORT_PULLUPEN_bm};
+      namespace pullup {
+         static constexpr pullup_t disabled{0};
+         static constexpr pullup_t enabled{PORT_PULLUPEN_bm};
+      }
 
-      enum class slewrate_limit_t : uint8_t
+      enum class slewrate_limit : uint8_t
       {
          disabled = 0,
          enabled = 1
