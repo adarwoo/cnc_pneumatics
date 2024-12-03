@@ -4,6 +4,7 @@
  */
 #include <sysclk.h>
 #include <asx/reactor.hpp>
+#include <asx/ioport.hpp>
 
 // Defines the modbus_slave
 #include "modbus.hpp"
@@ -14,6 +15,12 @@
 using namespace asx;
 using namespace relay;
 using namespace std::chrono;
+
+
+using namespace asx::ioport;
+
+using LED0 = Pin<A, 4, dir_t::out, enabled, rising>;
+auto led0 = LED0{};
 
 
 int main()
