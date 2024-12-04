@@ -7,10 +7,9 @@
 #include <asx/ioport.hpp>
 
 // Defines the modbus_slave
+#include "relay_ctrl.hpp"
 #include "modbus.hpp"
 
-// Defines the relay
-#include "relay_ctrl.hpp"
 
 using namespace asx;
 using namespace relay;
@@ -28,7 +27,7 @@ int main()
    modbus_slave::init();
 
    // Clean the relay LED after 2 seconds
-   reactor::bind(clean_relay_leds).delay(2s);
+   reactor::bind(relay::clean_leds).delay(2s);
 
    // Run the reactor/scheduler
    reactor::run();

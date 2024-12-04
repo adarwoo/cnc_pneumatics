@@ -1,7 +1,9 @@
 #pragma once
+
 #ifdef SIM
 #include <cstdio>
 #endif
+
 #include <logger.h>
 #include <string_view>
 

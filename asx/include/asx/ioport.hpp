@@ -1,40 +1,45 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <avr/io.h>
-
 
 namespace asx
 {
    // Provide own traits to remove need for stdlib
-   namespace std {
-        template <typename Base, typename Derived>
-        concept is_base_of = requires(Derived* d) {
-            { static_cast<Base*>(d) };
-        };
+   namespace aux
+   {
+      template <typename Base, typename Derived>
+      concept is_base_of = requires(Derived *d) {
+         { static_cast<Base *>(d) };
+      };
 
-        template <typename Base, typename Derived>
-        inline constexpr bool is_base_of_v = is_base_of<Base, Derived>;
+      template <typename Base, typename Derived>
+      inline constexpr bool is_base_of_v = is_base_of<Base, Derived>;
 
-        template <class T, T V>
-        struct integral_constant {
-            using type = integral_constant;
-            static constexpr T value = V;
-        };
+      template <class T, T V>
+      struct integral_constant
+      {
+         using type = integral_constant;
+         static constexpr T value = V;
+      };
 
-        using true_type = integral_constant<bool, true>;
-        using false_type = integral_constant<bool, false>;
+      using true_type = integral_constant<bool, true>;
+      using false_type = integral_constant<bool, false>;
 
-        template <class, class>
-        struct is_same : false_type {};
+      template <class, class>
+      struct is_same : false_type
+      {
+      };
 
-        template <class T>
-        struct is_same<T, T> : true_type {};
+      template <class T>
+      struct is_same<T, T> : true_type
+      {
+      };
 
-        template <typename T1, typename T2>
-        inline constexpr bool is_same_v = is_same<T1, T2>::value;
+      template <typename T1, typename T2>
+      inline constexpr bool is_same_v = is_same<T1, T2>::value;
 
-        using uintptr_t = uintptr_t;
+      using uintptr_t = uintptr_t;
    }
 
    namespace ioport
@@ -55,15 +60,19 @@ namespace asx
          high = 1
       };
 
-      struct option_t {
+      struct option_t
+      {
          uint8_t value;
       };
 
-      struct pinctrl_t : option_t {};
+      struct pinctrl_t : option_t
+      {
+      };
 
       // CRTP Base for Scoped Options
       template <typename Derived>
-      struct scoped_option_t : pinctrl_t {
+      struct scoped_option_t : pinctrl_t
+      {
          constexpr explicit scoped_option_t(uint8_t v) : pinctrl_t{v} {}
 
          // Allow implicit conversion to uint8_t for ease of use
@@ -71,11 +80,13 @@ namespace asx
       };
 
       // Specialized Scoped Options
-      struct sense_t : scoped_option_t<sense_t> {
+      struct sense_t : scoped_option_t<sense_t>
+      {
          constexpr explicit sense_t(uint8_t v) : scoped_option_t(v) {}
       };
 
-      namespace sense {
+      namespace sense
+      {
          static constexpr sense_t interrupt_disable{PORT_ISC_INTDISABLE_gc};
          static constexpr sense_t bothedges{PORT_ISC_BOTHEDGES_gc};
          static constexpr sense_t rising{PORT_ISC_RISING_gc};
@@ -84,20 +95,24 @@ namespace asx
          static constexpr sense_t level_low{PORT_ISC_LEVEL_gc};
       }
 
-      struct invert_t : scoped_option_t<invert_t> {
+      struct invert_t : scoped_option_t<invert_t>
+      {
          constexpr explicit invert_t(uint8_t v) : scoped_option_t(v) {}
       };
 
-      namespace invert {
+      namespace invert
+      {
          static constexpr invert_t normal{0};
          static constexpr invert_t inverted{PORT_INVEN_bm};
       }
 
-      struct pullup_t : scoped_option_t<pullup_t> {
+      struct pullup_t : scoped_option_t<pullup_t>
+      {
          constexpr explicit pullup_t(uint8_t v) : scoped_option_t(v) {}
       };
 
-      namespace pullup {
+      namespace pullup
+      {
          static constexpr pullup_t disabled{0};
          static constexpr pullup_t enabled{PORT_PULLUPEN_bm};
       }
@@ -121,30 +136,36 @@ namespace asx
       public:
          constexpr Port(const uint8_t _port) : port{_port} {}
 
-         constexpr PORT_t &base() const {
+         constexpr PORT_t &base() const
+         {
             return *((PORT_t *)(BASE_ADDRESS + (port * PORT_OFFSET)));
          }
 
-         constexpr VPORT_t &vbase() const {
+         constexpr VPORT_t &vbase() const
+         {
             return *((VPORT_t *)(VBASE_ADDRESS + (port * PORT_OFFSET)));
          }
 
-         constexpr uint8_t index() const {
+         constexpr uint8_t index() const
+         {
             return port;
          }
 
-         void set_slewrate(const slewrate_limit sr) {
+         void set_slewrate(const slewrate_limit sr)
+         {
             if (sr == slewrate_limit::enabled)
                base().PORTCTRL |= 1;
             else
                base().PORTCTRL &= ~1;
          }
 
-         constexpr bool operator==(const Port &p) {
+         constexpr bool operator==(const Port &p)
+         {
             return &(p.port) == &port;
          }
 
-         constexpr uint8_t operator*() const {
+         constexpr uint8_t operator*() const
+         {
             return port;
          }
       };
@@ -154,82 +175,106 @@ namespace asx
       constexpr auto B = Port{1};
       constexpr auto C = Port{2};
 
-      // Extract 
+      // Extract
       template <typename Target, typename First, typename... Rest>
-      constexpr Target extract_argument(First first, Rest... rest) {
-         if constexpr (std::is_same_v<First, Target>) {
+      constexpr Target extract_argument(First first, Rest... rest)
+      {
+         if constexpr (aux::is_same_v<First, Target>)
+         {
             return first; // Found the value
-         } else {
+         }
+         else
+         {
             return extract_argument<Target>(rest...); // Recurse
          }
       }
 
       // Pin object holding a value
-      class PinDef {
+      class PinDef
+      {
       protected:
          port_pin_t port_pin;
 
       public:
          constexpr PinDef(const Port port, const uint8_t pin) : port_pin((port.index() * 8U) + pin) {}
 
-         inline constexpr Port port() const {
+         inline constexpr Port port() const
+         {
             uint8_t index = port_pin >> 8;
             return Port{index};
          }
 
-         inline constexpr PORT_t& base() const {
+         inline constexpr PORT_t &base() const
+         {
             return port().base();
          }
 
-         inline constexpr VPORT_t& vbase() const {
+         inline constexpr VPORT_t &vbase() const
+         {
             return port().vbase();
          }
 
-         inline constexpr mask_t mask() const {
+         inline constexpr mask_t mask() const
+         {
             return 1U << (port_pin & 0x07);
          }
       };
 
       // Pin object holding a value
-      class Pin : public PinDef {
+      class Pin : public PinDef
+      {
          template <typename Target, typename First, typename... Rest>
-         constexpr Target extract_argument(First first, Rest... rest) {
-            if constexpr (std::is_same_v<First, Target>) {
+         constexpr Target extract_argument(First first, Rest... rest)
+         {
+            if constexpr (aux::is_same_v<First, Target>)
+            {
                return first; // Found the value
-            } else {
+            }
+            else
+            {
                return extract_argument<Target>(rest...); // Recurse
             }
          }
 
       public:
-         inline Pin& set_output() {
+         inline Pin &set_output()
+         {
             vbase().OUT |= mask();
 
             return *this;
          }
 
-         template<typename ...T>
-         inline constexpr Pin& init(T... args) {
-            constexpr bool has_value = (std::is_same_v<T, value> || ...);
+         template <typename... T>
+         inline constexpr Pin &init(T... args)
+         {
+            constexpr bool has_value = (aux::is_same_v<T, value> || ...);
 
-            if constexpr (has_value) {
+            if constexpr (has_value)
+            {
                value v = extract_argument<value>(args...);
 
-               if (v == value::low) {
+               if (v == value::low)
+               {
                   vbase().OUT &= ~mask();
-               } else {
+               }
+               else
+               {
                   vbase().OUT |= mask();
                }
             }
 
-            constexpr bool has_dir = (std::is_same_v<T, dir> || ...);
+            constexpr bool has_dir = (aux::is_same_v<T, dir> || ...);
 
-            if constexpr (has_dir) {
+            if constexpr (has_dir)
+            {
                dir dir_value = extract_argument<dir>(args...);
 
-               if (dir_value == dir::in) {
+               if (dir_value == dir::in)
+               {
                   vbase().DIR &= ~mask();
-               } else {
+               }
+               else
+               {
                   vbase().DIR |= mask();
                }
             }
@@ -237,7 +282,8 @@ namespace asx
             // Compute the PINCTRL register value
             constexpr uint8_t pinctrl_value = compute_pinctrl();
 
-            if constexpr (pinctrl_value != 0) {
+            if constexpr (pinctrl_value != 0)
+            {
                register8_t *pinctrl = &(base().PIN0CTRL) + (port_pin & 0x07);
                *pinctrl = pinctrl_value;
             }
@@ -245,34 +291,42 @@ namespace asx
             return *this;
          }
 
-         auto operator*() -> bool {
+         auto operator*() -> bool
+         {
             return vbase().IN & (~mask());
          }
 
-         auto set(const bool value = true) -> void {
-            if (value) {
+         auto set(const bool value = true) -> void
+         {
+            if (value)
+            {
                vbase().OUT |= mask();
-            } else {
+            }
+            else
+            {
                vbase().OUT &= ~mask();
-           }
+            }
          }
 
-         auto clear() -> void {
+         auto clear() -> void
+         {
             vbase().OUT &= ~mask();
          }
 
-         auto toggle() -> void {
+         auto toggle() -> void
+         {
             vbase().OUT ^= mask();
          }
+
       private:
          // Compute PINCTRL register value by summing options that inherit from pinctrl_t
-         template<typename... OPTS>
-         static constexpr uint8_t compute_pinctrl() {
+         template <typename... OPTS>
+         static constexpr uint8_t compute_pinctrl()
+         {
             uint8_t result = 0;
-            ((result |= static_cast<uint8_t>(std::is_base_of_v<pinctrl_t, OPTS> ? OPTS::value : 0)), ...);
+            ((result |= static_cast<uint8_t>(aux::is_base_of_v<pinctrl_t, OPTS> ? OPTS::value : 0)), ...);
             return result;
          }
       };
    } // End of ioport namespace
 }
-

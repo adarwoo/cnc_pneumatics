@@ -2,8 +2,9 @@
 
 #include <avr/io.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <tuple>
+#include <limits>
 
 #include "asx/reactor.hpp"
 #include "asx/chrono.hpp"
@@ -58,7 +59,7 @@ namespace asx {
 
          // Recover cpu_tick_t from the raw tick count N
          static constexpr asx::chrono::cpu_tick_t duration = asx::chrono::cpu_tick_t(N);
-         
+
          static inline reactor::mask clear_masks = 0;
 
          ///< @brief Possible prescaling values
