@@ -46,7 +46,10 @@ SRCS = \
    $(ASX_DIR)/src/uart.cpp \
    $(ASX_DIR)/src/hw_timer.cpp \
    $(ASX_DIR)/src/modbus_rtu.cpp \
+   relay_ctrl.cpp \
+   modbus.cpp \
    main.cpp \
+	other.cpp \
 
 ifdef SIM
 SRCS = \

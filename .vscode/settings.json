@@ -45,7 +45,8 @@
       "utility": "cpp",
       "variant": "cpp",
       "vector": "cpp",
-      "algorithm": "cpp"
+      "algorithm": "cpp",
+      "cstdarg": "cpp"
    },
    "cmake.sourceDirectory": "/mnt/e/gax/dev/cnc_pneumatics/etl"
 }

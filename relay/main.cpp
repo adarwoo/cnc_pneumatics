@@ -16,13 +16,6 @@ using namespace asx;
 using namespace relay;
 using namespace std::chrono;
 
-
-using namespace asx::ioport;
-
-using LED0 = Pin<A, 4, dir::in, pullup::enabled, sense::rising, invert::inverted>;
-auto led0 = LED0{};
-
-
 int main()
 {
    // Configure the system clock according to the conf/conf_clock.h

@@ -1,20 +1,23 @@
+#pragma once
+
 #include <cstdint>
 #include <type_traits>
 
 #include <avr/io.h>
 
+
 namespace asx
 {
    namespace ioport
    {
-      using mode_t = uint8_t;
-      using pin_t = uint8_t;
+      using port_pin_t = uint8_t;
       using mask_t = uint8_t;
 
       enum class dir : uint8_t
       {
          in = 0,
-         out = 1
+         out = 1,
+         configured = 2
       };
 
       enum class value : uint8_t
@@ -76,123 +79,155 @@ namespace asx
          enabled = 1
       };
 
-      template <uintptr_t BaseAddress>
-      struct Port
+      class Port
       {
-         static constexpr std::uintptr_t addr = BaseAddress;
+         static constexpr auto BASE_ADDRESS = std::uintptr_t{0x400};
+         static constexpr auto VBASE_ADDRESS = std::uintptr_t{0x000};
+         static constexpr auto PORT_OFFSET = uint8_t{0x20};
+         static constexpr auto PORT_VOFFSET = uint8_t{0x4};
 
-         static PORT_t &port()
-         {
-            return *(reinterpret_cast<PORT_t *>(BaseAddress));
+         ///< Port number
+         uint8_t port;
+
+      public:
+         constexpr Port(const uint8_t _port) : port{_port} {}
+
+         constexpr PORT_t &base() const {
+            return *((PORT_t *)(BASE_ADDRESS + (port * PORT_OFFSET)));
          }
 
-         static constexpr VPORT_t &vport()
-         {
-            VPORT_t *retval = (VPORT_t *)(addr - 0x400);
-            return *retval;
+         constexpr VPORT_t &vbase() const {
+            return *((VPORT_t *)(VBASE_ADDRESS + (port * PORT_OFFSET)));
          }
 
-         void set_slewrate(const slewrate_limit_t sr)
-         {
-            if (sr == slewrate_limit_t::enabled)
-               port().PORTCTRL |= 1;
+         constexpr uint8_t index() const {
+            return port;
+         }
+
+         void set_slewrate(const slewrate_limit sr) {
+            if (sr == slewrate_limit::enabled)
+               base().PORTCTRL |= 1;
             else
-               port().PORTCTRL &= ~1;
+               base().PORTCTRL &= ~1;
          }
 
-         constexpr bool operator==(const Port &p)
-         {
+         constexpr bool operator==(const Port &p) {
             return &(p.port) == &port;
+         }
+
+         constexpr uint8_t operator*() const {
+            return port;
          }
       };
 
       // Actual ports
-      using A = Port<0x400>;
-      using B = Port<0x420>;
-      using C = Port<0x440>;
+      constexpr auto A = Port{0};
+      constexpr auto B = Port{1};
+      constexpr auto C = Port{2};
 
-      // Create a dataless port - but a port
-      template <typename PORT, pin_t PIN, dir_t _DIR, auto... OPTIONS>
-      class Pin
-      {
+      // Pin object holding a value
+      class Pin {
+         port_pin_t port_pin;
+
+         template <typename Target, typename First, typename... Rest>
+         constexpr Target extract_argument(First first, Rest... rest) {
+            if constexpr (std::is_same_v<First, Target>) {
+               return first; // Found the value
+            } else {
+               return extract_argument<Target>(rest...); // Recurse
+            }
+         }
       public:
-         using port = PORT;
-         static constexpr auto pin = PIN;
+         constexpr Pin(const Port port, const uint8_t pin) : port_pin((port.index() * 8U) + pin) {}
 
-         static constexpr auto bitmask() -> mask_t
-         {
-            return uint8_t{1} << pin;
+         inline constexpr Port port() const {
+            uint8_t index = port_pin >> 8;
+            return Port{index};
          }
 
-         constexpr Pin()
-         {
-            PORT::vport().DIR = (uint8_t)_DIR;
+         inline constexpr PORT_t& base() const {
+            return port().base();
+         }
 
-            //if constexpr ((_DIR == dir_t::in and VALUE == value_t::high) or (_DIR == dir_t::out))
-            //{
-            //   PORT::vport().OUT = (uint8_t)VALUE << PIN;
-            //}
+         inline constexpr VPORT_t& vbase() const {
+            return port().vbase();
+         }
+
+         inline constexpr mask_t mask() const {
+            return 1U << (port_pin & 0x07);
+         }
+
+         inline Pin& set_output() {
+            vbase().OUT |= mask();
+
+            return *this;
+         }
+
+         template<typename ...T>
+         inline constexpr Pin& init(T... args) {
+            constexpr bool has_value = (std::is_same_v<T, value> || ...);
+
+            if (has_value) {
+               value v = extract_argument<value>(args...);
+
+               if (v == value::low) {
+                  vbase().OUT &= ~mask();
+               } else {
+                  vbase().OUT |= mask();
+               }
+            }
+
+            constexpr bool has_dir = (std::is_same_v<T, dir> || ...);
+
+            if (has_dir) {
+               dir dir_value = extract_argument<dir>(args...);
+
+               if (dir_value == dir::in) {
+                  vbase().DIR &= ~mask();
+               } else {
+                  vbase().DIR |= mask();
+               }
+            }
 
             // Compute the PINCTRL register value
             constexpr uint8_t pinctrl_value = compute_pinctrl();
+
             if constexpr (pinctrl_value != 0) {
-                  register8_t *pinctrl = &(PORT::port().PIN0CTRL) + PIN;
-                  *pinctrl = pinctrl_value;
+               register8_t *pinctrl = &(base().PIN0CTRL) + (port_pin & 0x07);
+               *pinctrl = pinctrl_value;
             }
+
+            return *this;
          }
 
-         constexpr auto operator()() -> bool
-         {
-            return PORT::vport().IN &= (~bitmask());
+         auto operator()() -> bool {
+            return vbase().IN & (~mask());
          }
 
-         constexpr auto set(const bool value = true) -> void
-         {
-            if (value)
-            {
-               PORT::vport() |= bitmask();
-            }
-            else
-            {
+         auto set(const bool value = true) -> void {
+            if (value) {
+               vbase().OUT |= mask();
+            } else {
                clear();
             }
          }
 
-         constexpr auto clear() -> void
-         {
-            PORT::vport() &= ~bitmask();
+         auto clear() -> void {
+            vbase().OUT &= 1; //~mask();
          }
 
-         constexpr auto toggle() -> void
-         {
-            PORT::vport() ^= bitmask();
+         auto toggle() -> void {
+            vbase().OUT ^= mask();
          }
-
-         // Configure the pin based on the options
-         constexpr void configure_pin()
-         {
-            // Configure pin direction
-            if constexpr (_DIR == dir_t::out)
-            {
-               PORT::port->DIR |= (1 << PIN);
-            }
-            else
-            {
-               PORT::port->DIR &= ~(1 << PIN);
-            }
-         }
-
       private:
-
-    // Compute PINCTRL register value by summing options that inherit from pinctrl_t
-    template<typename... OPTS>
-    static constexpr uint8_t compute_pinctrl() {
-        uint8_t result = 0;
-        ((result |= static_cast<uint8_t>(std::is_base_of_v<pinctrl_t, OPTS> ? OPTS::value : 0)), ...);
-        return result;
-    }
+         // Compute PINCTRL register value by summing options that inherit from pinctrl_t
+         template<typename... OPTS>
+         static constexpr uint8_t compute_pinctrl() {
+            uint8_t result = 0;
+            ((result |= static_cast<uint8_t>(std::is_base_of_v<pinctrl_t, OPTS> ? OPTS::value : 0)), ...);
+            return result;
+         }
       };
-
    } // End of ioport namespace
 }
 

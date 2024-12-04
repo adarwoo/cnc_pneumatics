@@ -8,7 +8,6 @@
 using namespace asx;
 
 namespace relay {
-
    //
    // Implement all the callbacks
    //
@@ -25,7 +24,7 @@ namespace relay {
 
       // If address is 0, keep all, if 1 remove the first etc..
       value >>= addr;
-      
+
       // Mask to keep the count
       value &= (1 << qty) - 1;
 

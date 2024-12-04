@@ -2,8 +2,19 @@
 
 #include "board.h"
 #include "relay_ctrl.hpp"
+#include <asx/ioport.hpp>
 
 namespace relay {
+   using namespace asx::ioport;
+
+   auto LED_A = Pin{B, 1};
+   auto LED_B = Pin{B, 0};
+   auto LED_C = Pin{A, 2};
+
+   auto RELAY_A = Pin{B, 3};
+   auto RELAY_B = Pin{A, 7};
+   auto RELAY_C = Pin{A, 6};
+
    auto relays = std::array<RelayCtrl, 3> {
       RelayCtrl(LED_A, RELAY_A),
       RelayCtrl(LED_B, RELAY_B),
