@@ -6,7 +6,7 @@
 namespace pca9555 {
 
    /**
-    * Reactor handle for when some data should be ready from the i2c
+    * Called from the interrupt
     */
    static inline void _i2c_on_complete(status_code_t status)
    {

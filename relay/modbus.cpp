@@ -16,11 +16,11 @@ namespace relay {
 
       Datagram::pack( uint8_t{1} ); // Number of bytes returned
 
-      uint8_t value = get_relay(2).status();
+      uint8_t value = status(2);
       value <<=1;
-      value |= get_relay(2).status();
+      value |= status(1);
       value <<=1;
-      value |= get_relay(2).status();
+      value |= status(0);
 
       // If address is 0, keep all, if 1 remove the first etc..
       value >>= addr;
@@ -39,9 +39,9 @@ namespace relay {
       LOG_TRACE("RELAY", "%d - %d", index, operation);
 
       switch ( operation ) {
-         case 0x0000: get_relay(index).clr(); break;
-         case 0xFF00: get_relay(index).set(); break;
-         case 0x5500: get_relay(index).tgl(); break;
+         case 0x0000: set(index, false); break;
+         case 0xFF00: set(index); break;
+         case 0x5500: set(index, !status(index)); break;
          default:                        break;
       }
    }
@@ -50,7 +50,7 @@ namespace relay {
       LOG_TRACE("RELAY", "%.2x", values);
 
       for ( uint8_t i=0; i<3; ++i ) {
-         get_relay(i).set( values & 1 );
+         set( i, values & 1 );
          values >>= 1;
       }
    }

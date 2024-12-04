@@ -1,13 +1,42 @@
 #pragma once
 
-#include <cstdint>
-#include <type_traits>
-
+#include <stdint.h>
 #include <avr/io.h>
 
 
 namespace asx
 {
+   // Provide own traits to remove need for stdlib
+   namespace std {
+        template <typename Base, typename Derived>
+        concept is_base_of = requires(Derived* d) {
+            { static_cast<Base*>(d) };
+        };
+
+        template <typename Base, typename Derived>
+        inline constexpr bool is_base_of_v = is_base_of<Base, Derived>;
+
+        template <class T, T V>
+        struct integral_constant {
+            using type = integral_constant;
+            static constexpr T value = V;
+        };
+
+        using true_type = integral_constant<bool, true>;
+        using false_type = integral_constant<bool, false>;
+
+        template <class, class>
+        struct is_same : false_type {};
+
+        template <class T>
+        struct is_same<T, T> : true_type {};
+
+        template <typename T1, typename T2>
+        inline constexpr bool is_same_v = is_same<T1, T2>::value;
+
+        using uintptr_t = uintptr_t;
+   }
+
    namespace ioport
    {
       using port_pin_t = uint8_t;
@@ -125,20 +154,23 @@ namespace asx
       constexpr auto B = Port{1};
       constexpr auto C = Port{2};
 
+      // Extract 
+      template <typename Target, typename First, typename... Rest>
+      constexpr Target extract_argument(First first, Rest... rest) {
+         if constexpr (std::is_same_v<First, Target>) {
+            return first; // Found the value
+         } else {
+            return extract_argument<Target>(rest...); // Recurse
+         }
+      }
+
       // Pin object holding a value
-      class Pin {
+      class PinDef {
+      protected:
          port_pin_t port_pin;
 
-         template <typename Target, typename First, typename... Rest>
-         constexpr Target extract_argument(First first, Rest... rest) {
-            if constexpr (std::is_same_v<First, Target>) {
-               return first; // Found the value
-            } else {
-               return extract_argument<Target>(rest...); // Recurse
-            }
-         }
       public:
-         constexpr Pin(const Port port, const uint8_t pin) : port_pin((port.index() * 8U) + pin) {}
+         constexpr PinDef(const Port port, const uint8_t pin) : port_pin((port.index() * 8U) + pin) {}
 
          inline constexpr Port port() const {
             uint8_t index = port_pin >> 8;
@@ -156,7 +188,20 @@ namespace asx
          inline constexpr mask_t mask() const {
             return 1U << (port_pin & 0x07);
          }
+      };
 
+      // Pin object holding a value
+      class Pin : public PinDef {
+         template <typename Target, typename First, typename... Rest>
+         constexpr Target extract_argument(First first, Rest... rest) {
+            if constexpr (std::is_same_v<First, Target>) {
+               return first; // Found the value
+            } else {
+               return extract_argument<Target>(rest...); // Recurse
+            }
+         }
+
+      public:
          inline Pin& set_output() {
             vbase().OUT |= mask();
 
@@ -167,7 +212,7 @@ namespace asx
          inline constexpr Pin& init(T... args) {
             constexpr bool has_value = (std::is_same_v<T, value> || ...);
 
-            if (has_value) {
+            if constexpr (has_value) {
                value v = extract_argument<value>(args...);
 
                if (v == value::low) {
@@ -179,7 +224,7 @@ namespace asx
 
             constexpr bool has_dir = (std::is_same_v<T, dir> || ...);
 
-            if (has_dir) {
+            if constexpr (has_dir) {
                dir dir_value = extract_argument<dir>(args...);
 
                if (dir_value == dir::in) {
@@ -200,7 +245,7 @@ namespace asx
             return *this;
          }
 
-         auto operator()() -> bool {
+         auto operator*() -> bool {
             return vbase().IN & (~mask());
          }
 
@@ -208,12 +253,12 @@ namespace asx
             if (value) {
                vbase().OUT |= mask();
             } else {
-               clear();
-            }
+               vbase().OUT &= ~mask();
+           }
          }
 
          auto clear() -> void {
-            vbase().OUT &= 1; //~mask();
+            vbase().OUT &= ~mask();
          }
 
          auto toggle() -> void {
