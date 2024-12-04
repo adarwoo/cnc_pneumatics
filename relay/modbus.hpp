@@ -7,7 +7,7 @@
 
 
 namespace relay {
-   // All APIs declared in datagram.h
+   // All APIs declared in datagram.hpp
 
    // Our relay modbus rtu slave templated class
    using modbus_slave = asx::modbus::Slave<Datagram, board::Uart>;

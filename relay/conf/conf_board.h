@@ -2,21 +2,10 @@
 #define BOARD_H_
 
 // Tracing
-#define TRACE_INFO IOPORT_CREATE_PIN(PORTA, 3)
-#define TRACE_WARN IOPORT_CREATE_PIN(PORTA, 5)
-#define TRACE_ERR  IOPORT_CREATE_PIN(PORTB, 2)
+#define DEBUG_REACTOR_IDLE IOPORT_CREATE_PIN(PORTA, 3)
+#define DEBUG_REACTOR_BUSY IOPORT_CREATE_PIN(PORTA, 5)
 
-// Leds
-//#define RELAY_A IOPORT_CREATE_PIN(PORTB, 3)
-//#define RELAY_B IOPORT_CREATE_PIN(PORTA, 7)
-//#define RELAY_C IOPORT_CREATE_PIN(PORTA, 6)
-
-
-/************************************************************************/
-/* UART                                                                 */
-/************************************************************************/
-#define RS485_UART UART0
-#define RS485_XDIR_PIN IOPORT_CREATE_PIN(PORTA, 4)
+#define ALERT_OUTPUT_PIN  IOPORT_CREATE_PIN(PORTB, 2)
 
 
 #endif /* BOARD_H_ */

@@ -27,7 +27,7 @@ namespace asx {
 
       ///< Shortcut for the C++ handle
       using Handler = reactor_handler_t;
-      
+
       ///< Shortcut for the C++ mask
       using mask = reactor_mask_t;
 
@@ -173,17 +173,23 @@ namespace asx {
       template <typename... Args>
       static constexpr mask mask_of(Handle a, Args... args) {
          mask m = reactor_mask_of(a);
-         
+
          // Use a fold expression to OR m with the masks of the remaining handles
          ((m |= reactor_mask_of(args)), ...);
-    
+
          return m;
       }
-      
+
       static inline void clear(mask m) { reactor_clear(m); }
 
       static inline void notify_from_isr(Handle on_xx) { reactor_null_notify_from_isr(on_xx); }
+
+      extern "C" void sysclk_init();
+
       static inline void init() {
+         // Configure the system clock according to the conf/conf_clock.h
+         sysclk_init();
+
          reactor_init();
          timer_init();
       }
