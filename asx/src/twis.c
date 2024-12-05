@@ -320,3 +320,8 @@ void TWI_SlaveTransactionFinished(TWI_Slave_t *twi, uint8_t result)
 	twi->result = result;
 	twi->status = TWIS_STATUS_READY;
 }
+
+ISR(TWI0_TWIS_vect)
+{
+   TWI_SlaveInterruptHandler(&slave);
+}

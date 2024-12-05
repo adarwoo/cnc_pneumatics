@@ -69,15 +69,24 @@ namespace asx {
             reactor_notify(handle, nullptr);
          }
 
+         void operator()() {
+            reactor_notify(handle, nullptr);
+         }
+
+         template <typename T>
+         inline void operator()(T arg) {
+            reactor_notify(handle, reinterpret_cast<void*>(static_cast<uintptr_t>(arg)));
+         }
+
          // Notify function for one argument
          template <typename T>
-         void notify(T arg) {
+         inline void notify(T arg) {
             reactor_notify(handle, reinterpret_cast<void*>(static_cast<uintptr_t>(arg)));
          }
 
          // Notify function for two arguments, packing them into a single 32-bit value
          template <typename T1, typename T2>
-         void notify(T1 arg1, T2 arg2) {
+         inline void notify(T1 arg1, T2 arg2) {
             uint32_t packed = pack(static_cast<uint8_t>(arg1), static_cast<uint8_t>(arg2));
             reactor_notify(handle, reinterpret_cast<void*>(static_cast<uintptr_t>(packed)));
          }

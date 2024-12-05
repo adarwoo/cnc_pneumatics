@@ -9,16 +9,16 @@
 #include "modbus.hpp"
 
 
-using namespace asx;
-
 int main()
 {
+   using namespace asx;
+
    // Initialise the reactor and the timer
    reactor::init();
 
    // Ready the relay control
    relay::init();
-
+   
    // Initialise the modbus slave template API
    relay::modbus_slave::init();
 

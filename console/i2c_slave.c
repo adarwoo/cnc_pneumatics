@@ -45,7 +45,4 @@ void i2c_slave_init(reactor_handle_t react_i2c_handler)
    TWI_SlaveInitializeModule(&slave, TWI_SLAVE_ADDR);
 }   
 
-ISR(TWI0_TWIS_vect)
-{
-   TWI_SlaveInterruptHandler(&slave);
-}
+
