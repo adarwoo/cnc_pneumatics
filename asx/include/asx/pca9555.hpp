@@ -12,7 +12,7 @@ namespace pca9555
       configure = 6,
    };
    
-   <typename I2CMASTER, uint8_t ADDRESS, uint16_t dir, uint16_t pol>
+   template<uint8_t ADDRESS, uint16_t dir, uint16_t pol>
    class PCA9555
    {
       ///< Address of the device
@@ -21,7 +21,7 @@ namespace pca9555
       uint8_t buffer[2];
 
    public:
-      static init(reactor_handle complete) {
+      static init(reactor::Handle complete) {
          static auto bind_this = [this, complete]() {
             this->init(complete);
          };
