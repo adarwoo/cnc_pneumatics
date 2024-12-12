@@ -56,64 +56,66 @@ pca1->init ---> pca1->init ---> pca2->init ---> pca2->init ---> sequencer ---> p
 reactor::bind(i2c_sequencer)();
 
 // Called every 10ms
-void i2c_sequencer() {
+class Sequencer {
+    ///< Debouncer for the inputs
+    static inline auto debouncers = std::array<2, Debouncer>{};
 
     struct StateMachine {
+        static inline auto pca1 = PCA1;
+        static inline auto pca2 = PCA2;
+
+        struct next {};
+        struct input_read { uint16_t value; }
+        static inline asx::chrono::time_point t;
+
         // Internal SM
         auto operator()() {
             using namespace boost::sml;
 
-            auto start_timer = [] () { Timer::start(); };
-            auto reset       = [] () { Datagram::reset(); };
-            auto ready_reply = [] () { Datagram::ready_reply(); };
-            auto reply       = [] () { Uart::send(Datagram::get_buffer()); };
-
-            auto handle_char = [] (const auto& event) {
-                Timer::start(); // Restart the timers (15/35/40)
-                Datagram::process_char(event.c);
-            };
+            auto init_pca1    = [] () { pca1.init(on_next); };
+            auto init_pca2    = [] () { pca2.init(on_next); };
+            auto process_pca1 = [] (const input_read& v) {   };
+            auto process_pca2 = [] () {  };
 
             return make_transition_table(
-            * "cold"_s                + event<can_start_receiving>                    = "initial"_s
-            , "initial"_s             + on_entry<_>                     / start_timer
-            , "initial"_s             + event<t35_timeout>                            = "idle"_s
-            , "initial"_s             + event<char_received>            / start_timer = "initial"_s
-            , "idle"_s                + on_entry<_>                     / reset
-            , "idle"_s                + event<char_received>            / handle_char = "reception"_s
-            , "idle"_s                + event<demand_of_emission>                     = "emission"_s
-            , "reception"_s           + event<t15_timeout>                            = "control_and_waiting"_s
-            , "reception"_s           + event<char_received>            / handle_char = "reception"_s
-            , "control_and_waiting"_s + event<t35_timeout> [must_reply]               = "reply"_s
-            , "control_and_waiting"_s + event<char_received>                          = "initial"_s
-            , "control_and_waiting"_s + event<t35_timeout>                            = "idle"_s
-            , "reply"_s               + on_entry<_>                     / ready_reply
-            , "reply"_s               + event<char_received>            / handle_char = "initial"_s // Unlikely - but a possibility
-            , "reply"_s               + event<t40_timeout>                            = "emission"_s
-            , "emission"_s            + on_entry<_>                     / reply
-            , "emission"_s            + event<frame_sent>                             = "initial"_s
+            * "initialising_pca1"_s + on_entry<_>    / init_pca1
+            , "initialising_pca1"_s + next           / init_pca2   = "initialising_pca2"_s
+            , "initialising_pca2"_s + next           / set_timer   = "sampling_pca1"_s
+            , "sampling_pca1"_s     + on_entry<_>    / sample_pca1
+            , "sampling_pca1"_s     + input_read     / process_in  = "sampling_pca2"_s
+            , "sampling_pca2"_s     + on_entry<_>    / sample_pca2
+            , "sampling_pca2"_s     + input_read     / process_in  = "debouncing"_s
+            , "debouncing"_s        + next                         = "sampling_pca1"_s
             );
+        }
+    };
 
-    static auto pca1 = PCA1;
-    static auto pca2 = PCA2;
+    ///< The overall modbus state machine
+    inline static auto sm = boost::sml::sm<StateMachine>{};
 
-    static enum { init_pca1, init_pca2, rw1, rw2 } stage = init_pca1;
+public:
+    static void on_next() {
+        sm.process_event(StateMachine::next);
+    }
 
-    switch ( stage )
-    {
-    case init_pca1:
-        pca1.init(i2c_sequencer);
-        break;
-    case init_pca2:
-        pca2.init(i2c_sequencer);
-        break;
-    case rw1:
-        pca1.readwrite(fb, i2c_on_read1);
-        break;
-    case rw2:
-        pca1.readwrite(fb, i2c_on_read1);
-        break;
-    default:
-        break;
+    static void process_in(uint8_t data) {
+        using namespace boost::sml;
+        uint8_t index = 0;
+
+        if ( sm.is("sampling_pca1"_s) ) {
+            index = 1;
+        }
+        
+        //integrator[index].integrate(data);
+
+        //
+
+        sm.process_event(StateMachine::next{read});
+    }
+
+    static void set_timer() {
+        asx::chrono::clock
+        sm.process_event(StateMachine::next{read});
     }
 
 
