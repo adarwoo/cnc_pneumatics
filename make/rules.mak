@@ -36,16 +36,16 @@ FLASH_END := \
 CPPFLAGS        += $(foreach p, $(INCLUDE_DIRS), -I$(p)) -D$(if $(NDEBUG),NDEBUG,DEBUG)=1 -DCRC_AT=$(strip $(FLASH_END))
 
 # Flags for the compilation of C files
-CFLAGS          += -ggdb3 -Wall
+CFLAGS          += -Wall -gdwarf-2
 
 # Flags for the compilation of C++ files
-CXXFLAGS        += $(CFLAGS) -std=c++17 -fno-exceptions
+CXXFLAGS        += $(CFLAGS) -std=c++20 -fno-exceptions -fno-rtti -fext-numeric-literals
 
 # Assembler flags
-ASFLAGS         += -Wa,-gdwarf2 -x assembler-with-cpp -Wa,-g
+ASFLAGS         += -Wa,-gdwarf-2 -x assembler-with-cpp -Wa,-g
 
 # Flag for the linker
-LDFLAGS         += -ggdb3
+LDFLAGS         += -gdwarf-2
 
 # Dependencies creation flags
 DEPFLAGS         = -MT $@ -MMD -MP -MF $(BUILD_DIR)/$*.d
@@ -73,13 +73,10 @@ BUILDDIRS        = $(sort $(dir $(OBJS)))
 
 all : $(BUILDDIRS) $(BIN)$(BIN_EXT)
 
-sim :
-	$(MUTE)$(MAKE) --no-print-directory $(MAKEFLAGS) SIM=1 all
-
 -include $(RCDEP_FILES)
 
 # Create the build directory
-$(BUILD_DIR): ; @-mkdir -p $@
+$(BUILD_DIR): ; $(MUTE)-mkdir -p $@
 
 $(BIN)$(BIN_EXT) : $(BUILD_DIR)/$(BIN)$(BIN_EXT)
 	@echo Copying $^ to $@
@@ -108,6 +105,11 @@ $(BUILD_DIR)/%.rcd : %.json
 	$(MUTE)[ -d $(@D) ] || mkdir -p $(@D)
 	$(MUTE)$(COMPILE.rc) $@ $<
 
+%.hpp : %.conf.py
+	@echo Generating $@ interface header code from $<
+	$(MUTE)[ -d $(@D) ] || mkdir -p $(@D)
+	$(MUTE)PYTHONPATH=$(TOP)/make $< -o$@
+
 # Add the CRC of the code to enable integrity check of the code
 # $(BUILD_DIR)/$(BIN)_crc$(BIN_EXT) : $(BUILD_DIR)/$(BIN)$(BIN_EXT)
 
@@ -124,7 +126,7 @@ endef
 # Build directory creation
 #
 $(BUILDDIRS) :
-	$(MKDIR) "$@"
+	$(MUTE)$(MKDIR) "$@"
 
 # Include the .d if they exists
 -include $(DEP_FILES)
@@ -133,4 +135,5 @@ $(BUILDDIRS) :
 # Clean rules
 #
 clean:
-	rm -rf $(BUILD_DIR)
+	@echo Removing build directory: $(BUILD_DIR) 
+	$(MUTE)rm -rf $(BUILD_DIR)

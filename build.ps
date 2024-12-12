@@ -1,0 +1,43 @@
+# Set up read-only variables
+$image = "cnc_pneumatics:latest"
+$hostname_ = "cnc_pneumatics"
+
+# Exit with error on failure
+$ErrorActionPreference = "Stop"
+
+# Check if Docker is installed
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "Could not find 'docker'. You must install docker first"
+    exit 1
+}
+
+# If the Docker image does not yet exist, build it
+if (-not (docker images $image -q)) {
+    docker build -t $image docker
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to build the docker image"
+        exit 1
+    }
+}
+
+# Variables
+$this_script_dir = (Get-Location).Path
+$base_opts = "-u $([System.Security.Principal.WindowsIdentity]::GetCurrent().User | Out-String).Trim() -v $this_script_dir:$this_script_dir"
+$workdir = (Resolve-Path ".").Path
+
+# Name the runtime container uniquely
+$container_name = "AVR_$(Get-Command id -u)_" + (Get-Date -Format "yyyyMMdd-HHmmss")
+
+# Detect number of CPUs. Environment variable J can override the value. If no value given, then 1 is used
+$core_count = if ($env:J) {
+    if ($env:J -gt 0) { $env:J } else { 1 }
+} else {
+    (Get-CimInstance Win32_Processor | Measure-Object -Property NumberOfCores -Sum).Sum
+}
+
+# Run make or start a shell
+if ($args[0] -eq "shell") {
+    docker run -ti --rm --init --name $container_name $xoptions -h $hostname_ $base_opts -w $workdir $image $args
+} else {
+    docker run -ti --rm --init --name $container_name -h $hostname_ $base_opts -w $workdir $image make -j$core_count $args
+}

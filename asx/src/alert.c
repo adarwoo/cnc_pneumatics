@@ -9,6 +9,7 @@
  * @{
  */
 #include <avr/wdt.h>
+
 #include <assert.h>
 #include <ioport.h>
 

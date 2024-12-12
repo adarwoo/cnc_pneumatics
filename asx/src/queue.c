@@ -102,7 +102,7 @@ bool queue_push_back(queue_t *queue, void *data)
 
     queue->head = (queue->head - 1 + queue->nelem) % queue->nelem;
     queue->buffer[queue->head] = data;
-    queue->length++;
+    ++queue->length;
 
     return true;
 }
@@ -112,7 +112,7 @@ bool queue_pop(queue_t *queue, void **data)
     assert(queue);
     assert(data);
 
-    if ( queue->length <= 0)
+    if ( queue->length == 0)
     {
         return false;
     }
@@ -133,7 +133,7 @@ void queue_push_ring(queue_t *queue, void *data)
 
     if (queue->length < queue->nelem)
     {
-        queue->length++;
+        ++queue->length;
     }
     else
     {

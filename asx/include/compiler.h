@@ -415,6 +415,7 @@ ERROR_FUNC(compiler_demux_bad_size, "Invalid parameter size");
  * becomes.
  */
 #if (defined __GNUC__)
+  #undef __always_inline
 	#define __always_inline     inline __attribute__((__always_inline__))
 #elif (defined __ICCAVR__)
 	#define __always_inline     _Pragma("inline=forced")
@@ -743,6 +744,8 @@ static inline int_fast8_t ilog2(uint32_t x)
  */
 //! @{
 
+// min/max are defined the std lib
+#ifndef __cplusplus
 /*! \brief Takes the absolute value of \a a.
  *
  * \param a Input value.
@@ -781,7 +784,7 @@ static inline int_fast8_t ilog2(uint32_t x)
 #define max(a, b)           Max(a, b)
 
 //! @}
-
+#endif
 
 /*! \brief Calls the routine at address \a addr.
  *

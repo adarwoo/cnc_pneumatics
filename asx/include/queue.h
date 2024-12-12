@@ -1,3 +1,5 @@
+#ifndef easy_queue_HAS_ALREADY_BEEN_INCLUDED
+#define easy_queue_HAS_ALREADY_BEEN_INCLUDED
 /**
  * @brief A typical queue and ring buffer static implementation in ANSI C.
  * Static implementations are really fast, portable (if you're not bothered
@@ -15,19 +17,14 @@
  * will be used for all further queues. That's the price to pay for the
  * speed of static implementations.
  */
-
-#ifndef __EASY_QUEUE_H
-#define __EASY_QUEUE_H
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include <assert.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-
 
 typedef struct
 {
@@ -132,8 +129,33 @@ bool queue_pop(queue_t *queue, void **data);
  */
 void queue_push_ring(queue_t *queue, void *data);
 
+/**
+ * Inline version for ISRs where the queue is known to be of size 1
+ */
+inline static void queue_store_single(queue_t *queue, void *data)
+{
+	assert(queue->nelem == 1);
+	
+	*queue->buffer = data;
+	queue->length = 1;
+	queue->head = 0;
+	queue->tail = 1;
+}
+
+/**
+ * Inline version for ISRs where the queue is known to be of size 1
+ */
+inline static void queue_null_store(queue_t *queue)
+{
+	assert(queue->nelem == 1);
+	queue->length = 1;
+	queue->head = 0;
+	queue->tail = 1;
+}
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif // ndef easy_queue_HAS_ALREADY_BEEN_INCLUDED

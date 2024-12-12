@@ -3,7 +3,7 @@
  *
  * Created: 07/05/2024 15:58:32
  *  Author: micro
- */ 
+ */
 #include <avr/interrupt.h>
 
 #include "reactor.h"
@@ -47,7 +47,7 @@ static reactor_handle_t _react_accept_comms;
 /* Local functions                                                      */
 /************************************************************************/
 
-/** 
+/**
  * Apply the given command without filter
  *
  * Make sure to turn off all unused, and on the one valve
@@ -84,17 +84,17 @@ static void _protocol_process(opcodes_cmd_t cmd)
    default:
       break;
    }
-   
+
    // Do not allow a new command to be accounted for in the next T cycle
    _ready_to_accept_new_command = false;
-   
+
    // If a timer is already running, cancel it
    if ( _ready_to_accept_timer_instance != TIMER_INVALID_INSTANCE )
    {
       timer_cancel(_ready_to_accept_timer_instance);
    }
-   
-   // Start a new timer 
+
+   // Start a new timer
    _ready_to_accept_timer_instance = timer_arm(
       _react_accept_comms,
       timer_get_count_from_now(NO_NEW_COMMAND_GRACE_PERIOD),
@@ -112,11 +112,11 @@ static void _on_check_comms(void *arg)
    {
       // Reset all valves
       _protocol_process(opcodes_cmd_idle);
-      
+
       // Assume the system is idle
       _current_cmd = opcodes_cmd_idle;
    }
-   
+
    _message_received_counter = 0;
 }
 
@@ -126,7 +126,7 @@ static void _on_check_comms(void *arg)
 static void _on_accept_command_again(void *arg)
 {
    _ready_to_accept_new_command = true;
-   
+
    // Mark as unused
    _ready_to_accept_timer_instance = TIMER_INVALID_INSTANCE;
 }
@@ -143,31 +143,31 @@ static void _on_accept_command_again(void *arg)
 void protocol_handle_traffic(void *arg)
 {
    opcodes_cmd_t cmd = (opcodes_cmd_t)arg;
-   
+
    // Make sure the value is valid
    if ( opcodes_check_cmd_valid(cmd) )
    {
       // The increase the counter, make sure we are receiving and the content is valid
       ++_message_received_counter;
-      
+
       if ( _current_cmd != cmd && _ready_to_accept_new_command )
       {
          _current_cmd = cmd;
-         
+
          _protocol_process(cmd);
-      } 
+      }
    }
 }
 
 
 void protocol_init(void)
 {
-   _react_accept_comms = reactor_register( _on_accept_command_again, PROTOCOL_CMD_PRIO, 1);
-   _react_check_comms = reactor_register( _on_check_comms, PROTOCOL_CMD_PRIO, 1);
+   _react_accept_comms = reactor_register( _on_accept_command_again, PROTOCOL_CMD_PRIO);
+   _react_check_comms = reactor_register( _on_check_comms, PROTOCOL_CMD_PRIO);
 
    // Kick start checking for the communication
    timer_arm(
-      _react_check_comms, 
+      _react_check_comms,
       timer_get_count_from_now(TIMER_SECONDS(5)),
       TIMER_SECONDS(2), // Repeat every 2 seconds
       0

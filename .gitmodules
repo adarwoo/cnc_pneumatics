@@ -1,0 +1,8 @@
+[submodule "libstdc++"]
+	path = libstdc++
+	url = https://github.com/modm-io/avr-libstdcpp.git
+
+[submodule "etl"]
+	path = etl
+    url = https://github.com/adarwoo/etl.git
+

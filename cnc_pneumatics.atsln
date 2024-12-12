@@ -14,10 +14,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7E2BE5AE-FEA
 		asx\src\_ccp.s = asx\src\_ccp.s
 		asx\src\alert.c = asx\src\alert.c
 		asx\src\builtin.cpp = asx\src\builtin.cpp
-		asx\src\ccp.c = asx\src\ccp.c
 		asx\src\digital_input.c = asx\src\digital_input.c
 		asx\src\digital_output.c = asx\src\digital_output.c
+		asx\src\hw_timer.cpp = asx\src\hw_timer.cpp
 		asx\src\mem.c = asx\src\mem.c
+		asx\src\pca9555.cpp = asx\src\pca9555.cpp
 		asx\src\piezzo.c = asx\src\piezzo.c
 		asx\src\queue.c = asx\src\queue.c
 		asx\src\reactor.c = asx\src\reactor.c
@@ -33,17 +34,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{2B38
 		asx\include\board.h = asx\include\board.h
 		asx\include\builtin.hpp = asx\include\builtin.hpp
 		asx\include\ccp.h = asx\include\ccp.h
+		asx\include\asx\chrono.hpp = asx\include\asx\chrono.hpp
 		asx\include\compiler.h = asx\include\compiler.h
 		asx\include\cpp.h = asx\include\cpp.h
 		asx\include\debug.h = asx\include\debug.h
+		asx\include\asx\deferred.hpp = asx\include\asx\deferred.hpp
 		asx\include\digital_input.h = asx\include\digital_input.h
 		asx\include\digital_output.h = asx\include\digital_output.h
+		asx\include\asx\hw_timer.hpp = asx\include\asx\hw_timer.hpp
+		asx\include\utils\interrupt.h = asx\include\utils\interrupt.h
 		asx\include\ioport.h = asx\include\ioport.h
 		asx\include\mem.h = asx\include\mem.h
 		asx\include\osc.h = asx\include\osc.h
+		asx\include\pca9555.h = asx\include\pca9555.h
 		asx\include\piezzo.h = asx\include\piezzo.h
+		asx\include\asx\priority.hpp = asx\include\asx\priority.hpp
 		asx\include\queue.h = asx\include\queue.h
 		asx\include\reactor.h = asx\include\reactor.h
+		asx\include\asx\reactor.hpp = asx\include\asx\reactor.hpp
 		asx\include\sound.h = asx\include\sound.h
 		asx\include\sysclk.h = asx\include\sysclk.h
 		asx\include\timer.h = asx\include\timer.h
@@ -51,6 +59,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{2B38
 		asx\include\twim.h = asx\include\twim.h
 		asx\include\twis.h = asx\include\twis.h
 		asx\include\typestring.hpp = asx\include\typestring.hpp
+		asx\include\asx\uart.hpp = asx\include\asx\uart.hpp
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{DF6E1EA5-BDA6-4CE6-BB93-9164EC48B8ED}"
@@ -66,6 +75,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "make", "make", "{84F229B0-7
 		make\studio.mak = make\studio.mak
 	EndProjectSection
 EndProject
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "relay", "relay\relay.cppproj", "{DE433324-A70A-460F-B7D3-5611B75574EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -73,13 +84,15 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.ActiveCfg = Debug|AVR
-		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.Build.0 = Debug|AVR
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.ActiveCfg = Release|AVR
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.Build.0 = Release|AVR
 		{5764C427-76A3-4304-9E24-98CF13FBBA9D}.Debug|AVR.ActiveCfg = Debug|AVR
-		{5764C427-76A3-4304-9E24-98CF13FBBA9D}.Debug|AVR.Build.0 = Debug|AVR
 		{5764C427-76A3-4304-9E24-98CF13FBBA9D}.Release|AVR.ActiveCfg = Release|AVR
 		{5764C427-76A3-4304-9E24-98CF13FBBA9D}.Release|AVR.Build.0 = Release|AVR
+		{DE433324-A70A-460F-B7D3-5611B75574EF}.Debug|AVR.ActiveCfg = Debug|AVR
+		{DE433324-A70A-460F-B7D3-5611B75574EF}.Debug|AVR.Build.0 = Debug|AVR
+		{DE433324-A70A-460F-B7D3-5611B75574EF}.Release|AVR.ActiveCfg = Release|AVR
+		{DE433324-A70A-460F-B7D3-5611B75574EF}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

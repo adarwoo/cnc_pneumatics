@@ -71,7 +71,11 @@ extern "C" {
  * \param pin IOPORT zero-based index of the I/O pin
  */
 #define IOPORT_CREATE_PIN(port, pin) ((IOPORT_ ## port) * 8 + (pin))
+#ifdef SIM
+#define IOPORT_BASE_ADDRESS SIM_OFFSET(0x400)
+#else
 #define IOPORT_BASE_ADDRESS 0x400
+#endif
 #define IOPORT_VBASE_ADDRESS 0x0000
 #define IOPORT_PORT_OFFSET  0x20
 #define IOPORT_PORT_VOFFSET  0x4
@@ -106,7 +110,7 @@ typedef uint8_t ioport_pin_t;
 typedef uint8_t ioport_port_t;
 typedef uint8_t ioport_port_mask_t;
 
-__always_inline static ioport_port_t ioport_create_pin(ioport_port_t port, uint8_t pin)
+__always_inline static ioport_pin_t ioport_create_pin(ioport_port_t port, uint8_t pin)
 {
    return (port * 8) + pin;
 }

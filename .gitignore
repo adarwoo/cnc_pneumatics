@@ -6,3 +6,7 @@
 **/*.lss
 **/*.elf
 **/*.eep
+**__pycache__
+relay/relay
+relay/sim/
+
